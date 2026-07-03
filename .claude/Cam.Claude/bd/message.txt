@@ -1,0 +1,229 @@
+## Table `audit_log`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `id` | `uuid` | Primary |
+| `table_name` | `varchar` |  |
+| `record_id` | `uuid` |  |
+| `action` | `varchar` |  |
+| `changed_by` | `uuid` |  Nullable |
+| `old_data` | `jsonb` |  Nullable |
+| `new_data` | `jsonb` |  Nullable |
+| `changed_at` | `timestamptz` |  |
+
+## Table `users`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `id` | `uuid` | Primary |
+| `email` | `varchar` |  Unique |
+| `full_name` | `varchar` |  |
+| `role` | `user_role` |  |
+| `state_code` | `int2` |  |
+| `created_at` | `timestamptz` |  |
+| `updated_at` | `timestamptz` |  |
+
+## Table `news_categories`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `id` | `uuid` | Primary |
+| `name` | `varchar` |  |
+| `slug` | `varchar` |  Unique |
+| `active` | `bool` |  |
+| `created_at` | `timestamptz` |  |
+
+## Table `news`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `id` | `uuid` | Primary |
+| `title` | `varchar` |  |
+| `slug` | `varchar` |  Unique |
+| `excerpt` | `text` |  Nullable |
+| `content` | `text` |  |
+| `image_url` | `text` |  Nullable |
+| `image_alt` | `varchar` |  Nullable |
+| `status` | `news_status` |  |
+| `category_id` | `uuid` |  Nullable |
+| `author_id` | `uuid` |  |
+| `published_at` | `timestamptz` |  Nullable |
+| `created_at` | `timestamptz` |  |
+| `updated_at` | `timestamptz` |  |
+
+## Table `privacy_policy_versions`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `version` | `varchar` | Primary |
+| `description` | `text` |  |
+| `published_at` | `timestamptz` |  |
+
+## Table `pqrsd`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `id` | `uuid` | Primary |
+| `tracking_code` | `varchar` |  Unique |
+| `type` | `pqrsd_type` |  |
+| `is_anonymous` | `bool` |  |
+| `full_name` | `varchar` |  Nullable |
+| `doc_type` | `doc_type_enum` |  Nullable |
+| `doc_number` | `varchar` |  Nullable |
+| `email` | `varchar` |  Nullable |
+| `phone` | `varchar` |  Nullable |
+| `address` | `varchar` |  Nullable |
+| `address_detail` | `varchar` |  Nullable |
+| `city` | `varchar` |  Nullable |
+| `response_mode` | `response_mode` |  |
+| `subject` | `varchar` |  |
+| `description` | `text` |  |
+| `accepted_terms` | `bool` |  |
+| `terms_version` | `varchar` |  Nullable |
+| `terms_accepted_at` | `timestamptz` |  Nullable |
+| `status` | `pqrsd_status` |  |
+| `admin_notes` | `text` |  Nullable |
+| `admin_response` | `text` |  Nullable |
+| `responded_at` | `timestamptz` |  Nullable |
+| `response_deadline` | `timestamptz` |  Nullable |
+| `is_overdue` | `bool` |  |
+| `scheduled_deletion_at` | `timestamptz` |  Nullable |
+| `created_at` | `timestamptz` |  |
+| `updated_at` | `timestamptz` |  |
+
+## Table `pqrsd_attachments`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `id` | `uuid` | Primary |
+| `pqrsd_id` | `uuid` |  |
+| `file_name` | `varchar` |  |
+| `original_name` | `varchar` |  |
+| `file_url` | `text` |  |
+| `mime_type` | `varchar` |  |
+| `file_size_bytes` | `int8` |  |
+| `is_clinical_doc` | `bool` |  |
+| `retention_until` | `timestamptz` |  Nullable |
+| `uploaded_at` | `timestamptz` |  |
+
+## Table `pages`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `id` | `uuid` | Primary |
+| `slug` | `varchar` |  Unique |
+| `title` | `varchar` |  |
+| `content` | `text` |  |
+| `meta_description` | `text` |  Nullable |
+| `updated_by` | `uuid` |  Nullable |
+| `updated_at` | `timestamptz` |  |
+
+## Table `documents`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `id` | `uuid` | Primary |
+| `title` | `varchar` |  |
+| `category` | `varchar` |  |
+| `document_series` | `varchar` |  Nullable |
+| `file_url` | `text` |  |
+| `description` | `text` |  Nullable |
+| `is_public` | `bool` |  |
+| `is_audit_doc` | `bool` |  |
+| `retention_years` | `int4` |  Nullable |
+| `retention_until` | `timestamptz` |  Nullable |
+| `uploaded_by` | `uuid` |  Nullable |
+| `uploaded_at` | `timestamptz` |  |
+| `updated_at` | `timestamptz` |  |
+
+## Table `gallery`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `id` | `uuid` | Primary |
+| `image_url` | `text` |  |
+| `image_alt` | `varchar` |  |
+| `caption` | `text` |  Nullable |
+| `category` | `varchar` |  Nullable |
+| `sort_order` | `int4` |  |
+| `created_at` | `timestamptz` |  |
+
+## Table `site_settings`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `key` | `varchar` | Primary |
+| `value` | `text` |  |
+| `updated_at` | `timestamptz` |  |
+
+## Table `contact_messages`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `id` | `uuid` | Primary |
+| `name` | `varchar` |  |
+| `email` | `varchar` |  |
+| `phone` | `varchar` |  Nullable |
+| `message` | `text` |  |
+| `is_read` | `bool` |  |
+| `retention_until` | `timestamptz` |  |
+| `created_at` | `timestamptz` |  |
+
+## Table `file_categories`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `id` | `uuid` | Primary |
+| `name` | `varchar` |  |
+| `active` | `bool` |  |
+| `created_at` | `timestamptz` |  |
+
+## Table `platform_files`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `id` | `uuid` | Primary |
+| `uploaded_by` | `uuid` |  |
+| `category_id` | `uuid` |  Nullable |
+| `file_name` | `varchar` |  |
+| `original_name` | `varchar` |  |
+| `file_path` | `text` |  |
+| `mime_type` | `varchar` |  |
+| `file_size_bytes` | `int8` |  |
+| `storage_bucket` | `varchar` |  |
+| `access_level` | `file_access` |  |
+| `description` | `text` |  Nullable |
+| `checksum_sha256` | `bpchar` |  Nullable |
+| `state_code` | `int2` |  |
+| `created_at` | `timestamptz` |  |
+| `updated_at` | `timestamptz` |  |
+| `deleted_at` | `timestamptz` |  Nullable |
+
