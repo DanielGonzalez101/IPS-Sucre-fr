@@ -13,7 +13,7 @@ export default function EquipoPage() {
     <div id="main-content">
 
       {/* ── Hero ── */}
-      <section className="equipo-hero" aria-labelledby="equipo-title">
+      <section className="equipo-hero equipo-hero--sm" aria-labelledby="equipo-title">
         <Image
           src="/images/hero-team.png"
           alt="Equipo del Cardiocentro Pediátrico de Sucre"

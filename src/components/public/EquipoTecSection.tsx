@@ -110,6 +110,16 @@ export function EquipoTecSection() {
           scrollTrigger: { trigger: ".equipo-tec-grid", start: "top 80%" },
         }
       );
+
+      const cards = sectionRef.current?.querySelectorAll(".equipo-tec-card");
+      cards?.forEach((card) => {
+        card.addEventListener("mouseenter", () =>
+          gsap.to(card, { y: -6, duration: 0.25, ease: "power2.out" })
+        );
+        card.addEventListener("mouseleave", () =>
+          gsap.to(card, { y: 0, duration: 0.25, ease: "power2.out" })
+        );
+      });
     },
     { scope: sectionRef }
   );

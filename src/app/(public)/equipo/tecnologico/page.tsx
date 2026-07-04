@@ -13,7 +13,7 @@ export default function EquipoTecPage() {
     <div id="main-content">
 
       {/* ── Hero ── */}
-      <section className="equipo-hero" aria-labelledby="equipo-tec-title">
+      <section className="equipo-hero equipo-hero--sm" aria-labelledby="equipo-tec-title">
         <Image
           src="/images/hero-2.png"
           alt="Equipos tecnológicos del Cardiocentro Pediátrico de Sucre"

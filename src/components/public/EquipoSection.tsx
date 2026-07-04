@@ -76,7 +76,7 @@ const groups: Group[] = [
 ];
 
 const CARDS_PER_VIEW = 3;
-const CARD_WIDTH = 270;
+const CARD_WIDTH = 216;
 const CARD_GAP = 20;
 
 function TeamCard({ name, role, specialty, formation, img }: TeamMember) {
@@ -201,7 +201,8 @@ export function EquipoSection() {
 
   return (
     <section ref={sectionRef} className="equipo-bento-section" aria-label="Equipo de profesionales">
-      <div className="container-main equipo-page-layout">
+      <div className="container-main">
+      <div className="equipo-page-layout">
 
         {/* Sidebar izquierdo */}
         <aside className="equipo-sidebar">
@@ -230,6 +231,7 @@ export function EquipoSection() {
           ))}
         </div>
 
+      </div>
       </div>
     </section>
   );
