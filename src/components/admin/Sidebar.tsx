@@ -16,6 +16,8 @@ import {
   Home,
   ChevronDown,
   SlidersHorizontal,
+  UserRound,
+  Cpu,
 } from "lucide-react";
 import { signOut } from "@/actions/auth";
 
@@ -29,6 +31,15 @@ const navGroups = [
       { href: "/hero", label: "Carrusel", Icon: SlidersHorizontal },
     ],
   },
+  {
+    key: "equipo",
+    label: "Equipo",
+    Icon: Users,
+    children: [
+      { href: "/equipo/humano",      label: "Equipo humano",      Icon: UserRound },
+      { href: "/equipo/tecnologico", label: "Equipo tecnológico", Icon: Cpu       },
+    ],
+  },
 ];
 
 // Items planos sin subcategorías
@@ -36,7 +47,6 @@ const navItems = [
   { href: "/dashboard",  label: "Dashboard",  Icon: LayoutDashboard },
   { href: "/paginas",    label: "Páginas",     Icon: FileText       },
   { href: "/servicios",  label: "Servicios",   Icon: Heart          },
-  { href: "/equipo",     label: "Equipo",      Icon: Users          },
   { href: "/normativa",  label: "Normativa",   Icon: BookOpen       },
   { href: "/pqrs",       label: "PQRS",        Icon: MessageSquare  },
   { href: "/usuarios",   label: "Usuarios",    Icon: UserCircle     },

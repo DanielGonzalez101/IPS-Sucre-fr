@@ -7,6 +7,8 @@ import { useGSAP } from "@gsap/react";
 import { gsap } from "@/lib/gsap";
 import { GraduationCap, ArrowUpRight, ArrowLeft, ArrowRight } from "lucide-react";
 
+import type { EquipoGrupo, EquipoMiembro } from "@/types";
+
 type TeamMember = {
   name: string;
   role: string;
@@ -20,60 +22,18 @@ type Group = {
   members: TeamMember[];
 };
 
-const groups: Group[] = [
-  {
-    title: "Personal Médico",
-    members: [
-      {
-        name: "Dra. Alicia Llach López",
-        role: "Médico Radiólogo especialista en diagnóstico por imágenes",
-        specialty: "Diagnóstico por Imágenes",
-        formation: ["Universidad del Salvador", "Buenos Aires, Argentina"],
-        img: "/personal Medico/Dra. Alicia Llach López/doctor2.png",
-      },
-      {
-        name: "Dr. Leandro Ruiz Moreno",
-        role: "Cardiólogo Pediatra",
-        specialty: "Cardiología Pediátrica",
-        formation: ["Hospital Garrahan", "Universidad de Buenos Aires", "Argentina"],
-        img: "/personal Medico/Dr. Leandro Ruiz Moreno/perso9.png",
-      },
-      {
-        name: "Mileinis Tilano Barraza",
-        role: "Tecnóloga en Radiología",
-        specialty: "Radiología",
-        formation: [],
-        img: "/personal Medico/Mileinis Tilano Barraza/perso14 (1).png",
-      },
-    ],
-  },
-  {
-    title: "Personal Administrativo",
-    members: [
-      {
-        name: "Julieth Contreras Romero",
-        role: "Administradora",
-        specialty: "Gestión Administrativa",
-        formation: [],
-        img: "/personal asistencial y administrativo/Julieth Contreras Romero/Administradora.png",
-      },
-      {
-        name: "José Quintero Pinzón",
-        role: "Auxiliar de Admisiones",
-        specialty: "Atención al Paciente",
-        formation: [],
-        img: "/personal asistencial y administrativo/José Quintero Pinzón/Auxiliar de Admisiones.png",
-      },
-      {
-        name: "Maura López Vergara",
-        role: "Asistente Administrativa",
-        specialty: "Gestión Administrativa",
-        formation: [],
-        img: "/personal asistencial y administrativo/Maura López Vergara/Asistente Admon..png",
-      },
-    ],
-  },
-];
+function mapToGroup(g: EquipoGrupo): Group {
+  return {
+    title: g.nombre,
+    members: g.miembros.map((m: EquipoMiembro) => ({
+      name: m.nombre,
+      role: m.cargo,
+      specialty: m.especialidad,
+      formation: m.formacion,
+      img: m.foto_url,
+    })),
+  };
+}
 
 const CARDS_PER_VIEW = 3;
 const CARD_WIDTH = 216;
@@ -89,6 +49,7 @@ function TeamCard({ name, role, specialty, formation, img }: TeamMember) {
           fill
           style={{ objectFit: "cover", objectPosition: "top center" }}
           sizes="280px"
+          unoptimized={img.startsWith("http")}
         />
         <div className="team-card-gradient" aria-hidden="true" />
       </div>
@@ -171,7 +132,8 @@ function GroupCarousel({ title, members }: Group) {
   );
 }
 
-export function EquipoSection() {
+export function EquipoSection({ grupos: gruposDB }: { grupos: EquipoGrupo[] }) {
+  const groups = gruposDB.map(mapToGroup);
   const sectionRef = useRef<HTMLElement>(null);
 
   useGSAP(
