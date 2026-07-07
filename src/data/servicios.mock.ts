@@ -62,7 +62,8 @@ export const SERVICIOS_MOCK: Servicio[] = [
   {
     id: "6",
     titulo: "Prueba de esfuerzo",
-    descripcion: "Se utiliza para medir el efecto del ejercicio sobre el corazón.",
+    descripcion:
+      "Se utiliza para medir el efecto del ejercicio sobre el corazón.",
     categoria: "cardiologia",
     icono: "Dumbbell",
     slug: "prueba-de-esfuerzo",
