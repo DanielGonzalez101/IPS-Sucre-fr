@@ -1,14 +1,23 @@
-import ServicioCard from "@/components/public/ServicioCard";
+import type { Metadata } from "next";
+import ServiciosHero from "@/components/public/servicios/ServiciosHero";
+import ServiciosGrid from "@/components/public/servicios/ServiciosGrid";
+import ServiciosCTA from "@/components/public/servicios/ServiciosCTA";
+import ServiciosDiferenciadores from "@/components/public/servicios/ServiciosDiferenciadores";
+import { SERVICIOS_MOCK } from "@/data/servicios.mock";
+
+export const metadata: Metadata = {
+  title: "Servicios",
+  description:
+    "Cardiología Pediátrica, Radiología y Diagnóstico por Imágenes en Sucre y la región Caribe — conoce todos los servicios del Cardiocentro Pediátrico de Sucre.",
+};
 
 export default function ServiciosPage() {
   return (
-    <section className="container mx-auto px-4 py-16">
-      <h1 className="text-3xl font-bold">Nuestros Servicios</h1>
-      <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        <ServicioCard titulo="Ecocardiografía" descripcion="Diagnóstico cardíaco por ultrasonido." />
-        <ServicioCard titulo="Holter" descripcion="Monitoreo cardíaco de 24 horas." />
-        <ServicioCard titulo="Consulta pediátrica" descripcion="Atención cardiológica especializada." />
-      </div>
-    </section>
+    <div id="main-content">
+      <ServiciosHero />
+      <ServiciosGrid servicios={SERVICIOS_MOCK} />
+      <ServiciosCTA />
+      <ServiciosDiferenciadores />
+    </div>
   );
 }
