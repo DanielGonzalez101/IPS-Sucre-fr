@@ -5,57 +5,14 @@ import Image from "next/image";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "@/lib/gsap";
 
+import type { EquipoTec } from "@/types";
+
 type Equipment = {
   name: string;
   category: string;
   description: string;
   img: string;
 };
-
-const equipos: Equipment[] = [
-  {
-    name: "Equipo 1",
-    category: "Por definir",
-    description: "Descripción pendiente.",
-    img: "/images/equipo tecnologico/eq1.jpg",
-  },
-  {
-    name: "Equipo 2",
-    category: "Por definir",
-    description: "Descripción pendiente.",
-    img: "/images/equipo tecnologico/eq2.jpg",
-  },
-  {
-    name: "Equipo 3",
-    category: "Por definir",
-    description: "Descripción pendiente.",
-    img: "/images/equipo tecnologico/eq3.jpg",
-  },
-  {
-    name: "Equipo 4",
-    category: "Por definir",
-    description: "Descripción pendiente.",
-    img: "/images/equipo tecnologico/eq4.jpg",
-  },
-  {
-    name: "Equipo 5",
-    category: "Por definir",
-    description: "Descripción pendiente.",
-    img: "/images/equipo tecnologico/eq5.jpg",
-  },
-  {
-    name: "Equipo 6",
-    category: "Por definir",
-    description: "Descripción pendiente.",
-    img: "/images/equipo tecnologico/eq6.jpg",
-  },
-  {
-    name: "Equipo 7",
-    category: "Por definir",
-    description: "Descripción pendiente.",
-    img: "/images/equipo tecnologico/eq7.jpg",
-  },
-];
 
 function EquipmentCard({ name, category, description, img }: Equipment) {
   return (
@@ -67,6 +24,7 @@ function EquipmentCard({ name, category, description, img }: Equipment) {
           fill
           style={{ objectFit: "cover" }}
           sizes="(max-width: 640px) 50vw, 300px"
+          unoptimized={img.startsWith("http")}
         />
       </div>
       <div className="equipo-tec-card-overlay" aria-hidden="true" />
@@ -79,7 +37,13 @@ function EquipmentCard({ name, category, description, img }: Equipment) {
   );
 }
 
-export function EquipoTecSection() {
+export function EquipoTecSection({ equipos: equiposDB }: { equipos: EquipoTec[] }) {
+  const equipos: Equipment[] = equiposDB.map((e) => ({
+    name: e.nombre,
+    category: e.categoria,
+    description: e.descripcion,
+    img: e.imagen_url,
+  }));
   const sectionRef = useRef<HTMLElement>(null);
 
   useGSAP(
@@ -110,6 +74,16 @@ export function EquipoTecSection() {
           scrollTrigger: { trigger: ".equipo-tec-grid", start: "top 80%" },
         }
       );
+
+      const cards = sectionRef.current?.querySelectorAll(".equipo-tec-card");
+      cards?.forEach((card) => {
+        card.addEventListener("mouseenter", () =>
+          gsap.to(card, { y: -6, duration: 0.25, ease: "power2.out" })
+        );
+        card.addEventListener("mouseleave", () =>
+          gsap.to(card, { y: 0, duration: 0.25, ease: "power2.out" })
+        );
+      });
     },
     { scope: sectionRef }
   );
