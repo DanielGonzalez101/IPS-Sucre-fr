@@ -61,44 +61,6 @@ export interface HeroSlide {
   es_principal: boolean;
 }
 
-export interface EquipoHero {
-  id: string;
-  pagina: "humano" | "tecnologico";
-  imagen_url: string;
-  imagen_alt: string;
-}
-
-export interface EquipoGrupo {
-  id: string;
-  nombre: string;
-  orden: number;
-  miembros: EquipoMiembro[];
-}
-
-export interface EquipoMiembro {
-  id: string;
-  grupo_id: string;
-  nombre: string;
-  cargo: string;
-  especialidad: string;
-  formacion: string[];
-  foto_url: string;
-  imagen_alt: string;
-  orden: number;
-  activo: boolean;
-}
-
-export interface EquipoTec {
-  id: string;
-  nombre: string;
-  categoria: string;
-  descripcion: string;
-  imagen_url: string;
-  imagen_alt: string;
-  orden: number;
-  activo: boolean;
-}
-
 export interface Pagina {
   id: string;
   slug: string;
