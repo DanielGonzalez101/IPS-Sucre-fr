@@ -13,6 +13,9 @@ const navLinks = [
   { href: "/consulta-examen", label: "Consulta tu examen" },
 ];
 
+const navLinksBeforeEquipo = navLinks.slice(0, 2);
+const navLinksAfterEquipo = navLinks.slice(2);
+
 export default function Header() {
   return (
     <header>
@@ -85,7 +88,7 @@ export default function Header() {
 
           {/* Links desktop */}
           <ul className="hidden lg:flex items-center gap-1" role="list">
-            {navLinks.map(({ href, label }) => (
+            {navLinksBeforeEquipo.map(({ href, label }) => (
               <li key={href}>
                 <Link
                   href={href}
@@ -96,7 +99,7 @@ export default function Header() {
               </li>
             ))}
 
-            {/* Dropdown Equipo */}
+            {/* Dropdown Equipo — posición 3 */}
             <li className="nav-dropdown-group">
               <button
                 className="nav-dropdown-trigger"
@@ -129,6 +132,17 @@ export default function Header() {
                 </Link>
               </div>
             </li>
+
+            {navLinksAfterEquipo.map(({ href, label }) => (
+              <li key={href}>
+                <Link
+                  href={href}
+                  className="nav-link font-heading font-semibold text-sm px-3 py-2 rounded-lg transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-azul-600 focus-visible:ring-offset-1"
+                >
+                  {label}
+                </Link>
+              </li>
+            ))}
           </ul>
 
           {/* CTA */}
