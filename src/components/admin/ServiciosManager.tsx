@@ -3,6 +3,34 @@
 import { useState, useTransition } from "react";
 import { ChevronRight, Trash2, ChevronUp, ChevronDown } from "lucide-react";
 import {
+  Stethoscope,
+  Heartbeat,
+  Pulse,
+  Timer,
+  Gauge,
+  Waves,
+  DropHalf,
+  FirstAid,
+  Heart,
+  Brain,
+  Bone,
+  Eye,
+  Ear,
+  Tooth,
+  Baby,
+  Syringe,
+  Pill,
+  Bandaids,
+  Flask,
+  Microscope,
+  Thermometer,
+  Barbell,
+  ArrowsClockwise,
+  ShieldPlus,
+  Scan,
+  type Icon,
+} from "@phosphor-icons/react";
+import {
   createServicio,
   updateServicio,
   deleteServicio,
@@ -10,30 +38,40 @@ import {
   getServicios,
 } from "@/actions/servicios";
 
-const ICONOS_DISPONIBLES = [
-  "Stethoscope",
-  "Heartbeat",
-  "Pulse",
-  "Timer",
-  "Gauge",
-  "Waves",
-  "DropHalf",
-  "FirstAid",
-  "Heart",
-  "Brain",
-  "Bone",
-  "Eye",
-  "Ear",
-  "Tooth",
-  "Baby",
-  "Syringe",
-  "Pill",
-  "Bandaids",
-  "Flask",
-  "Microscope",
-  "Activity",
-  "Thermometer",
-];
+const ICON_MAP: Record<string, Icon> = {
+  Stethoscope,
+  Heartbeat,
+  Pulse,
+  Timer,
+  Gauge,
+  Waves,
+  DropHalf,
+  FirstAid,
+  Heart,
+  Brain,
+  Bone,
+  Eye,
+  Ear,
+  Tooth,
+  Baby,
+  Syringe,
+  Pill,
+  Bandaids,
+  Flask,
+  Microscope,
+  Thermometer,
+  Barbell,
+  ArrowsClockwise,
+  ShieldPlus,
+  Scan,
+  // Aliases para los nombres que vienen de la rama feature/servicios
+  Dumbbell: Barbell,
+  RotateCw: ArrowsClockwise,
+};
+
+const ICONOS_DISPONIBLES = Object.keys(ICON_MAP).filter(
+  (k) => !["Dumbbell", "RotateCw"].includes(k)
+);
 
 interface Servicio {
   id: string;
@@ -49,6 +87,88 @@ interface Servicio {
 interface Props {
   servicios: Servicio[];
 }
+
+// ── Picker de ícono ──────────────────────────────────────────
+
+function IconPicker({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (name: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const SelectedIcon = ICON_MAP[value] ?? Stethoscope;
+
+  return (
+    <div className="relative">
+      <label className="block text-xs font-medium text-gray-600 mb-1">Ícono</label>
+
+      {/* Botón disparador */}
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className="w-full flex items-center gap-2 rounded border border-gray-200 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-azul-600 text-left"
+      >
+        <SelectedIcon size={16} weight="duotone" style={{ color: "var(--color-azul-700)", flexShrink: 0 }} />
+        <span className="text-gray-700">{value}</span>
+        <ChevronRight
+          size={14}
+          className="ml-auto text-gray-400"
+          style={{ transform: open ? "rotate(90deg)" : "rotate(0deg)", transition: "transform 0.15s" }}
+        />
+      </button>
+
+      {/* Grid de íconos */}
+      {open && (
+        <div
+          className="absolute z-20 mt-1 w-full rounded-lg border border-gray-200 bg-white shadow-lg overflow-y-auto"
+          style={{ maxHeight: 220 }}
+        >
+          <div className="grid grid-cols-4 gap-1 p-2">
+            {ICONOS_DISPONIBLES.map((nombre) => {
+              const Icono = ICON_MAP[nombre];
+              const activo = value === nombre;
+              return (
+                <button
+                  key={nombre}
+                  type="button"
+                  title={nombre}
+                  onClick={() => { onChange(nombre); setOpen(false); }}
+                  className="flex flex-col items-center gap-1 rounded-lg py-2 px-1 text-center transition-colors"
+                  style={{
+                    backgroundColor: activo ? "var(--color-azul-50)" : "transparent",
+                    border: activo ? "1.5px solid var(--color-azul-300)" : "1.5px solid transparent",
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!activo) e.currentTarget.style.backgroundColor = "#F9FAFB";
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!activo) e.currentTarget.style.backgroundColor = "transparent";
+                  }}
+                >
+                  <Icono
+                    size={20}
+                    weight="duotone"
+                    style={{ color: activo ? "var(--color-azul-700)" : "#6B7280" }}
+                  />
+                  <span
+                    className="text-[10px] leading-tight truncate w-full"
+                    style={{ color: activo ? "var(--color-azul-800)" : "#9CA3AF" }}
+                  >
+                    {nombre}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Manager principal ────────────────────────────────────────
 
 export function ServiciosManager({ servicios: initialServicios }: Props) {
   const [servicios, setServicios] = useState(initialServicios);
@@ -167,6 +287,8 @@ function ServicioCard({
     href_anchor: servicio.href_anchor,
   });
 
+  const HeaderIcon = ICON_MAP[servicio.icono] ?? Stethoscope;
+
   function handleSave() {
     setError(null);
     setSuccess(false);
@@ -185,9 +307,12 @@ function ServicioCard({
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-100 bg-gray-50">
         <div className="flex items-center gap-2">
-          <span className="text-xs font-mono px-1.5 py-0.5 rounded bg-gray-100 text-gray-500">
-            {servicio.icono}
-          </span>
+          <div
+            className="w-7 h-7 flex items-center justify-center rounded-lg"
+            style={{ backgroundColor: "var(--color-azul-50)" }}
+          >
+            <HeaderIcon size={14} weight="duotone" style={{ color: "var(--color-azul-700)" }} />
+          </div>
           <span className="text-sm font-semibold text-gray-700 truncate max-w-[200px]">
             {servicio.titulo}
           </span>
@@ -328,18 +453,10 @@ function ServicioCard({
             </div>
           </div>
           <div className="space-y-3">
-            <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Ícono</label>
-              <select
-                value={form.icono}
-                onChange={(e) => setForm((f) => ({ ...f, icono: e.target.value }))}
-                className="w-full rounded border border-gray-200 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-azul-600 bg-white"
-              >
-                {ICONOS_DISPONIBLES.map((icono) => (
-                  <option key={icono} value={icono}>{icono}</option>
-                ))}
-              </select>
-            </div>
+            <IconPicker
+              value={form.icono}
+              onChange={(nombre) => setForm((f) => ({ ...f, icono: nombre }))}
+            />
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">Descripción</label>
               <textarea
@@ -464,18 +581,10 @@ function NuevoServicioCard({
           </div>
         </div>
         <div className="space-y-3">
-          <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Ícono</label>
-            <select
-              value={form.icono}
-              onChange={(e) => setForm((f) => ({ ...f, icono: e.target.value }))}
-              className="w-full rounded border border-gray-200 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-azul-600 bg-white"
-            >
-              {ICONOS_DISPONIBLES.map((icono) => (
-                <option key={icono} value={icono}>{icono}</option>
-              ))}
-            </select>
-          </div>
+          <IconPicker
+            value={form.icono}
+            onChange={(nombre) => setForm((f) => ({ ...f, icono: nombre }))}
+          />
           <div>
             <label className="block text-xs font-medium text-gray-600 mb-1">Descripción</label>
             <textarea
