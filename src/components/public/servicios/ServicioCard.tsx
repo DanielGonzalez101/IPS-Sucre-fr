@@ -14,25 +14,36 @@ import {
   Scan,
   type LucideIcon,
 } from "lucide-react";
-import type { Servicio } from "@/data/servicios.mock";
 
 const ICONS: Record<string, LucideIcon> = {
+  // Nombres Phosphor → equivalente Lucide (los que están en la BD)
   Stethoscope,
-  HeartPulse,
-  Activity,
-  Watch,
+  Heartbeat: HeartPulse,
+  Pulse: Activity,
+  Timer: Watch,
   Gauge,
+  Waves,
+  DropHalf: Radar,
+  FirstAid: ShieldPlus,
+  // Nombres adicionales para futuros servicios
+  HeartPulse,
   Dumbbell,
   RotateCw,
-  Waves,
   Radar,
   Bone,
-  ShieldPlus,
   Scan,
 };
 
+export interface ServicioCardData {
+  id: string;
+  titulo: string;
+  descripcion: string;
+  icono: string;
+  slug: string;
+}
+
 interface ServicioCardProps {
-  servicio: Servicio;
+  servicio: ServicioCardData;
   index: number;
   featured?: boolean;
 }
@@ -45,9 +56,7 @@ export default function ServicioCard({ servicio, index, featured = false }: Serv
     <Link
       href={`/servicios/${servicio.slug}`}
       className={`servicio-card group relative flex flex-col overflow-hidden rounded-2xl p-6 transition-all duration-200 hover:shadow-md hover:scale-[1.02] focus-visible:ring-2 focus-visible:ring-offset-2 ${
-        featured
-          ? "text-white focus-visible:ring-white"
-          : "bg-white border"
+        featured ? "text-white focus-visible:ring-white" : "bg-white border"
       }`}
       style={
         featured
@@ -82,19 +91,15 @@ export default function ServicioCard({ servicio, index, featured = false }: Serv
       </h3>
 
       <p
-        className={`relative z-10 font-body text-sm leading-relaxed line-clamp-2 mb-6 ${
-          featured ? "text-white/80" : "text-gris-600"
-        }`}
-        style={!featured ? { color: "var(--color-gris-600)" } : undefined}
+        className="relative z-10 font-body text-sm leading-relaxed line-clamp-2 mb-6"
+        style={{ color: featured ? "rgba(255,255,255,0.80)" : "var(--color-gris-600)" }}
       >
         {servicio.descripcion}
       </p>
 
       <span
-        className={`relative z-10 mt-auto font-heading font-medium text-sm ${
-          featured ? "text-white underline" : ""
-        }`}
-        style={!featured ? { color: "var(--color-rojo-500)" } : undefined}
+        className="relative z-10 mt-auto font-heading font-medium text-sm"
+        style={{ color: featured ? "#fff" : "var(--color-rojo-500)" }}
       >
         Ver detalle →
       </span>

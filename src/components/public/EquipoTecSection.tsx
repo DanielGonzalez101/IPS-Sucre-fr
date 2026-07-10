@@ -8,13 +8,14 @@ import { gsap } from "@/lib/gsap";
 import type { EquipoTec } from "@/types";
 
 type Equipment = {
+  id: string;
   name: string;
   category: string;
   description: string;
   img: string;
 };
 
-function EquipmentCard({ name, category, description, img }: Equipment) {
+function EquipmentCard({ name, category, description, img }: Omit<Equipment, "id">) {
   return (
     <div className="equipo-tec-card">
       <div className="equipo-tec-card-img">
@@ -39,6 +40,7 @@ function EquipmentCard({ name, category, description, img }: Equipment) {
 
 export function EquipoTecSection({ equipos: equiposDB }: { equipos: EquipoTec[] }) {
   const equipos: Equipment[] = equiposDB.map((e) => ({
+    id: e.id,
     name: e.nombre,
     category: e.categoria,
     description: e.descripcion,
@@ -107,7 +109,7 @@ export function EquipoTecSection({ equipos: equiposDB }: { equipos: EquipoTec[] 
 
         <div className="equipo-tec-grid">
           {equipos.map((equipo) => (
-            <EquipmentCard key={equipo.name} {...equipo} />
+            <EquipmentCard key={equipo.id} {...equipo} />
           ))}
         </div>
 

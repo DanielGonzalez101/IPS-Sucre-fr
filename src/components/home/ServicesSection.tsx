@@ -15,20 +15,59 @@ import {
   Waves,
   DropHalf,
   FirstAid,
+  Heart,
+  Brain,
+  Bone,
+  Eye,
+  Ear,
+  Tooth,
+  Baby,
+  Syringe,
+  Pill,
+  Bandaids,
+  Flask,
+  Microscope,
+  Thermometer,
+  type Icon,
 } from "@phosphor-icons/react";
 
-const services = [
-  { icon: Stethoscope, title: "Consulta",                      category: "Cardiología Pediátrica",   href: "/servicios#consulta" },
-  { icon: Heartbeat,   title: "Ecocardiograma",                category: "Cardiología Pediátrica",   href: "/servicios#ecocardiograma" },
-  { icon: Pulse,       title: "Electrocardiograma",            category: "Cardiología Pediátrica",   href: "/servicios#electrocardiograma" },
-  { icon: Timer,       title: "Holter 24 Horas",              category: "Cardiología Pediátrica",   href: "/servicios#holter" },
-  { icon: Gauge,       title: "Monitoreo de Presión Arterial", category: "Cardiología Pediátrica",   href: "/servicios#mapa" },
-  { icon: Waves,       title: "Ecografía General",             category: "Radiología / Diagnóstico", href: "/servicios#ecografia" },
-  { icon: DropHalf,    title: "Doppler Color",                 category: "Radiología / Diagnóstico", href: "/servicios#doppler" },
-  { icon: FirstAid,    title: "Rayos X",                      category: "Radiología / Diagnóstico", href: "/servicios#rayosx" },
-];
+const ICON_MAP: Record<string, Icon> = {
+  Stethoscope,
+  Heartbeat,
+  Pulse,
+  Timer,
+  Gauge,
+  Waves,
+  DropHalf,
+  FirstAid,
+  Heart,
+  Brain,
+  Bone,
+  Eye,
+  Ear,
+  Tooth,
+  Baby,
+  Syringe,
+  Pill,
+  Bandaids,
+  Flask,
+  Microscope,
+  Thermometer,
+};
 
-export function ServicesSection() {
+interface Servicio {
+  id: string;
+  titulo: string;
+  categoria: string;
+  icono: string;
+  href_anchor: string;
+}
+
+interface Props {
+  servicios: Servicio[];
+}
+
+export function ServicesSection({ servicios }: Props) {
   const sectionRef = useRef<HTMLDivElement>(null);
 
   useGSAP(
@@ -122,62 +161,65 @@ export function ServicesSection() {
             </h2>
           </div>
 
-          {/* Grid 4×2 desktop / 2 col mobile */}
+          {/* Grid */}
           <div className="services-grid services-content-width grid gap-4">
-            {services.map(({ icon: Icon, title, category, href }) => (
-              <Link
-                key={title}
-                href={href}
-                className="service-card group flex flex-col justify-between bg-white p-5 focus-visible:ring-2 focus-visible:ring-offset-2"
-                style={{
-                  borderRadius: "16px",
-                  boxShadow: "var(--shadow-card)",
-                  minHeight: "130px",
-                  position: "relative",
-                  zIndex: 2,
-                  outline: "none",
-                }}
-              >
-                <div className="flex items-start justify-between mb-3">
-                  <div
-                    className="w-9 h-9 flex items-center justify-center"
-                    style={{
-                      backgroundColor: "var(--color-azul-50)",
-                      borderRadius: "10px",
-                    }}
-                    aria-hidden="true"
-                  >
-                    <Icon size={18} weight="duotone" style={{ color: "var(--color-azul-700)" }} />
+            {servicios.map(({ id, icono, titulo, categoria, href_anchor }) => {
+              const Icon = ICON_MAP[icono] ?? Stethoscope;
+              return (
+                <Link
+                  key={id}
+                  href={`/servicios#${href_anchor}`}
+                  className="service-card group flex flex-col justify-between bg-white p-5 focus-visible:ring-2 focus-visible:ring-offset-2"
+                  style={{
+                    borderRadius: "16px",
+                    boxShadow: "var(--shadow-card)",
+                    minHeight: "130px",
+                    position: "relative",
+                    zIndex: 2,
+                    outline: "none",
+                  }}
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <div
+                      className="w-9 h-9 flex items-center justify-center"
+                      style={{
+                        backgroundColor: "var(--color-azul-50)",
+                        borderRadius: "10px",
+                      }}
+                      aria-hidden="true"
+                    >
+                      <Icon size={18} weight="duotone" style={{ color: "var(--color-azul-700)" }} />
+                    </div>
+                    <div
+                      className="w-7 h-7 flex items-center justify-center transition-colors duration-200 group-hover:bg-black"
+                      style={{ borderRadius: "50%", backgroundColor: "var(--color-gris-100)" }}
+                      aria-hidden="true"
+                    >
+                      <ArrowUpRight
+                        size={14}
+                        className="transition-colors duration-200 group-hover:text-white"
+                        style={{ color: "var(--color-gris-500)" }}
+                      />
+                    </div>
                   </div>
-                  <div
-                    className="w-7 h-7 flex items-center justify-center transition-colors duration-200 group-hover:bg-black"
-                    style={{ borderRadius: "50%", backgroundColor: "var(--color-gris-100)" }}
-                    aria-hidden="true"
-                  >
-                    <ArrowUpRight
-                      size={14}
-                      className="transition-colors duration-200 group-hover:text-white"
-                      style={{ color: "var(--color-gris-500)" }}
-                    />
-                  </div>
-                </div>
 
-                <div>
-                  <p
-                    className="font-heading font-semibold text-sm leading-snug mb-0.5"
-                    style={{ color: "var(--color-azul-900)" }}
-                  >
-                    {title}
-                  </p>
-                  <p
-                    className="font-body text-xs"
-                    style={{ color: "var(--color-gris-500)" }}
-                  >
-                    {category}
-                  </p>
-                </div>
-              </Link>
-            ))}
+                  <div>
+                    <p
+                      className="font-heading font-semibold text-sm leading-snug mb-0.5"
+                      style={{ color: "var(--color-azul-900)" }}
+                    >
+                      {titulo}
+                    </p>
+                    <p
+                      className="font-body text-xs"
+                      style={{ color: "var(--color-gris-500)" }}
+                    >
+                      {categoria}
+                    </p>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
 
           {/* Enlace ver todos */}

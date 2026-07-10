@@ -1,13 +1,14 @@
 import { notFound } from "next/navigation";
-import { SERVICIOS_MOCK } from "@/data/servicios.mock";
+import { getServiciosPublicos } from "@/actions/servicios";
 
-interface ServicioDetallePageProps {
+interface Props {
   params: Promise<{ slug: string }>;
 }
 
-export default async function ServicioDetallePage({ params }: ServicioDetallePageProps) {
+export default async function ServicioDetallePage({ params }: Props) {
   const { slug } = await params;
-  const servicio = SERVICIOS_MOCK.find((s) => s.slug === slug);
+  const { data: servicios } = await getServiciosPublicos();
+  const servicio = (servicios ?? []).find((s) => s.slug === slug);
 
   if (!servicio) notFound();
 
@@ -29,8 +30,11 @@ export default async function ServicioDetallePage({ params }: ServicioDetallePag
       >
         {servicio.titulo}
       </h1>
-      <p className="font-body text-base mt-4" style={{ color: "var(--color-gris-600)" }}>
-        Estamos preparando el contenido detallado de este servicio.
+      <p
+        className="mt-4 font-body text-lg max-w-xl mx-auto"
+        style={{ color: "var(--color-gris-600)" }}
+      >
+        {servicio.descripcion}
       </p>
     </div>
   );
