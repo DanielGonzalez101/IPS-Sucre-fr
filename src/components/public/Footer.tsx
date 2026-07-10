@@ -1,5 +1,12 @@
 import Link from "next/link";
 import { MapPin, Phone, Mail, Heart, Clock } from "lucide-react";
+import type { Sede, RedesSociales } from "@/actions/sitio";
+
+interface FooterProps {
+  emailContacto?: string;
+  sedePrincipal?: Pick<Sede, "direccion" | "telefono" | "ciudad">;
+  redes?: RedesSociales;
+}
 
 const linksInteres = [
   { href: "/servicios",    label: "Nuestros servicios" },
@@ -15,7 +22,15 @@ const politicas = [
   { href: "/politicas/derechos-de-autor",      label: "Derechos de autor" },
 ];
 
-export default function Footer() {
+export default function Footer({
+  emailContacto = "info@cardiopediasucre.com",
+  sedePrincipal = {
+    ciudad: "Sincelejo",
+    direccion: "Calle 14 No. 17-72 / Barrio Ford",
+    telefono: "(+57) 300 912 7565",
+  },
+  redes = { facebook_url: "", instagram_url: "", whatsapp_url: "" },
+}: FooterProps) {
   const year = new Date().getFullYear();
 
   return (
@@ -63,20 +78,23 @@ export default function Footer() {
               <li className="flex items-start gap-2">
                 <MapPin size={13} className="mt-0.5 shrink-0" style={{ color: "var(--color-rojo-500)" }} aria-hidden="true" />
                 <span className="font-body text-sm leading-relaxed">
-                  Calle 14 No. 17-72 / Barrio Ford<br />
-                  Sincelejo — Sucre
+                  {sedePrincipal.direccion}<br />
+                  {sedePrincipal.ciudad} — Sucre
                 </span>
               </li>
               <li className="flex items-center gap-2">
                 <Phone size={13} className="shrink-0" style={{ color: "var(--color-rojo-500)" }} aria-hidden="true" />
-                <a href="tel:+573009127565" className="font-body text-sm hover:text-white transition-colors">
-                  (+57) 300 912 7565
+                <a
+                  href={`tel:${sedePrincipal.telefono.replace(/\s|\(|\)|-/g, "")}`}
+                  className="font-body text-sm hover:text-white transition-colors"
+                >
+                  {sedePrincipal.telefono}
                 </a>
               </li>
               <li className="flex items-center gap-2">
                 <Mail size={13} className="shrink-0" style={{ color: "var(--color-rojo-500)" }} aria-hidden="true" />
-                <a href="mailto:info@cardiopediasucre.com" className="font-body text-sm hover:text-white transition-colors">
-                  info@cardiopediasucre.com
+                <a href={`mailto:${emailContacto}`} className="font-body text-sm hover:text-white transition-colors">
+                  {emailContacto}
                 </a>
               </li>
             </ul>
@@ -146,24 +164,39 @@ export default function Footer() {
             © {year} IPS Cardiocentro Pediátrico de Sucre S.A.S. — NIT 900.550.249-0. Todos los derechos reservados.
           </p>
           <div className="flex items-center gap-4">
-            <a
-              href="https://www.facebook.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-body text-sm hover:text-white transition-colors focus-visible:underline"
-              aria-label="Síguenos en Facebook"
-            >
-              Facebook
-            </a>
-            <a
-              href="https://www.instagram.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-body text-sm hover:text-white transition-colors focus-visible:underline"
-              aria-label="Síguenos en Instagram"
-            >
-              Instagram
-            </a>
+            {redes.facebook_url && (
+              <a
+                href={redes.facebook_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-body text-sm hover:text-white transition-colors focus-visible:underline"
+                aria-label="Síguenos en Facebook"
+              >
+                Facebook
+              </a>
+            )}
+            {redes.instagram_url && (
+              <a
+                href={redes.instagram_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-body text-sm hover:text-white transition-colors focus-visible:underline"
+                aria-label="Síguenos en Instagram"
+              >
+                Instagram
+              </a>
+            )}
+            {redes.whatsapp_url && (
+              <a
+                href={redes.whatsapp_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-body text-sm hover:text-white transition-colors focus-visible:underline"
+                aria-label="Contáctanos por WhatsApp"
+              >
+                WhatsApp
+              </a>
+            )}
           </div>
         </div>
       </div>
