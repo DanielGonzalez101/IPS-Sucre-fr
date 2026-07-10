@@ -24,11 +24,13 @@ export async function proxy(request: NextRequest) {
         {
           status: 429,
           headers: {
-            "Retry-After": String(Math.ceil((result.resetAt - Date.now()) / 1000)),
+            "Retry-After": String(
+              Math.ceil((result.resetAt - Date.now()) / 1000),
+            ),
             "X-RateLimit-Limit": "5",
             "X-RateLimit-Remaining": "0",
           },
-        }
+        },
       );
     }
   }
@@ -42,11 +44,13 @@ export async function proxy(request: NextRequest) {
         {
           status: 429,
           headers: {
-            "Retry-After": String(Math.ceil((result.resetAt - Date.now()) / 1000)),
+            "Retry-After": String(
+              Math.ceil((result.resetAt - Date.now()) / 1000),
+            ),
             "X-RateLimit-Limit": "10",
             "X-RateLimit-Remaining": "0",
           },
-        }
+        },
       );
     }
   }
@@ -62,18 +66,22 @@ export async function proxy(request: NextRequest) {
           return request.cookies.getAll();
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
+          cookiesToSet.forEach(({ name, value }) =>
+            request.cookies.set(name, value),
+          );
           supabaseResponse = NextResponse.next({ request });
           cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
+            supabaseResponse.cookies.set(name, value, options),
           );
         },
       },
-    }
+    },
   );
 
   // Refrescar la sesión — obligatorio para que el token no expire silenciosamente.
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   const isAdminRoute = request.nextUrl.pathname.startsWith("/gestion-interna");
   const isLoginPage = request.nextUrl.pathname === "/gestion-interna/login";
