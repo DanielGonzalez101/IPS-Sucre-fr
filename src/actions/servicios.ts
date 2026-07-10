@@ -58,10 +58,13 @@ export async function updateServicio(
     href_anchor: string;
     orden: number;
     activo: boolean;
-  }>
+  }>,
 ) {
   const supabase = await createClient();
-  const { error } = await supabase.from("servicios").update(fields).eq("id", id);
+  const { error } = await supabase
+    .from("servicios")
+    .update(fields)
+    .eq("id", id);
 
   if (error) return { error: error.message };
   revalidateAll();
@@ -80,7 +83,7 @@ export async function deleteServicio(id: string) {
 export async function reorderServicios(items: { id: string; orden: number }[]) {
   const supabase = await createClient();
   const updates = items.map(({ id, orden }) =>
-    supabase.from("servicios").update({ orden }).eq("id", id)
+    supabase.from("servicios").update({ orden }).eq("id", id),
   );
   await Promise.all(updates);
   revalidateAll();
