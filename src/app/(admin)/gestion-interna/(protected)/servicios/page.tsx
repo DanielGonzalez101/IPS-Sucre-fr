@@ -8,7 +8,7 @@ export default async function AdminServiciosPage() {
   const { data: servicios, error } = await getServicios();
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div>
       <div className="mb-6">
         <h1 className="text-xl font-bold text-gray-900">Servicios</h1>
         <p className="text-sm text-gray-500 mt-1">
