@@ -5,35 +5,13 @@ import Image from "next/image";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "@/lib/gsap";
 import { MapPin, Phone, Clock } from "lucide-react";
+import type { Sede } from "@/actions/sitio";
 
-const sedes = [
-  {
-    id: "sincelejo",
-    ciudad: "Sincelejo",
-    direccion: "Calle 14 No. 17-72 / Barrio Ford",
-    telefono: "(+57) 300 912 7565",
-    horario: "L–V 7:00 a.m.–12:00 m. / 1:00–6:00 p.m.\nSáb 7:00–11:00 a.m.",
-    mapUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3946.123!2d-75.39770!3d9.30470!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e5a504f0e6b9b7b%3A0x123456789abcdef!2sCalle%2014%20%2317-72%2C%20Sincelejo%2C%20Sucre!5e0!3m2!1ses!2sco!4v1700000000000!5m2!1ses!2sco",
-  },
-  {
-    id: "carmen",
-    ciudad: "El Carmen de Bolívar",
-    direccion: "Calle 23 No. 54-20 / Barrio Bureche",
-    telefono: "(+57) 300 912 7565",
-    horario: "L–V 7:00 a.m.–12:00 m. / 1:00–6:00 p.m.",
-    mapUrl: "",
-  },
-  {
-    id: "magangue",
-    ciudad: "Magangué",
-    direccion: "Calle 16 No. 12-56 / Barrio San José",
-    telefono: "(+57) 300 912 7565",
-    horario: "L–V 7:00 a.m.–12:00 m. / 1:00–6:00 p.m.",
-    mapUrl: "",
-  },
-];
+interface Props {
+  sedes: Sede[];
+}
 
-export function SedesSection() {
+export function SedesSection({ sedes }: Props) {
   const sectionRef   = useRef<HTMLDivElement>(null);
   const mapWrapRef   = useRef<HTMLDivElement>(null);
   const cardsRef     = useRef<HTMLDivElement>(null);
@@ -214,9 +192,9 @@ export function SedesSection() {
               boxShadow: "0 4px 24px rgba(6,36,77,0.08)",
             }}
           >
-            {sede.mapUrl ? (
+            {sede.map_url ? (
               <iframe
-                src={sede.mapUrl}
+                src={sede.map_url}
                 width="100%"
                 height="100%"
                 style={{ border: 0 }}
