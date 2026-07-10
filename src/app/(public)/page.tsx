@@ -8,6 +8,7 @@ import { BentoCtaRow }    from "@/components/home/BentoCtaRow";
 import { TeamSection }    from "@/components/home/TeamSection";
 import { NewsSection }     from "@/components/home/NewsSection";
 import { SedesSection }    from "@/components/home/SedesSection";
+import { getServiciosPublicos } from "@/actions/servicios";
 
 export const dynamic = "force-dynamic";
 
@@ -56,13 +57,16 @@ async function getHeroSlides(): Promise<HeroSlide[]> {
 }
 
 export default async function HomePage() {
-  const slides = await getHeroSlides();
+  const [slides, { data: servicios }] = await Promise.all([
+    getHeroSlides(),
+    getServiciosPublicos(),
+  ]);
 
   return (
     <div id="main-content">
       <HeroSection slides={slides} />
       <StatsSection />
-      <ServicesSection />
+      <ServicesSection servicios={servicios ?? []} />
       <BentoCtaRow />
       <TeamSection />
       <NewsSection />

@@ -5,7 +5,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "@/lib/gsap";
-import { GraduationCap, ArrowUpRight, ArrowLeft, ArrowRight } from "lucide-react";
+import {
+  GraduationCap,
+  ArrowUpRight,
+  ArrowLeft,
+  ArrowRight,
+} from "lucide-react";
 
 import type { EquipoGrupo, EquipoMiembro } from "@/types";
 
@@ -87,7 +92,7 @@ function GroupCarousel({ title, members }: Group) {
   const prev = useCallback(() => setIndex((i) => Math.max(0, i - 1)), []);
   const next = useCallback(
     () => setIndex((i) => Math.min(members.length - CARDS_PER_VIEW, i + 1)),
-    [members.length]
+    [members.length],
   );
 
   const offset = index * (CARD_WIDTH + CARD_GAP);
@@ -116,7 +121,11 @@ function GroupCarousel({ title, members }: Group) {
         </div>
       </div>
 
-      <div className="equipo-carousel-viewport" aria-label={title} role="region">
+      <div
+        className="equipo-carousel-viewport"
+        aria-label={title}
+        role="region"
+      >
         <div
           className="equipo-carousel-track"
           style={{ transform: `translateX(-${offset}px)` }}
@@ -144,57 +153,68 @@ export function EquipoSection({ grupos: gruposDB }: { grupos: EquipoGrupo[] }) {
         ".equipo-sidebar",
         { opacity: 0, x: -30 },
         {
-          opacity: 1, x: 0, duration: 0.7, ease: "power3.out",
+          opacity: 1,
+          x: 0,
+          duration: 0.7,
+          ease: "power3.out",
           scrollTrigger: { trigger: sectionRef.current, start: "top 78%" },
-        }
+        },
       );
 
       gsap.fromTo(
         ".equipo-group",
         { opacity: 0, y: 30 },
         {
-          opacity: 1, y: 0, duration: 0.6, ease: "power3.out", stagger: 0.15,
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          ease: "power3.out",
+          stagger: 0.15,
           scrollTrigger: { trigger: sectionRef.current, start: "top 78%" },
-        }
+        },
       );
     },
-    { scope: sectionRef }
+    { scope: sectionRef },
   );
 
   return (
-    <section ref={sectionRef} className="equipo-bento-section" aria-label="Equipo de profesionales">
+    <section
+      ref={sectionRef}
+      className="equipo-bento-section"
+      aria-label="Equipo de profesionales"
+    >
       <div className="container-main">
-      <div className="equipo-page-layout">
+        <div className="equipo-page-layout">
+          {/* Sidebar izquierdo */}
+          <aside className="equipo-sidebar">
+            <p className="equipo-side-eyebrow">Nuestro equipo</p>
+            <h2 className="equipo-sidebar-heading">
+              Conoce a nuestros profesionales
+            </h2>
+            <p className="equipo-sidebar-desc">
+              Especialistas comprometidos con la salud cardiovascular infantil y
+              la atención integral de las familias de Sucre.
+            </p>
+            <Link
+              href="https://wa.me/573009127565"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="equipo-side-cta"
+            >
+              Agendar cita
+              <ArrowUpRight size={14} aria-hidden="true" />
+            </Link>
+          </aside>
 
-        {/* Sidebar izquierdo */}
-        <aside className="equipo-sidebar">
-          <p className="equipo-side-eyebrow">Nuestro equipo</p>
-          <h2 className="equipo-sidebar-heading">
-            Conoce a nuestros profesionales
-          </h2>
-          <p className="equipo-sidebar-desc">
-            Especialistas comprometidos con la salud cardiovascular infantil y la atención integral de las familias de Sucre.
-          </p>
-          <Link
-            href="https://wa.me/573009127565"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="equipo-side-cta"
-          >
-            Agendar cita
-            <ArrowUpRight size={14} aria-hidden="true" />
-          </Link>
-        </aside>
-
-        {/* Grupos con carrusel */}
-        <div className="equipo-groups">
-          {groups.map((group) => (
-            <GroupCarousel key={group.title} {...group} />
-          ))}
+          {/* Grupos con carrusel */}
+          <div className="equipo-groups">
+            {groups.map((group) => (
+              <GroupCarousel key={group.title} {...group} />
+            ))}
+          </div>
         </div>
-
-      </div>
       </div>
     </section>
   );
 }
+

@@ -6,10 +6,6 @@ import { Heart } from "lucide-react";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "@/lib/gsap";
 
-/*
-  Imagen real: colocar en /public/images/servicios/servicios-hero.jpg
-  Mientras no exista, se usa /images/hero-2.png como placeholder.
-*/
 const HERO_IMG = "/images/hero-2.png";
 
 export default function ServiciosHero() {

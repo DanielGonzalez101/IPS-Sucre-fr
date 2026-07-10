@@ -3,7 +3,7 @@
 @theme {
   /* ── Fuentes ─────────────────────────────────── */
   --font-heading: "Inter", sans-serif;
-  --font-body: "Inter", sans-serif;
+  --font-body: var(--font-heading);
 
   /* ── Paleta Cardiocentro ─────────────────────── */
   --color-azul-50: #eef3fb;
@@ -1377,6 +1377,12 @@ h6 {
   z-index: 3;
 }
 
+/* Card Misión — ícono brújula gira suave en hover */
+.mision-card:hover .mision-icon-wrap {
+  transform: rotate(20deg);
+  background-color: var(--color-azul-100);
+}
+
 /* ── Bento grid (layout Image 10) ── */
 .equipo-bento-section {
   padding-block: 4rem;
@@ -1486,11 +1492,10 @@ h6 {
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: 260px 688px;
+  grid-template-columns: 300px minmax(0, 1fr);
   gap: 4rem;
   align-items: start;
-  width: fit-content;
-  margin-inline: auto;
+  width: 100%;
 }
 
 /* Sidebar izquierdo */
@@ -1502,7 +1507,7 @@ h6 {
 .equipo-sidebar-heading {
   font-family: var(--font-heading);
   font-weight: 800;
-  font-size: clamp(1.6rem, 2.8vw, 2.4rem);
+  font-size: clamp(1.75rem, 3vw, 2.75rem);
   color: #fff;
   line-height: 1.15;
   margin-bottom: 1rem;
@@ -1511,6 +1516,7 @@ h6 {
 .equipo-sidebar-desc {
   font-family: var(--font-body);
   font-size: 1rem;
+  font-weight: 400;
   color: #fff;
   line-height: 1.65;
   margin-bottom: 1.75rem;
