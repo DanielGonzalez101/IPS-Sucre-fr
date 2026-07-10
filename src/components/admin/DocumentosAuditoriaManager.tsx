@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useRef, useTransition } from "react";
-import { FileText, Trash2, Download, Upload } from "lucide-react";
-import { uploadAndCreateAuditDocument, deleteAuditDocument } from "@/actions/documentos";
+import { FileText, Trash2, Download, Upload, Eye, EyeOff } from "lucide-react";
+import { uploadAndCreateAuditDocument, deleteAuditDocument, toggleDocumentPublic } from "@/actions/documentos";
 
 interface Documento {
   id: string;
@@ -10,6 +10,7 @@ interface Documento {
   file_url: string;
   description: string | null;
   uploaded_at: string;
+  is_public: boolean;
 }
 
 interface Props {
@@ -58,6 +59,7 @@ function SubirDocumentoCard({ onCreated }: { onCreated: (doc: Documento) => void
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [isPublic, setIsPublic] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -80,6 +82,7 @@ function SubirDocumentoCard({ onCreated }: { onCreated: (doc: Documento) => void
     formData.append("file", selectedFile);
     formData.append("title", title.trim());
     formData.append("description", description.trim());
+    formData.append("is_public", String(isPublic));
 
     startTransition(async () => {
       const result = await uploadAndCreateAuditDocument(formData);
@@ -91,11 +94,13 @@ function SubirDocumentoCard({ onCreated }: { onCreated: (doc: Documento) => void
         file_url: result.file_url!,
         description: description.trim() || null,
         uploaded_at: new Date().toISOString(),
+        is_public: isPublic,
       });
 
       setTitle("");
       setDescription("");
       setSelectedFile(null);
+      setIsPublic(true);
       if (fileRef.current) fileRef.current.value = "";
     });
   }
@@ -157,6 +162,29 @@ function SubirDocumentoCard({ onCreated }: { onCreated: (doc: Documento) => void
           />
         </div>
 
+        <div className="flex items-center justify-between rounded-lg border border-gray-200 px-3 py-2.5">
+          <div className="flex items-center gap-2">
+            {isPublic
+              ? <Eye size={14} className="text-green-600" />
+              : <EyeOff size={14} className="text-gray-400" />
+            }
+            <span className="text-sm text-gray-700">
+              {isPublic ? "Público — visible en el sitio" : "Privado — solo administradores"}
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setIsPublic((v) => !v)}
+            className={`relative inline-flex h-5 w-9 shrink-0 rounded-full border-2 border-transparent transition-colors focus:outline-none ${isPublic ? "bg-green-500" : "bg-gray-300"}`}
+            role="switch"
+            aria-checked={isPublic}
+          >
+            <span
+              className={`pointer-events-none inline-block h-4 w-4 rounded-full bg-white shadow transform transition-transform ${isPublic ? "translate-x-4" : "translate-x-0"}`}
+            />
+          </button>
+        </div>
+
         {error && (
           <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded px-3 py-2">
             {error}
@@ -181,11 +209,21 @@ function SubirDocumentoCard({ onCreated }: { onCreated: (doc: Documento) => void
 
 function DocumentoFila({ doc, onDeleted }: { doc: Documento; onDeleted: () => void }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [isPublic, setIsPublic] = useState(doc.is_public);
   const [isPending, startTransition] = useTransition();
 
   const fecha = new Date(doc.uploaded_at).toLocaleDateString("es-CO", {
     day: "2-digit", month: "short", year: "numeric",
   });
+
+  function handleTogglePublic() {
+    const next = !isPublic;
+    setIsPublic(next);
+    startTransition(async () => {
+      const r = await toggleDocumentPublic(doc.id, next);
+      if (r.error) setIsPublic(!next);
+    });
+  }
 
   return (
     <li className="bg-white rounded-xl border border-gray-200 px-4 py-3 flex items-start gap-3">
@@ -201,10 +239,30 @@ function DocumentoFila({ doc, onDeleted }: { doc: Documento; onDeleted: () => vo
         {doc.description && (
           <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">{doc.description}</p>
         )}
-        <p className="text-xs text-gray-400 mt-1">{fecha}</p>
+        <div className="flex items-center gap-2 mt-1">
+          <p className="text-xs text-gray-400">{fecha}</p>
+          <span className={`inline-flex items-center gap-0.5 text-xs font-medium px-1.5 py-0.5 rounded-full ${isPublic ? "bg-green-50 text-green-700" : "bg-gray-100 text-gray-500"}`}>
+            {isPublic ? <Eye size={10} /> : <EyeOff size={10} />}
+            {isPublic ? "Público" : "Privado"}
+          </span>
+        </div>
       </div>
 
       <div className="flex items-center gap-2 shrink-0">
+        <button
+          type="button"
+          onClick={handleTogglePublic}
+          disabled={isPending}
+          className={`relative inline-flex h-5 w-9 shrink-0 rounded-full border-2 border-transparent transition-colors focus:outline-none disabled:opacity-50 ${isPublic ? "bg-green-500" : "bg-gray-300"}`}
+          role="switch"
+          aria-checked={isPublic}
+          title={isPublic ? "Ocultar del sitio" : "Publicar en el sitio"}
+        >
+          <span
+            className={`pointer-events-none inline-block h-4 w-4 rounded-full bg-white shadow transform transition-transform ${isPublic ? "translate-x-4" : "translate-x-0"}`}
+          />
+        </button>
+
         <a
           href={doc.file_url}
           target="_blank"

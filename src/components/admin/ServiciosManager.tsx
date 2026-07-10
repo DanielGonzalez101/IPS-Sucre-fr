@@ -79,7 +79,6 @@ interface Servicio {
   categoria: string;
   descripcion: string;
   icono: string;
-  href_anchor: string;
   orden: number;
   activo: boolean;
 }
@@ -284,7 +283,6 @@ function ServicioCard({
     categoria: servicio.categoria,
     descripcion: servicio.descripcion,
     icono: servicio.icono,
-    href_anchor: servicio.href_anchor,
   });
 
   const HeaderIcon = ICON_MAP[servicio.icono] ?? Stethoscope;
@@ -438,19 +436,6 @@ function ServicioCard({
                 placeholder="Cardiología Pediátrica"
               />
             </div>
-            <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">
-                Ancla del enlace{" "}
-                <span className="font-normal text-gray-400">(sin # — ej: holter)</span>
-              </label>
-              <input
-                type="text"
-                value={form.href_anchor}
-                onChange={(e) => setForm((f) => ({ ...f, href_anchor: e.target.value }))}
-                className="w-full rounded border border-gray-200 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-azul-600"
-                placeholder="holter"
-              />
-            </div>
           </div>
           <div className="space-y-3">
             <IconPicker
@@ -513,7 +498,6 @@ function NuevoServicioCard({
     categoria: "",
     descripcion: "",
     icono: "Stethoscope",
-    href_anchor: "",
   });
 
   function handleCreate() {
@@ -564,19 +548,6 @@ function NuevoServicioCard({
               onChange={(e) => setForm((f) => ({ ...f, categoria: e.target.value }))}
               className="w-full rounded border border-gray-200 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-azul-600"
               placeholder="Cardiología Pediátrica"
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">
-              Ancla del enlace{" "}
-              <span className="font-normal text-gray-400">(sin # — ej: holter)</span>
-            </label>
-            <input
-              type="text"
-              value={form.href_anchor}
-              onChange={(e) => setForm((f) => ({ ...f, href_anchor: e.target.value }))}
-              className="w-full rounded border border-gray-200 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-azul-600"
-              placeholder="holter"
             />
           </div>
         </div>
