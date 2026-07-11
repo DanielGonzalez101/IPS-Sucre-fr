@@ -9,11 +9,12 @@ interface FooterProps {
 }
 
 const linksInteres = [
-  { href: "/servicios",    label: "Nuestros servicios" },
-  { href: "/equipo",       label: "Equipo médico" },
-  { href: "/pqrs",         label: "PQRSD" },
-  { href: "/contacto",     label: "Contacto" },
-  { href: "/normativa",    label: "Normativa" },
+  { href: "/servicios",       label: "Nuestros servicios" },
+  { href: "/equipo",          label: "Equipo médico" },
+  { href: "/pqrs",            label: "Radicar PQRSD" },
+  { href: "/pqrs/consulta",   label: "Consultar estado de PQRSD" },
+  { href: "/contacto",        label: "Contacto" },
+  { href: "/normativa",       label: "Normativa" },
 ];
 
 const politicas = [
