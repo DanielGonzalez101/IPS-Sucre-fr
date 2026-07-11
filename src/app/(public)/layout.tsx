@@ -14,9 +14,11 @@ export default async function PublicLayout({ children }: { children: React.React
     ? { ciudad: sedes[0].ciudad, direccion: sedes[0].direccion, telefono: sedes[0].telefono }
     : undefined;
 
+  const whatsappUrl = redes.whatsapp_url || "https://wa.me/573009127565";
+
   return (
     <>
-      <Header />
+      <Header sedes={sedes} emailContacto={emailContacto} whatsappUrl={whatsappUrl} />
       <main className="min-h-screen">{children}</main>
       <Footer emailContacto={emailContacto} sedePrincipal={sedePrincipal} redes={redes} />
       <FloatingWhatsApp />

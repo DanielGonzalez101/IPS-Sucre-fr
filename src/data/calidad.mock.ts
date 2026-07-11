@@ -19,112 +19,112 @@ export const DERECHOS_MOCK: DerechosDeber[] = [
     numero: "01",
     titulo: "Acceso a servicios de salud",
     descripcion:
-      "A acceder a los servicios y tecnologías de salud, que le garanticen una atención integral, oportuna y de alta calidad.",
+      "Acceder a los servicios y tecnologías de salud, que le garanticen una atención integral, oportuna y de alta calidad.",
   },
   {
     id: 2,
     numero: "02",
     titulo: "Atención de urgencias",
     descripcion:
-      "A recibir la atención de urgencias que sea requerida con la oportunidad que su condición amerite sin que sea exigible documento o cancelación de pago previo alguno.",
+      "Recibir la atención de urgencias que sea requerida con la oportunidad que su condición amerite sin que sea exigible documento o cancelación de pago previo alguno.",
   },
   {
     id: 3,
     numero: "03",
-    titulo: "Comunicación con el médico",
+    titulo: "Comunicación con el profesional",
     descripcion:
-      "A mantener una comunicación plena, permanente, expresa y clara con el profesional de la salud tratante.",
+      "Mantener una comunicación plena, permanente, expresa y clara con el profesional de salud tratante.",
   },
   {
     id: 4,
     numero: "04",
-    titulo: "Información clara y consentimiento",
+    titulo: "Información para decisiones libres",
     descripcion:
-      "A obtener información clara, apropiada y suficiente por parte del profesional de la salud tratante que le permita tomar decisiones libres, conscientes e informadas respecto de los procedimientos que le vayan a practicar y riesgos de los mismos. Ninguna persona podrá ser obligada, contra su voluntad, a recibir un tratamiento de salud.",
+      "Obtener información clara, apropiada y suficiente por parte del profesional de la salud que permita tomar decisiones libres, conscientes e informadas respecto de los procedimientos que se vayan a practicar y riesgos de los mismos. Ninguna persona podrá ser obligada, contra su voluntad, a recibir un tratamiento de salud.",
   },
   {
     id: 5,
     numero: "05",
-    titulo: "Prestaciones de salud según la ley",
+    titulo: "Prestaciones según la ley",
     descripcion:
-      "A recibir prestaciones de salud en las condiciones y términos consagrados en la ley.",
+      "Recibir prestaciones de salud en las condiciones y términos consagrados en la ley.",
   },
   {
     id: 6,
     numero: "06",
-    titulo: "Trato digno",
+    titulo: "Trato digno y respetuoso",
     descripcion:
-      "A recibir un trato digno, respetando sus creencias y costumbres, así como las opiniones personales que tengan sobre los procedimientos.",
+      "Recibir un trato digno, respetando sus creencias y costumbres, así como las opiniones personales que tenga sobre los procedimientos.",
   },
   {
     id: 7,
     numero: "07",
     titulo: "Confidencialidad de la historia clínica",
     descripcion:
-      "A que la historia clínica sea tratada de manera confidencial y reservada y que únicamente pueda ser conocida por terceros, previa autorización del paciente o en los casos previstos en la ley, y a poder consultar la totalidad de su historia clínica en forma gratuita y a obtener copia de la misma.",
+      "A que la historia clínica sea tratada de manera confidencial y reservada y que únicamente pueda ser conocida por terceros, con previa autorización del paciente o en los casos previstos en la ley, y a poder consultar la totalidad de la historia clínica de manera gratuita.",
   },
   {
     id: 8,
     numero: "08",
-    titulo: "Asistencia por personal capacitado",
+    titulo: "Asistencia de calidad",
     descripcion:
-      "A que se le preste durante todo el proceso de la enfermedad, asistencia de calidad por trabajadores de la salud debidamente capacitados y autorizados para ejercer.",
+      "A que se preste durante todo el proceso de la enfermedad, asistencia de calidad por trabajadores de la salud debidamente capacitados y autorizados para ejercer.",
   },
   {
     id: 9,
     numero: "09",
-    titulo: "Acceso oportuno a tecnologías y medicamentos",
+    titulo: "Derecho a la intimidad",
     descripcion:
-      "A la provisión y acceso oportuno a las tecnologías y a los medicamentos requeridos.",
+      "A la intimidad. Se garantiza la confidencialidad de toda la información que sea suministrada en el ámbito de acceso a los servicios de salud y de las condiciones de salud y enfermedad de la persona, sin perjuicio de la posibilidad de acceso a la misma por los familiares en los eventos autorizados por la ley o las autoridades en las condiciones que esta determine.",
   },
   {
     id: 10,
     numero: "10",
-    titulo: "Higiene, seguridad e intimidad",
+    titulo: "Acceso a tecnologías y medicamentos",
     descripcion:
-      "A recibir los servicios de salud en condiciones de higiene, seguridad y respeto a su intimidad.",
+      "A la provisión y acceso oportuno a las tecnologías y a los medicamentos requeridos.",
   },
   {
     id: 11,
     numero: "11",
-    titulo: "Derecho a la intimidad",
+    titulo: "Canales de reclamación",
     descripcion:
-      "A la intimidad. Se garantiza la confidencialidad de toda la información que sea suministrada en el ámbito del acceso a los servicios de salud y de las condiciones de salud y enfermedad de la persona, sin perjuicio de la posibilidad de acceso a la misma por los familiares en los eventos autorizados por la ley o las autoridades en las condiciones que esta determine.",
+      "Recibir información sobre los canales formales para presentar reclamaciones, quejas, sugerencias y en general, para comunicarse con la administración de las instituciones, así como recibir una respuesta por escrito.",
   },
   {
     id: 12,
     numero: "12",
-    titulo: "Canales de reclamación y respuesta",
+    titulo: "Condiciones de higiene y seguridad",
     descripcion:
-      "A recibir información sobre los canales formales para presentar reclamaciones, quejas, sugerencias y en general, para comunicarse con la administración de las instituciones, así como a recibir una respuesta por escrito.",
+      "Recibir los servicios de salud en condiciones de higiene, seguridad y respeto a su intimidad.",
   },
   {
     id: 13,
     numero: "13",
-    titulo: "Rendición de cuentas sobre costos",
+    titulo: "Rendición de cuentas",
     descripcion:
-      "A solicitar y recibir explicaciones o rendición de cuentas acerca de los costos por los tratamientos de salud recibidos.",
+      "Solicitar y recibir explicaciones o rendición de cuentas acerca de los costos por los tratamientos de salud recibidos.",
   },
   {
     id: 14,
     numero: "14",
     titulo: "Voluntad sobre donación de órganos",
     descripcion:
-      "A que se le respete la voluntad de aceptación o negación de la donación de sus órganos de conformidad con la ley.",
+      "Que se respete la voluntad de aceptar o negar la donación de sus órganos de conformidad con la ley.",
   },
   {
     id: 15,
     numero: "15",
-    titulo: "No a tratos crueles o inhumanos",
+    titulo: "Protección contra tratos inhumanos",
     descripcion:
-      "A no ser sometidos en ningún caso a tratos crueles o inhumanos que afecten su dignidad, ni a ser obligados a soportar sufrimiento evitable, ni obligados a padecer enfermedades que pueden recibir tratamiento.",
+      "A no ser sometido en ningún caso a tratos crueles o inhumanos que afecten su dignidad, ni a ser obligado a soportar sufrimiento evitable, ni obligado a padecer enfermedades que pueden recibir tratamiento.",
   },
   {
     id: 16,
     numero: "16",
-    titulo: "Sin cargas administrativas ajenas",
+    titulo: "Sin cargas administrativas indebidas",
     descripcion:
-      "A que no se le trasladen las cargas administrativas y burocráticas que les corresponde asumir a los encargados o intervinientes en la prestación del servicio.",
+      "A que no se trasladen las cargas administrativas y burocráticas que les corresponde asumir a los encargados o intervinientes en la prestación del servicio.",
   },
   {
     id: 17,
