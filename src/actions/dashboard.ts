@@ -18,9 +18,9 @@ export async function getDashboardStats() {
     { count: miembros },
     { data: pqrsRecientes },
   ] = await Promise.all([
-    supabase.from("pqrs").select("*", { count: "exact", head: true }),
+    supabase.from("pqrsd").select("*", { count: "exact", head: true }),
     supabase
-      .from("pqrs")
+      .from("pqrsd")
       .select("*", { count: "exact", head: true })
       .gte("created_at", hace7dias.toISOString()),
     supabase.from("servicios").select("activo"),
@@ -38,8 +38,8 @@ export async function getDashboardStats() {
       .select("*", { count: "exact", head: true })
       .eq("activo", true),
     supabase
-      .from("pqrs")
-      .select("id, tipo, nombre, email, created_at")
+      .from("pqrsd")
+      .select("id, type, full_name, email, created_at")
       .order("created_at", { ascending: false })
       .limit(5),
   ]);

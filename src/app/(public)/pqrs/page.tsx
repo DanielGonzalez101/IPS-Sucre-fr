@@ -52,7 +52,7 @@ export default function PqrsPage() {
       >
         <div className="container-main">
           <div
-            className="max-w-3xl mx-auto rounded-2xl p-6 md:p-10"
+            className="rounded-2xl p-6 md:p-12"
             style={{
               backgroundColor: "#fff",
               boxShadow: "var(--shadow-card)",

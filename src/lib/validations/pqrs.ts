@@ -34,17 +34,18 @@ export const pqrsdSchema = z
     is_anonymous: z.boolean().default(false),
     full_name: z.string().max(150).optional(),
     doc_type: z.enum(DOC_TYPES).optional(),
-    doc_number: z.string().max(30).optional(),
+    doc_number: z.string().max(10, "El número de documento no puede superar 10 dígitos").optional(),
     email: z
       .string()
       .min(1, "El correo electrónico es obligatorio")
       .email("Correo electrónico inválido"),
     phone: z
       .string()
-      .refine((val) => !val || /^\+?[\d\s\-(). ]{7,20}$/.test(val), {
-        message: "Teléfono inválido",
-      })
-      .optional(),
+      .min(7, "El teléfono debe tener mínimo 7 dígitos")
+      .max(10, "El teléfono no puede superar 10 dígitos")
+      .refine((val) => /^\d{7,10}$/.test(val), {
+        message: "Solo se permiten dígitos (7 a 10 números)",
+      }),
     address: z.string().max(200).optional(),
     address_detail: z.string().max(100).optional(),
     city: z.string().max(100).optional(),
@@ -55,7 +56,8 @@ export const pqrsdSchema = z
       .max(200, "El asunto no puede superar 200 caracteres"),
     description: z
       .string()
-      .min(50, "La descripción debe tener al menos 50 caracteres"),
+      .min(50, "La descripción debe tener al menos 50 caracteres")
+      .max(500, "La descripción no puede superar los 500 caracteres"),
     accepted_terms: z
       .boolean()
       .refine((v) => v === true, {

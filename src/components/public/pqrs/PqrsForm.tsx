@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useId } from "react";
-import { Upload, X, FileText, AlertCircle, ChevronDown } from "lucide-react";
+import { Upload, X, FileText, AlertCircle } from "lucide-react";
 import {
   PQRSD_TYPES,
   DOC_TYPES,
@@ -9,11 +9,11 @@ import {
   pqrsdSchema,
   type PqrsdType,
   type DocType,
-  type ResponseMode,
 } from "@/lib/validations/pqrs";
+import CityInput from "./CityInput";
 import PqrsConfirmation from "./PqrsConfirmation";
 
-// ─── Constantes de presentación ───────────────────────────────────────────────
+// ─── Definiciones de tipos ────────────────────────────────────────────────────
 
 const TYPE_META: Record<
   PqrsdType,
@@ -61,7 +61,7 @@ const ALLOWED_EXTENSIONS = ["PDF", "JPG", "PNG"];
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const MAX_FILES = 3;
 
-// ─── Tipos ───────────────────────────────────────────────────────────────────
+// ─── Estado del formulario ────────────────────────────────────────────────────
 
 interface FormState {
   type: PqrsdType | "";
@@ -74,7 +74,7 @@ interface FormState {
   address: string;
   address_detail: string;
   city: string;
-  response_mode: ResponseMode;
+  response_mode: "email";
   subject: string;
   description: string;
   accepted_terms: boolean;
@@ -97,33 +97,66 @@ const INITIAL: FormState = {
   accepted_terms: false,
 };
 
-// ─── Helpers de UI ────────────────────────────────────────────────────────────
+// ─── Componentes de UI ────────────────────────────────────────────────────────
 
 function FieldError({ id, message }: { id: string; message?: string }) {
   if (!message) return null;
   return (
-    <p id={id} role="alert" className="flex items-center gap-1.5 mt-1.5 text-sm" style={{ color: "var(--color-rojo-500)" }}>
-      <AlertCircle size={14} aria-hidden="true" />
+    <p
+      id={id}
+      role="alert"
+      className="flex items-center gap-2 mt-2 text-base"
+      style={{ color: "var(--color-rojo-500)" }}
+    >
+      <AlertCircle size={16} aria-hidden="true" className="flex-shrink-0" />
       {message}
     </p>
   );
 }
 
-function SectionTitle({ children }: { children: React.ReactNode }) {
+function SectionTitle({
+  children,
+  number,
+}: {
+  children: React.ReactNode;
+  number: number;
+}) {
   return (
-    <h3
-      className="font-bold text-base mb-4"
-      style={{ color: "var(--color-azul-900)" }}
-    >
-      {children}
-    </h3>
+    <div className="flex items-center gap-4 mb-6">
+      <span
+        className="w-9 h-9 rounded-full flex items-center justify-center font-bold text-base flex-shrink-0"
+        style={{
+          backgroundColor: "var(--color-azul-800)",
+          color: "#fff",
+        }}
+        aria-hidden="true"
+      >
+        {number}
+      </span>
+      <h3
+        className="font-bold text-xl md:text-2xl"
+        style={{ color: "var(--color-azul-900)" }}
+      >
+        {children}
+      </h3>
+    </div>
+  );
+}
+
+function Divider() {
+  return (
+    <hr
+      className="my-10"
+      style={{ borderColor: "var(--color-gris-100)" }}
+      aria-hidden="true"
+    />
   );
 }
 
 function inputClass(hasError: boolean) {
   return [
-    "w-full px-4 py-3 rounded-xl border text-sm transition-all duration-200",
-    "focus:outline-none focus:ring-2 focus:ring-offset-0",
+    "w-full px-5 py-4 rounded-xl border text-base transition-all duration-200",
+    "focus:outline-none focus:ring-2",
     "bg-white",
     hasError
       ? "border-[#EE3538] focus:ring-[#EE3538]/30"
@@ -143,13 +176,17 @@ function Label({
   return (
     <label
       htmlFor={htmlFor}
-      className="block text-sm font-semibold mb-1.5"
+      className="block text-base font-semibold mb-2"
       style={{ color: "var(--color-gris-700)" }}
     >
       {children}
       {required && (
-        <span style={{ color: "var(--color-rojo-500)" }} aria-hidden="true">
-          {" "}*
+        <span
+          style={{ color: "var(--color-rojo-500)" }}
+          aria-hidden="true"
+        >
+          {" "}
+          *
         </span>
       )}
     </label>
@@ -162,11 +199,10 @@ export default function PqrsForm() {
   const [form, setForm] = useState<FormState>(INITIAL);
   const [files, setFiles] = useState<File[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [fileError, setFileError] = useState<string>("");
+  const [fileError, setFileError] = useState("");
   const [step, setStep] = useState<"form" | "success">("form");
   const [trackingCode, setTrackingCode] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [helpOpen, setHelpOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const uid = useId();
 
@@ -231,9 +267,7 @@ export default function PqrsForm() {
     e.preventDefault();
 
     // TODO: Integrar reCAPTCHA v3 aquí antes de enviar
-    // const recaptchaToken = await grecaptcha.execute(SITE_KEY, { action: 'pqrsd_submit' });
 
-    // Client-side validation
     const result = pqrsdSchema.safeParse({
       ...form,
       type: form.type || undefined,
@@ -247,17 +281,12 @@ export default function PqrsForm() {
         if (msgs?.[0]) newErrors[key] = msgs[0];
       }
       setErrors(newErrors);
-      // Focus first error
       const firstKey = Object.keys(newErrors)[0];
-      if (firstKey) {
-        const el = document.getElementById(id(firstKey));
-        el?.focus();
-      }
+      if (firstKey) document.getElementById(id(firstKey))?.focus();
       return;
     }
 
     setSubmitting(true);
-
     try {
       const fd = new FormData();
       fd.append("type", form.type);
@@ -268,30 +297,25 @@ export default function PqrsForm() {
         fd.append("doc_number", form.doc_number);
       }
       fd.append("email", form.email);
-      if (form.phone) fd.append("phone", form.phone);
+      fd.append("phone", form.phone);
       if (form.address) fd.append("address", form.address);
       if (form.address_detail) fd.append("address_detail", form.address_detail);
       if (form.city) fd.append("city", form.city);
-      fd.append("response_mode", form.response_mode);
+      fd.append("response_mode", "email");
       fd.append("subject", form.subject);
       fd.append("description", form.description);
       fd.append("accepted_terms", "true");
+      for (const f of files) fd.append("adjuntos", f);
 
-      for (const f of files) {
-        fd.append("adjuntos", f);
-      }
-
-      const res = await fetch("/api/pqrsd", {
-        method: "POST",
-        body: fd,
-      });
-
+      const res = await fetch("/api/pqrsd", { method: "POST", body: fd });
       const json = await res.json();
 
       if (!res.ok) {
         if (json.fields) {
           const newErrors: Record<string, string> = {};
-          for (const [key, msgs] of Object.entries(json.fields as Record<string, string[]>)) {
+          for (const [key, msgs] of Object.entries(
+            json.fields as Record<string, string[]>
+          )) {
             if (msgs[0]) newErrors[key] = msgs[0];
           }
           setErrors(newErrors);
@@ -305,7 +329,10 @@ export default function PqrsForm() {
       setStep("success");
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch {
-      setErrors({ _global: "Error de conexión. Verifique su internet e intente nuevamente." });
+      setErrors({
+        _global:
+          "Error de conexión. Verifique su internet e intente nuevamente.",
+      });
     } finally {
       setSubmitting(false);
     }
@@ -333,86 +360,17 @@ export default function PqrsForm() {
 
   return (
     <form onSubmit={handleSubmit} noValidate aria-label="Formulario PQRSD">
-      {/* ── Sección de ayuda ───────────────────────────── */}
-      <div className="mb-8">
-        <button
-          type="button"
-          onClick={() => setHelpOpen(!helpOpen)}
-          className="w-full flex items-center justify-between gap-3 p-4 rounded-2xl text-left transition-all duration-200 cursor-pointer"
-          style={{
-            backgroundColor: "var(--color-azul-50)",
-            border: "1.5px solid var(--color-azul-100)",
-          }}
-          aria-expanded={helpOpen}
-          aria-controls="pqrs-help-content"
-        >
-          <span
-            className="font-semibold text-sm"
-            style={{ color: "var(--color-azul-800)" }}
-          >
-            ¿Cuál es la diferencia entre cada tipo de solicitud? Ver definiciones
-          </span>
-          <ChevronDown
-            size={18}
-            aria-hidden="true"
-            style={{
-              color: "var(--color-azul-600)",
-              transform: helpOpen ? "rotate(180deg)" : "rotate(0deg)",
-              transition: "transform 0.2s",
-              flexShrink: 0,
-            }}
-          />
-        </button>
 
-        {helpOpen && (
-          <div
-            id="pqrs-help-content"
-            className="mt-3 grid sm:grid-cols-2 lg:grid-cols-3 gap-3"
-          >
-            {PQRSD_TYPES.map((t) => (
-              <div
-                key={t}
-                className="p-4 rounded-xl"
-                style={{
-                  backgroundColor: "#fff",
-                  border: "1px solid var(--color-gris-100)",
-                }}
-              >
-                <div className="flex items-center gap-2 mb-2">
-                  <span
-                    className="w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs"
-                    style={{
-                      backgroundColor: "var(--color-azul-800)",
-                      color: "#fff",
-                    }}
-                    aria-hidden="true"
-                  >
-                    {TYPE_META[t].short}
-                  </span>
-                  <span
-                    className="font-semibold text-sm"
-                    style={{ color: "var(--color-azul-900)" }}
-                  >
-                    {TYPE_META[t].label}
-                  </span>
-                </div>
-                <p className="text-sm" style={{ color: "var(--color-gris-500)" }}>
-                  {TYPE_META[t].description}
-                </p>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+      {/* ── Sección 1: Tipo ──────────────────────────────────────────── */}
+      <SectionTitle number={1}>
+        ¿Qué tipo de solicitud desea presentar?
+      </SectionTitle>
 
-      {/* ── Tipo de solicitud ──────────────────────────── */}
-      <fieldset className="mb-8">
-        <legend className="font-bold text-base mb-4" style={{ color: "var(--color-azul-900)" }}>
-          Tipo de solicitud{" "}
-          <span style={{ color: "var(--color-rojo-500)" }} aria-hidden="true">*</span>
-        </legend>
+      {/* Selector de tipo */}
+      <fieldset>
+        <legend className="sr-only">Tipo de solicitud (obligatorio)</legend>
         <div
-          className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3"
+          className="grid sm:grid-cols-2 xl:grid-cols-3 gap-4"
           role="radiogroup"
           aria-required="true"
         >
@@ -421,12 +379,13 @@ export default function PqrsForm() {
             return (
               <label
                 key={t}
-                className="flex items-start gap-3 p-4 rounded-xl cursor-pointer transition-all duration-200 select-none"
+                className="flex items-start gap-4 p-5 rounded-xl cursor-pointer transition-all duration-200 select-none"
                 style={{
                   backgroundColor: selected ? "var(--color-azul-50)" : "#fff",
                   border: selected
-                    ? "2px solid var(--color-azul-800)"
-                    : "1.5px solid var(--color-gris-100)",
+                    ? "2.5px solid var(--color-azul-800)"
+                    : "2px solid var(--color-gris-100)",
+                  minHeight: "96px",
                 }}
               >
                 <input
@@ -435,25 +394,25 @@ export default function PqrsForm() {
                   value={t}
                   checked={selected}
                   onChange={() => handleTypeChange(t)}
-                  className="mt-0.5 accent-[var(--color-azul-800)]"
+                  className="mt-1 w-5 h-5 accent-[var(--color-azul-800)] flex-shrink-0"
                   aria-describedby={errors.type ? id("type-error") : undefined}
                 />
                 <span>
                   <span
-                    className="block font-semibold text-sm"
+                    className="block font-bold text-base"
                     style={{
                       color: selected
                         ? "var(--color-azul-800)"
-                        : "var(--color-gris-700)",
+                        : "var(--color-gris-800)",
                     }}
                   >
                     {TYPE_META[t].label}
                   </span>
                   <span
-                    className="block text-xs mt-0.5"
+                    className="block text-sm mt-1 leading-snug"
                     style={{ color: "var(--color-gris-500)" }}
                   >
-                    {TYPE_META[t].description.slice(0, 70)}…
+                    {TYPE_META[t].description}
                   </span>
                 </span>
               </label>
@@ -463,50 +422,52 @@ export default function PqrsForm() {
         <FieldError id={id("type-error")} message={errors.type} />
       </fieldset>
 
-      {/* ── Anonimato (solo queja/denuncia) ───────────── */}
+      {/* ── Anonimato (solo queja/denuncia) ──── */}
       {canBeAnonymous && (
         <div
-          className="mb-8 p-4 rounded-xl"
+          className="mt-6 p-5 rounded-xl"
           style={{
             backgroundColor: "var(--color-azul-50)",
-            border: "1.5px solid var(--color-azul-100)",
+            border: "2px solid var(--color-azul-100)",
           }}
         >
-          <label className="flex items-start gap-3 cursor-pointer select-none">
+          <label className="flex items-start gap-4 cursor-pointer select-none">
             <input
               type="checkbox"
               checked={form.is_anonymous}
               onChange={(e) => set("is_anonymous", e.target.checked)}
-              className="mt-0.5 accent-[var(--color-azul-800)]"
+              className="mt-1 w-5 h-5 accent-[var(--color-azul-800)] flex-shrink-0"
               aria-describedby={id("anon-desc")}
             />
             <span>
               <span
-                className="block font-semibold text-sm"
+                className="block font-bold text-base"
                 style={{ color: "var(--color-azul-900)" }}
               >
                 Deseo presentar esta solicitud de forma anónima
               </span>
               <span
                 id={id("anon-desc")}
-                className="block text-xs mt-0.5"
+                className="block text-sm mt-1"
                 style={{ color: "var(--color-gris-500)" }}
               >
-                Solo disponible para Quejas y Denuncias. No se registrarán sus
-                datos personales, pero deberá suministrar un correo para la
-                respuesta.
+                Solo disponible para Quejas y Denuncias. Sus datos personales no
+                quedarán registrados, pero debe ingresar un correo para recibir
+                la respuesta.
               </span>
             </span>
           </label>
         </div>
       )}
 
-      {/* ── Datos de identificación ───────────────────── */}
+      <Divider />
+
+      {/* ── Sección 2: Identidad ─────────────────────────────────────── */}
       {!form.is_anonymous && (
-        <div className="mb-8">
-          <SectionTitle>Datos de identificación</SectionTitle>
-          <div className="grid sm:grid-cols-2 gap-4">
-            <div className="sm:col-span-2">
+        <>
+          <SectionTitle number={2}>Sus datos de identificación</SectionTitle>
+          <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6 mb-2">
+            <div className="md:col-span-2 xl:col-span-3">
               <Label htmlFor={id("full_name")} required>
                 Nombre completo
               </Label>
@@ -517,11 +478,16 @@ export default function PqrsForm() {
                 onChange={(e) => set("full_name", e.target.value)}
                 className={inputClass(!!errors.full_name)}
                 aria-invalid={!!errors.full_name}
-                aria-describedby={errors.full_name ? id("full_name-error") : undefined}
+                aria-describedby={
+                  errors.full_name ? id("full_name-error") : undefined
+                }
                 autoComplete="name"
-                placeholder="Nombre y apellidos"
+                placeholder="Escriba su nombre y apellidos"
               />
-              <FieldError id={id("full_name-error")} message={errors.full_name} />
+              <FieldError
+                id={id("full_name-error")}
+                message={errors.full_name}
+              />
             </div>
 
             <div>
@@ -534,7 +500,9 @@ export default function PqrsForm() {
                 onChange={(e) => set("doc_type", e.target.value as DocType)}
                 className={inputClass(!!errors.doc_type)}
                 aria-invalid={!!errors.doc_type}
-                aria-describedby={errors.doc_type ? id("doc_type-error") : undefined}
+                aria-describedby={
+                  errors.doc_type ? id("doc_type-error") : undefined
+                }
               >
                 <option value="">Seleccione…</option>
                 {DOC_TYPES.map((dt) => (
@@ -543,10 +511,13 @@ export default function PqrsForm() {
                   </option>
                 ))}
               </select>
-              <FieldError id={id("doc_type-error")} message={errors.doc_type} />
+              <FieldError
+                id={id("doc_type-error")}
+                message={errors.doc_type}
+              />
             </div>
 
-            <div>
+            <div className="xl:col-span-2">
               <Label htmlFor={id("doc_number")} required>
                 Número de documento
               </Label>
@@ -554,10 +525,17 @@ export default function PqrsForm() {
                 id={id("doc_number")}
                 type="text"
                 value={form.doc_number}
-                onChange={(e) => set("doc_number", e.target.value)}
+                onChange={(e) => {
+                  const clean = e.target.value.replace(/\D/g, "").slice(0, 10);
+                  set("doc_number", clean);
+                }}
                 className={inputClass(!!errors.doc_number)}
                 aria-invalid={!!errors.doc_number}
-                aria-describedby={errors.doc_number ? id("doc_number-error") : undefined}
+                aria-describedby={
+                  errors.doc_number ? id("doc_number-error") : undefined
+                }
+                inputMode="numeric"
+                maxLength={10}
                 placeholder="Ej. 1050000000"
               />
               <FieldError
@@ -566,322 +544,299 @@ export default function PqrsForm() {
               />
             </div>
           </div>
-        </div>
+          <Divider />
+        </>
       )}
 
-      {/* ── Datos de contacto ─────────────────────────── */}
-      <div className="mb-8">
-        <SectionTitle>Datos de contacto</SectionTitle>
-        <div className="grid sm:grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor={id("email")} required>
-              Correo electrónico
-            </Label>
-            <input
-              id={id("email")}
-              type="email"
-              value={form.email}
-              onChange={(e) => set("email", e.target.value)}
-              className={inputClass(!!errors.email)}
-              aria-invalid={!!errors.email}
-              aria-describedby={errors.email ? id("email-error") : undefined}
-              autoComplete="email"
-              placeholder="ejemplo@correo.com"
-            />
-            <FieldError id={id("email-error")} message={errors.email} />
-          </div>
+      {/* ── Sección 3 (o 2 si anónimo): Contacto ──────────────────────── */}
+      <SectionTitle number={form.is_anonymous ? 2 : 3}>
+        Datos de contacto
+      </SectionTitle>
+      <div className="grid md:grid-cols-2 gap-6 mb-2">
+        <div>
+          <Label htmlFor={id("email")} required>
+            Correo electrónico
+          </Label>
+          <input
+            id={id("email")}
+            type="email"
+            value={form.email}
+            onChange={(e) => set("email", e.target.value)}
+            className={inputClass(!!errors.email)}
+            aria-invalid={!!errors.email}
+            aria-describedby={errors.email ? id("email-error") : undefined}
+            autoComplete="email"
+            placeholder="ejemplo@correo.com"
+          />
+          <FieldError id={id("email-error")} message={errors.email} />
+        </div>
 
-          <div>
-            <Label htmlFor={id("phone")}>Teléfono (opcional)</Label>
-            <input
-              id={id("phone")}
-              type="tel"
-              value={form.phone}
-              onChange={(e) => set("phone", e.target.value)}
-              className={inputClass(!!errors.phone)}
-              aria-invalid={!!errors.phone}
-              aria-describedby={errors.phone ? id("phone-error") : undefined}
-              autoComplete="tel"
-              placeholder="Ej. 300 000 0000"
-            />
-            <FieldError id={id("phone-error")} message={errors.phone} />
-          </div>
+        <div>
+          <Label htmlFor={id("phone")} required>Teléfono</Label>
+          <input
+            id={id("phone")}
+            type="tel"
+            value={form.phone}
+            onChange={(e) => {
+              const clean = e.target.value.replace(/\D/g, "").slice(0, 10);
+              set("phone", clean);
+            }}
+            className={inputClass(!!errors.phone)}
+            aria-invalid={!!errors.phone}
+            aria-describedby={errors.phone ? id("phone-error") : undefined}
+            autoComplete="tel"
+            inputMode="numeric"
+            maxLength={10}
+            placeholder="Ej. 3001234567"
+          />
+          <FieldError id={id("phone-error")} message={errors.phone} />
+        </div>
 
-          <div className="sm:col-span-2">
-            <Label htmlFor={id("address")}>Dirección de correspondencia</Label>
-            <input
-              id={id("address")}
-              type="text"
-              value={form.address}
-              onChange={(e) => set("address", e.target.value)}
-              className={inputClass(false)}
-              autoComplete="street-address"
-              placeholder="Calle, carrera, transversal…"
-            />
-          </div>
+        <div className="md:col-span-2">
+          <Label htmlFor={id("address")}>Dirección de correspondencia</Label>
+          <input
+            id={id("address")}
+            type="text"
+            value={form.address}
+            onChange={(e) => set("address", e.target.value)}
+            className={inputClass(false)}
+            autoComplete="street-address"
+            placeholder="Calle, carrera, transversal…"
+          />
+        </div>
 
-          <div>
-            <Label htmlFor={id("address_detail")}>
-              Barrio / Vereda / Corregimiento
-            </Label>
-            <input
-              id={id("address_detail")}
-              type="text"
-              value={form.address_detail}
-              onChange={(e) => set("address_detail", e.target.value)}
-              className={inputClass(false)}
-              placeholder="Nombre del barrio o vereda"
-            />
-          </div>
+        <div>
+          <Label htmlFor={id("address_detail")}>Barrio</Label>
+          <input
+            id={id("address_detail")}
+            type="text"
+            value={form.address_detail}
+            onChange={(e) => set("address_detail", e.target.value)}
+            className={inputClass(false)}
+            placeholder="Nombre del barrio"
+          />
+        </div>
 
-          <div>
-            <Label htmlFor={id("city")}>Municipio / Distrito</Label>
-            <input
-              id={id("city")}
-              type="text"
-              value={form.city}
-              onChange={(e) => set("city", e.target.value)}
-              className={inputClass(false)}
-              autoComplete="address-level2"
-              placeholder="Ciudad o municipio"
-            />
-          </div>
+        <div>
+          <Label htmlFor={id("city")}>Ciudad</Label>
+          <CityInput
+            inputId={id("city")}
+            value={form.city}
+            onChange={(v) => set("city", v)}
+          />
         </div>
       </div>
 
-      {/* ── Modalidad de respuesta ─────────────────────── */}
-      <fieldset className="mb-8">
-        <legend
-          className="font-bold text-base mb-4"
-          style={{ color: "var(--color-azul-900)" }}
-        >
-          Modalidad de respuesta
-        </legend>
-        <div className="flex flex-col sm:flex-row gap-3">
-          {(["email", "correspondencia"] as ResponseMode[]).map((mode) => {
-            const labels: Record<ResponseMode, string> = {
-              email: "Correo electrónico",
-              correspondencia: "Dirección de correspondencia",
-            };
-            const selected = form.response_mode === mode;
-            return (
-              <label
-                key={mode}
-                className="flex items-center gap-3 px-5 py-3.5 rounded-xl cursor-pointer transition-all duration-200 select-none"
-                style={{
-                  backgroundColor: selected ? "var(--color-azul-50)" : "#fff",
-                  border: selected
-                    ? "2px solid var(--color-azul-800)"
-                    : "1.5px solid var(--color-gris-100)",
-                  flex: 1,
-                }}
-              >
-                <input
-                  type="radio"
-                  name="response_mode"
-                  value={mode}
-                  checked={selected}
-                  onChange={() => set("response_mode", mode)}
-                  className="accent-[var(--color-azul-800)]"
-                />
-                <span
-                  className="font-semibold text-sm"
-                  style={{
-                    color: selected
-                      ? "var(--color-azul-800)"
-                      : "var(--color-gris-700)",
-                  }}
-                >
-                  {labels[mode]}
-                </span>
-              </label>
-            );
-          })}
+      <Divider />
+
+      {/* ── Sección 4: Contenido ─────────────────────────────────────── */}
+      <SectionTitle number={form.is_anonymous ? 3 : 4}>
+        Describa su solicitud
+      </SectionTitle>
+      <div className="space-y-6 mb-2">
+        <div>
+          <Label htmlFor={id("subject")} required>
+            Asunto o motivo principal
+          </Label>
+          <input
+            id={id("subject")}
+            type="text"
+            value={form.subject}
+            onChange={(e) => set("subject", e.target.value)}
+            className={inputClass(!!errors.subject)}
+            aria-invalid={!!errors.subject}
+            aria-describedby={
+              errors.subject ? id("subject-error") : undefined
+            }
+            maxLength={200}
+            placeholder="Resuma en pocas palabras el motivo de su solicitud"
+          />
+          <FieldError id={id("subject-error")} message={errors.subject} />
         </div>
-      </fieldset>
 
-      {/* ── Contenido ─────────────────────────────────── */}
-      <div className="mb-8">
-        <SectionTitle>Contenido de la solicitud</SectionTitle>
-        <div className="space-y-4">
-          <div>
-            <Label htmlFor={id("subject")} required>
-              Asunto / Objeto
-            </Label>
-            <input
-              id={id("subject")}
-              type="text"
-              value={form.subject}
-              onChange={(e) => set("subject", e.target.value)}
-              className={inputClass(!!errors.subject)}
-              aria-invalid={!!errors.subject}
-              aria-describedby={errors.subject ? id("subject-error") : undefined}
-              maxLength={200}
-              placeholder="Resuma brevemente el motivo de su solicitud"
-            />
-            <FieldError id={id("subject-error")} message={errors.subject} />
-          </div>
-
-          <div>
-            <Label htmlFor={id("description")} required>
-              Descripción detallada
-            </Label>
-            <textarea
-              id={id("description")}
-              value={form.description}
-              onChange={(e) => set("description", e.target.value)}
-              className={inputClass(!!errors.description)}
-              aria-invalid={!!errors.description}
-              aria-describedby={
-                [
-                  errors.description ? id("description-error") : "",
-                  id("description-hint"),
-                ]
-                  .filter(Boolean)
-                  .join(" ") || undefined
-              }
-              rows={6}
-              placeholder="Describa con detalle los hechos, fechas, personas involucradas y lo que solicita a la entidad…"
-            />
-            <div className="flex items-start justify-between mt-1.5">
-              <FieldError
-                id={id("description-error")}
-                message={errors.description}
-              />
-              <span
-                id={id("description-hint")}
-                className="text-xs ml-auto"
-                style={{
-                  color:
-                    form.description.length < 50
-                      ? "var(--color-gris-500)"
-                      : "var(--color-azul-600)",
-                }}
-                aria-live="polite"
-              >
-                {form.description.length} / 50 mín.
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Adjuntos ──────────────────────────────────── */}
-      <div className="mb-8">
-        <SectionTitle>Documentos adjuntos (opcional)</SectionTitle>
-        <p
-          className="text-sm mb-4"
-          style={{ color: "var(--color-gris-500)" }}
-          id={id("file-hint")}
-        >
-          PDF, JPG o PNG — máximo 5 MB por archivo — hasta 3 archivos.
-        </p>
-
-        {files.length < MAX_FILES && (
-          <label
-            className="flex flex-col items-center justify-center gap-2 p-8 rounded-xl cursor-pointer transition-all duration-200"
-            style={{
-              border: "2px dashed var(--color-azul-100)",
-              backgroundColor: "var(--color-azul-50)",
-            }}
-            onDragOver={(e) => e.preventDefault()}
-            onDrop={(e) => {
-              e.preventDefault();
-              handleFileAdd(e.dataTransfer.files);
-            }}
-          >
-            <Upload
-              size={28}
-              aria-hidden="true"
-              style={{ color: "var(--color-azul-600)" }}
+        <div>
+          <Label htmlFor={id("description")} required>
+            Descripción detallada
+          </Label>
+          <textarea
+            id={id("description")}
+            value={form.description}
+            onChange={(e) => set("description", e.target.value)}
+            className={inputClass(!!errors.description)}
+            aria-invalid={!!errors.description}
+            aria-describedby={
+              [
+                errors.description ? id("description-error") : "",
+                id("description-hint"),
+              ]
+                .filter(Boolean)
+                .join(" ") || undefined
+            }
+            rows={7}
+            maxLength={500}
+            placeholder="Describa con detalle los hechos, fechas y lo que solicita a la entidad…"
+          />
+          <div className="flex items-start justify-between mt-2">
+            <FieldError
+              id={id("description-error")}
+              message={errors.description}
             />
             <span
-              className="font-semibold text-sm"
-              style={{ color: "var(--color-azul-800)" }}
+              id={id("description-hint")}
+              className="text-sm ml-auto"
+              style={{
+                color:
+                  form.description.length > 480
+                    ? "var(--color-rojo-500)"
+                    : form.description.length >= 50
+                    ? "var(--color-azul-600)"
+                    : "var(--color-gris-500)",
+              }}
+              aria-live="polite"
             >
-              Haga clic o arrastre archivos aquí
+              {form.description.length} / 500
             </span>
-            <span className="text-xs" style={{ color: "var(--color-gris-500)" }}>
-              {files.length} / {MAX_FILES} archivos seleccionados
-            </span>
-            <input
-              ref={fileInputRef}
-              type="file"
-              multiple
-              accept=".pdf,.jpg,.jpeg,.png"
-              onChange={(e) => handleFileAdd(e.target.files)}
-              className="sr-only"
-              aria-describedby={id("file-hint")}
-            />
-          </label>
-        )}
-
-        {fileError && (
-          <p
-            className="flex items-center gap-1.5 mt-2 text-sm"
-            role="alert"
-            style={{ color: "var(--color-rojo-500)" }}
-          >
-            <AlertCircle size={14} aria-hidden="true" />
-            {fileError}
-          </p>
-        )}
-
-        {files.length > 0 && (
-          <ul className="mt-3 space-y-2" aria-label="Archivos seleccionados">
-            {files.map((f, i) => (
-              <li
-                key={i}
-                className="flex items-center justify-between gap-3 px-4 py-3 rounded-xl"
-                style={{
-                  backgroundColor: "#fff",
-                  border: "1px solid var(--color-gris-100)",
-                }}
-              >
-                <div className="flex items-center gap-3 min-w-0">
-                  <FileText
-                    size={18}
-                    aria-hidden="true"
-                    style={{ color: "var(--color-azul-600)", flexShrink: 0 }}
-                  />
-                  <span
-                    className="text-sm truncate"
-                    style={{ color: "var(--color-gris-700)" }}
-                    title={f.name}
-                  >
-                    {f.name}
-                  </span>
-                  <span
-                    className="text-xs flex-shrink-0"
-                    style={{ color: "var(--color-gris-500)" }}
-                  >
-                    {formatSize(f.size)}
-                  </span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => removeFile(i)}
-                  className="p-1 rounded-full transition-colors duration-150 cursor-pointer flex-shrink-0"
-                  style={{ color: "var(--color-gris-500)" }}
-                  aria-label={`Eliminar ${f.name}`}
-                >
-                  <X size={16} aria-hidden="true" />
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
+          </div>
+        </div>
       </div>
 
-      {/* ── Aceptación de términos ─────────────────────── */}
-      <div className="mb-8">
-        <label className="flex items-start gap-3 cursor-pointer select-none">
+      <Divider />
+
+      {/* ── Sección 6: Adjuntos ──────────────────────────────────────── */}
+      <SectionTitle number={form.is_anonymous ? 4 : 5}>
+        Documentos adjuntos{" "}
+        <span
+          className="text-base font-normal"
+          style={{ color: "var(--color-gris-500)" }}
+        >
+          (opcional)
+        </span>
+      </SectionTitle>
+      <p
+        className="text-base mb-6"
+        style={{ color: "var(--color-gris-500)" }}
+        id={id("file-hint")}
+      >
+        Puede adjuntar hasta <strong>3 archivos</strong> en formato PDF, JPG o
+        PNG. Cada archivo no debe superar los <strong>5 MB</strong>.
+      </p>
+
+      {files.length < MAX_FILES && (
+        <label
+          className="flex flex-col items-center justify-center gap-3 py-10 rounded-xl cursor-pointer transition-all duration-200"
+          style={{
+            border: "2.5px dashed var(--color-azul-100)",
+            backgroundColor: "var(--color-azul-50)",
+          }}
+          onDragOver={(e) => e.preventDefault()}
+          onDrop={(e) => {
+            e.preventDefault();
+            handleFileAdd(e.dataTransfer.files);
+          }}
+        >
+          <Upload
+            size={36}
+            aria-hidden="true"
+            style={{ color: "var(--color-azul-600)" }}
+          />
+          <span
+            className="font-bold text-lg"
+            style={{ color: "var(--color-azul-800)" }}
+          >
+            Haga clic aquí o arrastre los archivos
+          </span>
+          <span className="text-base" style={{ color: "var(--color-gris-500)" }}>
+            {files.length} de {MAX_FILES} archivos seleccionados
+          </span>
+          <input
+            ref={fileInputRef}
+            type="file"
+            multiple
+            accept=".pdf,.jpg,.jpeg,.png"
+            onChange={(e) => handleFileAdd(e.target.files)}
+            className="sr-only"
+            aria-describedby={id("file-hint")}
+          />
+        </label>
+      )}
+
+      {fileError && (
+        <p
+          className="flex items-center gap-2 mt-3 text-base"
+          role="alert"
+          style={{ color: "var(--color-rojo-500)" }}
+        >
+          <AlertCircle size={16} aria-hidden="true" />
+          {fileError}
+        </p>
+      )}
+
+      {files.length > 0 && (
+        <ul className="mt-4 space-y-3" aria-label="Archivos seleccionados">
+          {files.map((f, i) => (
+            <li
+              key={i}
+              className="flex items-center justify-between gap-4 px-5 py-4 rounded-xl"
+              style={{
+                backgroundColor: "#fff",
+                border: "1.5px solid var(--color-gris-100)",
+              }}
+            >
+              <div className="flex items-center gap-3 min-w-0">
+                <FileText
+                  size={22}
+                  aria-hidden="true"
+                  style={{ color: "var(--color-azul-600)", flexShrink: 0 }}
+                />
+                <span
+                  className="text-base truncate font-medium"
+                  style={{ color: "var(--color-gris-700)" }}
+                  title={f.name}
+                >
+                  {f.name}
+                </span>
+                <span
+                  className="text-sm flex-shrink-0"
+                  style={{ color: "var(--color-gris-500)" }}
+                >
+                  {formatSize(f.size)}
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => removeFile(i)}
+                className="p-2 rounded-full transition-colors duration-150 cursor-pointer flex-shrink-0 hover:bg-gray-100"
+                style={{ color: "var(--color-gris-500)" }}
+                aria-label={`Eliminar ${f.name}`}
+              >
+                <X size={20} aria-hidden="true" />
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <Divider />
+
+      {/* ── Sección 7: Términos y envío ──────────────────────────────── */}
+      <SectionTitle number={form.is_anonymous ? 5 : 6}>
+        Aceptación y envío
+      </SectionTitle>
+
+      <div
+        className="p-6 rounded-xl mb-8"
+        style={{
+          backgroundColor: "var(--color-gris-50)",
+          border: "1.5px solid var(--color-gris-100)",
+        }}
+      >
+        <label className="flex items-start gap-4 cursor-pointer select-none">
           <input
             id={id("accepted_terms")}
             type="checkbox"
             checked={form.accepted_terms}
             onChange={(e) => set("accepted_terms", e.target.checked)}
-            className="mt-0.5 accent-[var(--color-azul-800)]"
+            className="mt-1 w-5 h-5 accent-[var(--color-azul-800)] flex-shrink-0"
             aria-invalid={!!errors.accepted_terms}
             aria-describedby={[
               id("terms-text"),
@@ -892,14 +847,14 @@ export default function PqrsForm() {
           />
           <span
             id={id("terms-text")}
-            className="text-sm"
+            className="text-base leading-relaxed"
             style={{ color: "var(--color-gris-700)" }}
           >
             He leído y acepto que mis datos personales serán tratados conforme a
-            la{" "}
-            <strong>Ley 1581 de 2012</strong> (Protección de Datos Personales) y
-            la política de privacidad de IPS Sucre. Los datos recolectados
-            serán utilizados exclusivamente para gestionar esta solicitud.{" "}
+            la <strong>Ley 1581 de 2012</strong> (Protección de Datos
+            Personales) y la política de privacidad de IPS Sucre. Los datos
+            recolectados serán utilizados exclusivamente para gestionar esta
+            solicitud.{" "}
             <span style={{ color: "var(--color-rojo-500)" }} aria-hidden="true">
               *
             </span>
@@ -908,10 +863,10 @@ export default function PqrsForm() {
         <FieldError id={id("terms-error")} message={errors.accepted_terms} />
       </div>
 
-      {/* ── Error global ───────────────────────────────── */}
+      {/* Error global */}
       {errors._global && (
         <div
-          className="flex items-center gap-2 p-4 rounded-xl mb-6 text-sm"
+          className="flex items-center gap-3 p-5 rounded-xl mb-8 text-base"
           role="alert"
           style={{
             backgroundColor: "rgba(238,53,56,0.07)",
@@ -919,27 +874,28 @@ export default function PqrsForm() {
             color: "var(--color-rojo-500)",
           }}
         >
-          <AlertCircle size={16} aria-hidden="true" />
+          <AlertCircle size={20} aria-hidden="true" className="flex-shrink-0" />
           {errors._global}
         </div>
       )}
 
-      {/* ── Botón enviar ───────────────────────────────── */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+      {/* Botón enviar */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
         <button
           type="submit"
           disabled={submitting}
-          className="inline-flex items-center justify-center font-semibold text-sm rounded-full px-8 py-3.5 transition-all duration-200 hover:opacity-90 active:scale-95 focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+          className="inline-flex items-center justify-center font-bold text-lg rounded-full px-10 py-4 transition-all duration-200 hover:opacity-90 active:scale-95 focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
           style={{
             backgroundColor: "var(--color-rojo-500)",
             color: "#fff",
-            boxShadow: "0 4px 16px 0 rgba(238,53,56,0.30)",
+            boxShadow: "0 4px 20px 0 rgba(238,53,56,0.35)",
+            minWidth: "220px",
           }}
         >
           {submitting ? "Enviando…" : "Radicar solicitud"}
         </button>
-        <p className="text-xs" style={{ color: "var(--color-gris-500)" }}>
-          Los campos marcados con{" "}
+        <p className="text-base" style={{ color: "var(--color-gris-500)" }}>
+          Los campos con{" "}
           <span style={{ color: "var(--color-rojo-500)" }}>*</span> son
           obligatorios.
         </p>
