@@ -9,6 +9,7 @@ import { TeamSection }    from "@/components/home/TeamSection";
 import { NewsSection }     from "@/components/home/NewsSection";
 import { SedesSection }    from "@/components/home/SedesSection";
 import { getServiciosPublicos } from "@/actions/servicios";
+import { getSedes } from "@/actions/sitio";
 
 export const dynamic = "force-dynamic";
 
@@ -57,9 +58,10 @@ async function getHeroSlides(): Promise<HeroSlide[]> {
 }
 
 export default async function HomePage() {
-  const [slides, { data: servicios }] = await Promise.all([
+  const [slides, { data: servicios }, { data: sedes }] = await Promise.all([
     getHeroSlides(),
     getServiciosPublicos(),
+    getSedes(),
   ]);
 
   return (
@@ -70,7 +72,7 @@ export default async function HomePage() {
       <BentoCtaRow />
       <TeamSection />
       <NewsSection />
-      <SedesSection />
+      <SedesSection sedes={sedes} />
     </div>
   );
 }

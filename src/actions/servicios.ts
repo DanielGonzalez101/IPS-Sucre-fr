@@ -37,7 +37,6 @@ export async function createServicio(fields: {
   categoria: string;
   descripcion: string;
   icono: string;
-  href_anchor: string;
   orden: number;
 }) {
   const supabase = await createClient();
@@ -55,7 +54,6 @@ export async function updateServicio(
     categoria: string;
     descripcion: string;
     icono: string;
-    href_anchor: string;
     orden: number;
     activo: boolean;
   }>,

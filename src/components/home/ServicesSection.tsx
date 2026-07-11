@@ -60,7 +60,7 @@ interface Servicio {
   titulo: string;
   categoria: string;
   icono: string;
-  href_anchor: string;
+  slug: string;
 }
 
 interface Props {
@@ -163,12 +163,12 @@ export function ServicesSection({ servicios }: Props) {
 
           {/* Grid */}
           <div className="services-grid services-content-width grid gap-4">
-            {servicios.map(({ id, icono, titulo, categoria, href_anchor }) => {
+            {servicios.map(({ id, icono, titulo, categoria, slug }) => {
               const Icon = ICON_MAP[icono] ?? Stethoscope;
               return (
                 <Link
                   key={id}
-                  href={`/servicios#${href_anchor}`}
+                  href={`/servicios/${slug}`}
                   className="service-card group flex flex-col justify-between bg-white p-5 focus-visible:ring-2 focus-visible:ring-offset-2"
                   style={{
                     borderRadius: "16px",

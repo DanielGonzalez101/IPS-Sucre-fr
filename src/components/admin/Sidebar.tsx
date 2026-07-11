@@ -18,6 +18,7 @@ import {
   SlidersHorizontal,
   UserRound,
   Cpu,
+  Settings,
 } from "lucide-react";
 import { signOut } from "@/actions/auth";
 
@@ -44,12 +45,13 @@ const navGroups = [
 
 // Items planos sin subcategorías
 const navItems = [
-  { href: "/dashboard",  label: "Dashboard",  Icon: LayoutDashboard },
-  { href: "/paginas",    label: "Páginas",     Icon: FileText       },
-  { href: "/servicios",  label: "Servicios",   Icon: Heart          },
-  { href: "/normativa",  label: "Normativa",   Icon: BookOpen       },
-  { href: "/pqrs",       label: "PQRS",        Icon: MessageSquare  },
-  { href: "/usuarios",   label: "Usuarios",    Icon: UserCircle     },
+  { href: "/dashboard",  label: "Dashboard",      Icon: LayoutDashboard },
+  { href: "/paginas",    label: "Páginas",         Icon: FileText       },
+  { href: "/servicios",  label: "Servicios",       Icon: Heart          },
+  { href: "/normativa",  label: "Normativa",       Icon: BookOpen       },
+  { href: "/pqrs",       label: "PQRS",            Icon: MessageSquare  },
+  { href: "/usuarios",   label: "Usuarios",        Icon: UserCircle     },
+  { href: "/sitio",      label: "Datos del sitio", Icon: Settings       },
 ];
 
 export default function Sidebar() {
