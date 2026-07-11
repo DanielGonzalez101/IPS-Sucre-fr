@@ -137,12 +137,12 @@ Sábados 7:00 a.m. – 11:00 a.m.
 
 **Título:** Redes Sociales
 
-- Facebook
-- Instagram
+- Facebook: https://www.facebook.com/cardiocentropediatrico/
+- Instagram: https://www.instagram.com/cardiocentropediatrico/ 
 
 ### Copyright
 
 **Texto:**
-© 2021. Todos los derechos reservados. IPS Cardiocentro Pediátrico de Sucre
+© 2026 Todos los derechos reservados. IPS Cardiocentro Pediátrico de Sucre
 
 `[IMAGEN: ]` — Logo Multi-screen

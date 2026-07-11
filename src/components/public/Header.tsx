@@ -1,22 +1,33 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Phone, Mail, ChevronDown, Users, Cpu } from "lucide-react";
+import type { Sede } from "@/actions/sitio";
+import ContactanosDropdown from "@/components/public/navbar/ContactanosDropdown";
 
-const navLinks = [
+const navLinksBeforeEquipo = [
   { href: "/", label: "Inicio" },
   { href: "/quienes-somos", label: "Quiénes somos" },
+];
+
+const navLinksMiddle = [
   { href: "/servicios", label: "Servicios" },
   { href: "/multimedia", label: "Multimedia" },
   { href: "/calidad", label: "Calidad" },
   { href: "/blog", label: "Blog" },
-  { href: "/contactos", label: "Contactos" },
-  { href: "/consulta-examen", label: "Consulta tu examen" },
 ];
 
-const navLinksBeforeEquipo = navLinks.slice(0, 2);
-const navLinksAfterEquipo = navLinks.slice(2);
+const navLinksEnd = [{ href: "/consulta-examen", label: "Consulta tu examen" }];
 
-export default function Header() {
+const HORARIO_FALLBACK =
+  "Lunes a Viernes 7:00 a.m. – 12:00 m. / 1:00 p.m. – 6:00 p.m.\nSábados 7:00 a.m. – 11:00 a.m.";
+
+interface HeaderProps {
+  sedes: Sede[];
+  emailContacto: string;
+  whatsappUrl: string;
+}
+
+export default function Header({ sedes, emailContacto, whatsappUrl }: HeaderProps) {
   return (
     <header>
       {/* Top bar */}
@@ -133,7 +144,26 @@ export default function Header() {
               </div>
             </li>
 
-            {navLinksAfterEquipo.map(({ href, label }) => (
+            {navLinksMiddle.map(({ href, label }) => (
+              <li key={href}>
+                <Link
+                  href={href}
+                  className="nav-link font-heading font-semibold text-sm px-3 py-2 rounded-lg transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-azul-600 focus-visible:ring-offset-1"
+                >
+                  {label}
+                </Link>
+              </li>
+            ))}
+
+            <ContactanosDropdown
+              sedes={sedes}
+              emailContacto={emailContacto}
+              whatsappUrl={whatsappUrl}
+              telefono={sedes[0]?.telefono ?? "(+57) 300 912 7565"}
+              horario={sedes[0]?.horario ?? HORARIO_FALLBACK}
+            />
+
+            {navLinksEnd.map(({ href, label }) => (
               <li key={href}>
                 <Link
                   href={href}

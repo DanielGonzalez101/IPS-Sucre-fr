@@ -41,3 +41,4 @@ Thumbs.db
 
 # Ocultar los scripts de supabase
 db/
+tsconfig.tsbuildinfo
