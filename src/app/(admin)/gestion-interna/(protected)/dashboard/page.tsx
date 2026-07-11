@@ -19,6 +19,8 @@ const TIPO_LABEL: Record<string, { label: string; color: string; bg: string }> =
   peticion:   { label: "Petición",   color: "#1D4ED8", bg: "#EFF6FF" },
   queja:      { label: "Queja",      color: "#B45309", bg: "#FFFBEB" },
   reclamo:    { label: "Reclamo",    color: "#DC2626", bg: "#FEF2F2" },
+  solicitud:  { label: "Solicitud",  color: "#065F46", bg: "#ECFDF5" },
+  denuncia:   { label: "Denuncia",   color: "#7C3AED", bg: "#F5F3FF" },
   sugerencia: { label: "Sugerencia", color: "#065F46", bg: "#ECFDF5" },
 };
 
@@ -141,7 +143,7 @@ export default async function DashboardPage() {
           ) : (
             <ul className="divide-y divide-gray-100">
               {stats.pqrsRecientes.map((p) => {
-                const tipo = TIPO_LABEL[p.tipo] ?? { label: p.tipo, color: "#374151", bg: "#F9FAFB" };
+                const tipo = TIPO_LABEL[p.type] ?? { label: p.type, color: "#374151", bg: "#F9FAFB" };
                 const fecha = new Date(p.created_at).toLocaleDateString("es-CO", {
                   day: "2-digit", month: "short", year: "numeric",
                 });
@@ -154,7 +156,7 @@ export default async function DashboardPage() {
                       {tipo.label}
                     </span>
                     <span className="flex-1 text-sm text-gray-700 truncate">
-                      {p.nombre}
+                      {p.full_name ?? "Anónimo"}
                     </span>
                     <span className="shrink-0 text-xs text-gray-400">{fecha}</span>
                   </li>
