@@ -5,10 +5,11 @@ import { CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 import { updatePqrsdStatus, type PqrsdStatus } from "@/actions/pqrsd-admin";
 
 const STATUS_OPTIONS: { value: PqrsdStatus; label: string }[] = [
-  { value: "recibido",   label: "Recibido"   },
-  { value: "en_proceso", label: "En proceso" },
-  { value: "respondido", label: "Respondido" },
-  { value: "cerrado",    label: "Cerrado"    },
+  { value: "recibido",   label: "Recibido"    },
+  { value: "en_revision", label: "En revisión" },
+  { value: "en_tramite",  label: "En trámite"  },
+  { value: "respondido", label: "Respondido"  },
+  { value: "cerrado",    label: "Cerrado"     },
 ];
 
 interface Props {
@@ -28,14 +29,21 @@ export default function PqrsdResponseForm({
   const [notes, setNotes]       = useState(currentNotes ?? "");
   const [response, setResponse] = useState(currentResponse ?? "");
   const [result, setResult]     = useState<"ok" | "error" | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setResult(null);
+    setErrorMsg(null);
     startTransition(async () => {
       const res = await updatePqrsdStatus(id, status, notes, response);
-      setResult(res.error ? "error" : "ok");
+      if (res.error) {
+        setResult("error");
+        setErrorMsg(res.error);
+      } else {
+        setResult("ok");
+      }
     });
   }
 
@@ -50,10 +58,11 @@ export default function PqrsdResponseForm({
           {STATUS_OPTIONS.map((opt) => {
             const selected = status === opt.value;
             const colors: Record<PqrsdStatus, { bg: string; border: string; text: string }> = {
-              recibido:   { bg: "#EFF6FF", border: "#93C5FD", text: "#1D4ED8" },
-              en_proceso: { bg: "#FFFBEB", border: "#FCD34D", text: "#92400E" },
-              respondido: { bg: "#ECFDF5", border: "#6EE7B7", text: "#065F46" },
-              cerrado:    { bg: "#F9FAFB", border: "#D1D5DB", text: "#374151" },
+              recibido:    { bg: "#EFF6FF", border: "#93C5FD", text: "#1D4ED8" },
+              en_revision: { bg: "#FFFBEB", border: "#FCD34D", text: "#92400E" },
+              en_tramite:  { bg: "#FFF7ED", border: "#FDBA74", text: "#9A3412" },
+              respondido:  { bg: "#ECFDF5", border: "#6EE7B7", text: "#065F46" },
+              cerrado:     { bg: "#F9FAFB", border: "#D1D5DB", text: "#374151" },
             };
             const c = colors[opt.value];
             return (
@@ -123,9 +132,14 @@ export default function PqrsdResponseForm({
         </div>
       )}
       {result === "error" && (
-        <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
-          <AlertCircle size={16} />
-          Error al guardar. Intente nuevamente.
+        <div className="flex flex-col gap-1 text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+          <span className="flex items-center gap-2">
+            <AlertCircle size={16} />
+            Error al guardar. Intente nuevamente.
+          </span>
+          {errorMsg && (
+            <span className="text-xs text-red-400 font-mono">{errorMsg}</span>
+          )}
         </div>
       )}
 

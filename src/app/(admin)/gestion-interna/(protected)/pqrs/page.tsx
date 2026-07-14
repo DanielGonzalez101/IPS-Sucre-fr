@@ -25,10 +25,11 @@ const TYPE_LABEL: Record<string, string> = {
 };
 
 const STATUS_STYLE: Record<string, { label: string; bg: string; text: string; Icon: React.ElementType }> = {
-  recibido:   { label: "Recibido",    bg: "#EFF6FF", text: "#1D4ED8", Icon: Clock        },
-  en_proceso: { label: "En proceso",  bg: "#FFFBEB", text: "#92400E", Icon: Loader2      },
-  respondido: { label: "Respondido",  bg: "#ECFDF5", text: "#065F46", Icon: CheckCircle  },
-  cerrado:    { label: "Cerrado",     bg: "#F9FAFB", text: "#374151", Icon: XCircle      },
+  recibido:    { label: "Recibido",    bg: "#EFF6FF", text: "#1D4ED8", Icon: Clock       },
+  en_revision: { label: "En revisión", bg: "#FFFBEB", text: "#92400E", Icon: Loader2     },
+  en_tramite:  { label: "En trámite",  bg: "#FFF7ED", text: "#9A3412", Icon: Loader2     },
+  respondido:  { label: "Respondido",  bg: "#ECFDF5", text: "#065F46", Icon: CheckCircle },
+  cerrado:     { label: "Cerrado",     bg: "#F9FAFB", text: "#374151", Icon: XCircle     },
 };
 
 interface PageProps {
@@ -61,7 +62,7 @@ export default async function AdminPqrsPage({ searchParams }: PageProps) {
   const statCards = [
     { label: "Total",       value: stats.total,      color: "#1D4ED8", bg: "#EFF6FF" },
     { label: "Recibidas",   value: stats.recibido,   color: "#1D4ED8", bg: "#EFF6FF" },
-    { label: "En proceso",  value: stats.en_proceso, color: "#92400E", bg: "#FFFBEB" },
+    { label: "En proceso",  value: stats.en_proceso, color: "#92400E", bg: "#FFFBEB" }, // en_revision + en_tramite
     { label: "Respondidas", value: stats.respondido, color: "#065F46", bg: "#ECFDF5" },
     { label: "Vencidas",    value: stats.vencidas,   color: "#B91C1C", bg: "#FEF2F2" },
     { label: "Esta semana", value: stats.semana,     color: "#6D28D9", bg: "#F5F3FF" },
@@ -121,11 +122,12 @@ export default async function AdminPqrsPage({ searchParams }: PageProps) {
         {/* Filtro estado */}
         <div className="flex gap-1.5 flex-wrap">
           {[
-            { label: "Todos",      value: undefined },
-            { label: "Recibido",   value: "recibido" },
-            { label: "En proceso", value: "en_proceso" },
-            { label: "Respondido", value: "respondido" },
-            { label: "Cerrado",    value: "cerrado" },
+            { label: "Todos",       value: undefined },
+            { label: "Recibido",    value: "recibido" },
+            { label: "En revisión", value: "en_revision" },
+            { label: "En trámite",  value: "en_tramite" },
+            { label: "Respondido",  value: "respondido" },
+            { label: "Cerrado",     value: "cerrado" },
           ].map(({ label, value }) => {
             const active = (params.status ?? undefined) === value;
             return (

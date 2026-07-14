@@ -28,10 +28,11 @@ const DOC_TYPE_LABEL: Record<string, string> = {
 };
 
 const STATUS_STYLE: Record<string, { label: string; bg: string; text: string }> = {
-  recibido:   { label: "Recibido",   bg: "#EFF6FF", text: "#1D4ED8" },
-  en_proceso: { label: "En proceso", bg: "#FFFBEB", text: "#92400E" },
-  respondido: { label: "Respondido", bg: "#ECFDF5", text: "#065F46" },
-  cerrado:    { label: "Cerrado",    bg: "#F9FAFB", text: "#374151" },
+  recibido:    { label: "Recibido",    bg: "#EFF6FF", text: "#1D4ED8" },
+  en_revision: { label: "En revisión", bg: "#FFFBEB", text: "#92400E" },
+  en_tramite:  { label: "En trámite",  bg: "#FFF7ED", text: "#9A3412" },
+  respondido:  { label: "Respondido",  bg: "#ECFDF5", text: "#065F46" },
+  cerrado:     { label: "Cerrado",     bg: "#F9FAFB", text: "#374151" },
 };
 
 function formatDate(iso: string | null) {

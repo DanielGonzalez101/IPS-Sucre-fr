@@ -3,7 +3,7 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { revalidatePath } from "next/cache";
 
-export type PqrsdStatus = "recibido" | "en_proceso" | "respondido" | "cerrado";
+export type PqrsdStatus = "recibido" | "en_revision" | "en_tramite" | "respondido" | "cerrado";
 
 export interface PqrsdRow {
   id: string;
@@ -114,7 +114,6 @@ export async function updatePqrsdStatus(
     status,
     admin_notes: adminNotes || null,
     admin_response: adminResponse || null,
-    updated_at: new Date().toISOString(),
   };
 
   if (status === "respondido" || status === "cerrado") {
@@ -122,7 +121,10 @@ export async function updatePqrsdStatus(
   }
 
   const { error } = await admin.from("pqrsd").update(update).eq("id", id);
-  if (error) return { error: error.message };
+  if (error) {
+    console.error("[updatePqrsdStatus]", error);
+    return { error: error.message };
+  }
 
   revalidatePath("/gestion-interna/pqrs");
   revalidatePath(`/gestion-interna/pqrs/${id}`);
@@ -146,7 +148,7 @@ export async function getPqrsdStats() {
     await Promise.all([
       admin.from("pqrsd").select("*", { count: "exact", head: true }),
       admin.from("pqrsd").select("*", { count: "exact", head: true }).eq("status", "recibido"),
-      admin.from("pqrsd").select("*", { count: "exact", head: true }).eq("status", "en_proceso"),
+      admin.from("pqrsd").select("*", { count: "exact", head: true }).in("status", ["en_revision", "en_tramite"]),
       admin.from("pqrsd").select("*", { count: "exact", head: true }).eq("status", "respondido"),
       admin.from("pqrsd").select("*", { count: "exact", head: true }).eq("is_overdue", true).in("status", ["recibido", "en_proceso"]),
       admin.from("pqrsd").select("*", { count: "exact", head: true }).gte(
@@ -158,7 +160,7 @@ export async function getPqrsdStats() {
   return {
     total: total.count ?? 0,
     recibido: recibido.count ?? 0,
-    en_proceso: en_proceso.count ?? 0,
+    en_proceso: en_proceso.count ?? 0, // suma en_revision + en_tramite
     respondido: respondido.count ?? 0,
     vencidas: vencidas.count ?? 0,
     semana: semana.count ?? 0,

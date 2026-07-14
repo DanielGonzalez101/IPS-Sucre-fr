@@ -28,13 +28,27 @@ export type ResponseMode = (typeof RESPONSE_MODES)[number];
 
 export const ANONYMOUS_ALLOWED: PqrsdType[] = ["queja", "denuncia"];
 
+export const DOC_CONSTRAINTS: Record<
+  DocType,
+  { max: number; numeric: boolean; placeholder: string; hint: string }
+> = {
+  CC:        { max: 10, numeric: true,  placeholder: "Ej. 1050000000",     hint: "6–10 dígitos" },
+  CE:        { max: 12, numeric: false, placeholder: "Ej. 123456AB",        hint: "Hasta 12 caracteres" },
+  NUIP:      { max: 10, numeric: true,  placeholder: "Ej. 1050000000",     hint: "10 dígitos" },
+  TI:        { max: 11, numeric: true,  placeholder: "Ej. 10203040506",    hint: "10–11 dígitos" },
+  NIT:       { max: 9,  numeric: true,  placeholder: "Ej. 900550249",      hint: "9 dígitos sin dígito de verificación" },
+  Pasaporte: { max: 15, numeric: false, placeholder: "Ej. AC1234567",      hint: "Hasta 15 caracteres alfanuméricos" },
+  PPT:       { max: 15, numeric: false, placeholder: "Ej. PPT202312345",   hint: "Hasta 15 caracteres" },
+  Otro:      { max: 20, numeric: false, placeholder: "Número de documento", hint: "Hasta 20 caracteres" },
+};
+
 export const pqrsdSchema = z
   .object({
     type: z.enum(PQRSD_TYPES, { message: "Seleccione un tipo de solicitud" }),
     is_anonymous: z.boolean().default(false),
     full_name: z.string().max(150).optional(),
     doc_type: z.enum(DOC_TYPES).optional(),
-    doc_number: z.string().max(10, "El número de documento no puede superar 10 dígitos").optional(),
+    doc_number: z.string().max(20, "Número de documento demasiado largo").optional(),
     email: z
       .string()
       .min(1, "El correo electrónico es obligatorio")
@@ -87,6 +101,22 @@ export const pqrsdSchema = z
           path: ["doc_number"],
           message: "El número de documento es obligatorio",
         });
+      } else if (data.doc_type && data.doc_number) {
+        const c = DOC_CONSTRAINTS[data.doc_type];
+        if (data.doc_number.length > c.max) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["doc_number"],
+            message: `El número de documento no puede superar ${c.max} caracteres para ${data.doc_type}`,
+          });
+        }
+        if (c.numeric && !/^\d+$/.test(data.doc_number)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["doc_number"],
+            message: `El número de ${data.doc_type} solo puede contener dígitos`,
+          });
+        }
       }
     }
   });
