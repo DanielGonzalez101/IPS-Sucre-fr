@@ -5,12 +5,14 @@ import { Upload, X, FileText, AlertCircle } from "lucide-react";
 import {
   PQRSD_TYPES,
   DOC_TYPES,
+  DOC_CONSTRAINTS,
   ANONYMOUS_ALLOWED,
   pqrsdSchema,
   type PqrsdType,
   type DocType,
 } from "@/lib/validations/pqrs";
 import CityInput from "./CityInput";
+import DocTypeSelect from "./DocTypeSelect";
 import PqrsConfirmation from "./PqrsConfirmation";
 
 // ─── Definiciones de tipos ────────────────────────────────────────────────────
@@ -494,23 +496,15 @@ export default function PqrsForm() {
               <Label htmlFor={id("doc_type")} required>
                 Tipo de documento
               </Label>
-              <select
-                id={id("doc_type")}
+              <DocTypeSelect
+                inputId={id("doc_type")}
                 value={form.doc_type}
-                onChange={(e) => set("doc_type", e.target.value as DocType)}
-                className={inputClass(!!errors.doc_type)}
-                aria-invalid={!!errors.doc_type}
-                aria-describedby={
-                  errors.doc_type ? id("doc_type-error") : undefined
-                }
-              >
-                <option value="">Seleccione…</option>
-                {DOC_TYPES.map((dt) => (
-                  <option key={dt} value={dt}>
-                    {dt}
-                  </option>
-                ))}
-              </select>
+                onChange={(dt) => {
+                  setForm((prev) => ({ ...prev, doc_type: dt, doc_number: "" }));
+                  setErrors((prev) => ({ ...prev, doc_type: "", doc_number: "" }));
+                }}
+                hasError={!!errors.doc_type}
+              />
               <FieldError
                 id={id("doc_type-error")}
                 message={errors.doc_type}
@@ -518,30 +512,52 @@ export default function PqrsForm() {
             </div>
 
             <div className="xl:col-span-2">
-              <Label htmlFor={id("doc_number")} required>
-                Número de documento
-              </Label>
-              <input
-                id={id("doc_number")}
-                type="text"
-                value={form.doc_number}
-                onChange={(e) => {
-                  const clean = e.target.value.replace(/\D/g, "").slice(0, 10);
-                  set("doc_number", clean);
-                }}
-                className={inputClass(!!errors.doc_number)}
-                aria-invalid={!!errors.doc_number}
-                aria-describedby={
-                  errors.doc_number ? id("doc_number-error") : undefined
-                }
-                inputMode="numeric"
-                maxLength={10}
-                placeholder="Ej. 1050000000"
-              />
-              <FieldError
-                id={id("doc_number-error")}
-                message={errors.doc_number}
-              />
+              {(() => {
+                const constraint = form.doc_type ? DOC_CONSTRAINTS[form.doc_type as DocType] : null;
+                return (
+                  <>
+                    <Label htmlFor={id("doc_number")} required>
+                      Número de documento
+                    </Label>
+                    <input
+                      id={id("doc_number")}
+                      type="text"
+                      value={form.doc_number}
+                      onChange={(e) => {
+                        const raw = constraint?.numeric
+                          ? e.target.value.replace(/\D/g, "")
+                          : e.target.value.replace(/[^a-zA-Z0-9]/g, "");
+                        set("doc_number", raw.slice(0, constraint?.max ?? 20));
+                      }}
+                      className={inputClass(!!errors.doc_number)}
+                      aria-invalid={!!errors.doc_number}
+                      aria-describedby={
+                        [
+                          errors.doc_number ? id("doc_number-error") : "",
+                          constraint ? id("doc_number-hint") : "",
+                        ].filter(Boolean).join(" ") || undefined
+                      }
+                      inputMode={constraint?.numeric ? "numeric" : "text"}
+                      maxLength={constraint?.max ?? 20}
+                      placeholder={constraint?.placeholder ?? "Número de documento"}
+                      disabled={!form.doc_type}
+                    />
+                    {constraint && !errors.doc_number && (
+                      <p
+                        id={id("doc_number-hint")}
+                        className="text-sm mt-1.5"
+                        style={{ color: "var(--color-gris-500)" }}
+                      >
+                        {constraint.hint}
+                      </p>
+                    )}
+                    <FieldError
+                      id={id("doc_number-error")}
+                      message={errors.doc_number}
+                    />
+                  </>
+                );
+              })()}
             </div>
           </div>
           <Divider />
