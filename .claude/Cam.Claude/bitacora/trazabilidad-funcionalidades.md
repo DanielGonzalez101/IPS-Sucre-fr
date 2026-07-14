@@ -357,3 +357,67 @@ git commit -m "feat: rediseñar CTASection PQRSD — layout creativo con signo d
 ```
 
 ---
+
+### [2026-07-11] — Merge de release/Release-2: módulo PQRSD completo, página de Calidad, dashboard y panel de sitio
+**Tipo:** Nueva funcionalidad (merge de rama externa — 54 archivos, +5650/-196)
+**Archivos afectados (resumen por módulo):**
+
+**PQRSD (público):**
+- `src/components/public/pqrs/PqrsForm.tsx` — formulario completo (905 líneas): 6 tipos de PQRSD (petición, queja, reclamo, solicitud, denuncia, sugerencia), lógica de anonimato condicional, tipo/número de documento, modalidad de respuesta (email/correspondencia), upload de adjuntos.
+- `src/components/public/pqrs/CityInput.tsx` — autocompletado de ciudades colombianas para dirección de correspondencia.
+- `src/components/public/pqrs/PqrsConfirmation.tsx` — pantalla de confirmación con número de radicado tras enviar.
+- `src/components/public/pqrs/PqrsConsulta.tsx` — consulta de estado de una PQRSD por radicado.
+- `src/app/(public)/pqrs/consulta/page.tsx` — página pública `/pqrs/consulta`.
+- `src/lib/ciudades-colombia.ts` — dataset de municipios/departamentos para el autocompletado.
+- `src/lib/validations/pqrs.ts` — schema Zod ampliado con los ENUMs `pqrsd_type`, `doc_type`, `response_mode`, `pqrsd_status`.
+- `src/app/api/pqrsd/route.ts` — endpoint POST que crea la PQRSD, genera radicado y sube adjuntos al bucket `pqrsd-adjuntos` vía `service_role`.
+- `src/app/api/pqrsd/consulta/route.ts` — endpoint de consulta pública por radicado.
+
+**PQRSD (admin):**
+- `src/actions/pqrsd-admin.ts` — Server Actions para listar, filtrar y responder PQRSD desde el panel.
+- `src/components/admin/PqrsdResponseForm.tsx` — formulario de respuesta del admin.
+- `src/components/admin/PqrsdTypeFilter.tsx` — filtro por tipo de solicitud.
+- `src/app/(admin).../pqrs/page.tsx` y `.../pqrs/[id]/page.tsx` — ampliados significativamente (+324 y +265 líneas) para el nuevo flujo de gestión.
+
+**Página de Calidad (`/calidad`) — cumple ítems rojos de transparencia MinTIC:**
+- `src/app/(public)/calidad/page.tsx`
+- `src/components/public/calidad/CalidadHero.tsx`, `CalidadTabs.tsx`, `CalidadCTA.tsx`
+- `src/components/public/calidad/DerechosPaciente.tsx`, `DeberesPaciente.tsx` — derechos y deberes del paciente
+- `src/components/public/calidad/TransparenciaFinanciera.tsx`
+- `src/data/calidad.mock.ts` — contenido placeholder hasta integración con Supabase
+
+**Panel admin — sitio y dashboard:**
+- `src/actions/sitio.ts` + `src/components/admin/SitioManager.tsx` — gestor de configuración general del sitio (sedes, contacto).
+- `src/app/(admin).../sitio/page.tsx` — nueva ruta `/gestion-interna/sitio`.
+- `src/actions/dashboard.ts` + ampliación de `.../dashboard/page.tsx` (+195 líneas) — métricas reales del panel.
+
+**Navegación pública:**
+- `src/components/public/navbar/ContactanosDropdown.tsx` — dropdown "Contáctanos" en el Header.
+- `src/components/public/Header.tsx`, `Footer.tsx` — ajustes de navegación y enlaces.
+- `src/components/home/SedesSection.tsx` — ajustes menores.
+
+**Configuración:**
+- `.gitignore` — combinado: agrega `tsconfig.tsbuildinfo` (ya no se versiona, es autogenerado) manteniendo las reglas de `.claude/` de la rama `camilo`.
+- `next.config.ts` — un ajuste adicional de release-2.
+
+**Descripción:**
+Se integró a la rama `camilo` el trabajo de `release/Release-2`, que resuelve varios de los ítems ROJOS críticos de la Matriz ITA (normativa MinTIC 1519/2020) que estaban pendientes desde el 2026-06-20: módulo PQRSD completo (antes devolvía 404), página de Calidad con derechos/deberes del paciente y transparencia financiera. También trae un dashboard admin más completo y un gestor de configuración del sitio.
+
+El merge tuvo 2 conflictos, resueltos manualmente:
+1. `.gitignore` — combinado sin pérdida de reglas (ver `trazabilidad-problemas.md`).
+2. `tsconfig.tsbuildinfo` — aceptado el borrado propuesto por release-2 (archivo autogenerado, no debía versionarse).
+
+**Pendiente de verificación:** el bucket `pqrsd-adjuntos` en Supabase Storage y las políticas RLS de las tablas `pqrsd`/`pqrsd_attachments` — ver solicitud `.claude/Cam.Claude/backend/backend-2026-07-10-pqrsd-storage.md`. Sin esto, el POST a `/api/pqrsd` falla al intentar subir adjuntos.
+
+**Commit realizado:**
+```
+Merge release/Release-2: módulo PQRSD, calidad institucional y panel de sitio
+
+Integra el formulario PQRSD completo con consulta por radicado, la página
+de Calidad (transparencia, derechos y deberes del paciente), el dashboard
+admin, el gestor de configuración del sitio y el dropdown de contáctanos
+en el navbar. Combina .gitignore (reglas de .claude/ y tsconfig.tsbuildinfo)
+y deja de versionar tsconfig.tsbuildinfo por ser un artefacto autogenerado.
+```
+
+---

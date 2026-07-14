@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useGSAP } from "@gsap/react";
 import { gsap, ScrollTrigger } from "@/lib/gsap";
-import { Heart, Activity, Calendar, MapPin, Star } from "lucide-react";
+import { Heart, MapPin, Star } from "lucide-react";
 import type { HeroSlide } from "@/types";
 
 const avatars = [
@@ -186,8 +186,9 @@ export function HeroSection({ slides }: Props) {
             }}
             aria-hidden="true"
           />
+        </div>{/* fin hero-image-wrap */}
 
-          <div className="hero-overlay container-main">
+        <div className="hero-overlay container-main">
             <div className="hero-copy">
 
               <span
@@ -244,7 +245,7 @@ export function HeroSection({ slides }: Props) {
                   Ver nuestros servicios
                 </Link>
                 <a
-                  href="https://wa.me/573009127565"
+                  href="https://cardiocentro.gomedicaltm.co/portal-pacientes"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex w-full sm:w-auto items-center justify-center font-heading font-semibold text-sm sm:text-[15px] rounded-full px-6 sm:px-7 py-3 sm:py-3.5 border-2 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 transition-all duration-200 active:scale-95"
@@ -255,7 +256,7 @@ export function HeroSection({ slides }: Props) {
                     backdropFilter: "blur(3px)",
                   }}
                 >
-                  Agenda tu cita
+                  Tus resultados
                 </a>
 
                 <div
@@ -360,42 +361,41 @@ export function HeroSection({ slides }: Props) {
               )}
 
             </div>{/* fin hero-copy */}
-          </div>{/* fin hero-overlay */}
+        </div>{/* fin hero-overlay */}
 
-          {/* Tarjeta Google Maps — solo desktop */}
-          <a
-            href="https://maps.app.goo.gl/EPKgTqsSgwadC4Xd8"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Ver reseñas en Google Maps — 4,8 estrellas"
-            className="hero-rating-card hidden md:flex items-center gap-3 px-5 py-4 z-20"
-            style={{ minWidth: "190px" }}
+        {/* Tarjeta Google Maps — solo desktop */}
+        <a
+          href="https://maps.app.goo.gl/EPKgTqsSgwadC4Xd8"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Ver reseñas en Google Maps — 4,8 estrellas"
+          className="hero-rating-card hidden md:flex items-center gap-3 px-5 py-4 z-20"
+          style={{ minWidth: "190px" }}
+        >
+          <div
+            className="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
+            style={{ backgroundColor: "#FEE2E2" }}
+            aria-hidden="true"
           >
-            <div
-              className="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
-              style={{ backgroundColor: "#FEE2E2" }}
-              aria-hidden="true"
-            >
-              <MapPin size={15} style={{ color: "#EF4444" }} />
-            </div>
-            <div>
-              <div className="flex items-center gap-2 mb-0.5">
-                <p className="font-heading font-black text-xl leading-none" style={{ color: "var(--color-azul-900)" }}>
-                  4,8
-                </p>
-                <div className="flex items-center gap-0.5" aria-label="4.8 de 5 estrellas">
-                  {[1,2,3,4].map((s) => (
-                    <Star key={s} size={13} fill="#FBBF24" stroke="none" aria-hidden="true" />
-                  ))}
-                  <Star size={13} fill="#FBBF24" stroke="none" style={{ opacity: 0.45 }} aria-hidden="true" />
-                </div>
-              </div>
-              <p className="font-body text-xs" style={{ color: "var(--color-gris-500)" }}>
-                en Google Maps
+            <MapPin size={15} style={{ color: "#EF4444" }} />
+          </div>
+          <div>
+            <div className="flex items-center gap-2 mb-0.5">
+              <p className="font-heading font-black text-xl leading-none" style={{ color: "var(--color-azul-900)" }}>
+                4,8
               </p>
+              <div className="flex items-center gap-0.5" aria-label="4.8 de 5 estrellas">
+                {[1,2,3,4].map((s) => (
+                  <Star key={s} size={13} fill="#FBBF24" stroke="none" aria-hidden="true" />
+                ))}
+                <Star size={13} fill="#FBBF24" stroke="none" style={{ opacity: 0.45 }} aria-hidden="true" />
+              </div>
             </div>
-          </a>
-        </div>{/* fin hero-image-wrap */}
+            <p className="font-body text-xs" style={{ color: "var(--color-gris-500)" }}>
+              en Google Maps
+            </p>
+          </div>
+        </a>
       </div>{/* fin hero-shell */}
 
       {/* ── Fila inferior: 3 tarjetas bento ── */}
@@ -403,7 +403,7 @@ export function HeroSection({ slides }: Props) {
         className="relative z-20 w-full py-6 px-6 md:px-10 lg:px-14"
         style={{ backgroundColor: "var(--color-gris-50)" }}
       >
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
 
           <Link
             href="/servicios#cardiologia"
@@ -412,11 +412,11 @@ export function HeroSection({ slides }: Props) {
           >
             <div className="flex flex-col justify-between p-7 z-10" style={{ flex: "0 0 58%" }}>
               <div>
-                <h2 className="font-heading font-bold text-base mb-2 leading-snug" style={{ color: "var(--color-azul-900)" }}>
-                  Cardiología Pediátrica
+                <h2 className="font-heading font-bold text-lg mb-2 leading-snug" style={{ color: "var(--color-azul-900)" }}>
+                  Cardiología Pediátrica y Adultos
                 </h2>
                 <p className="font-body text-sm leading-relaxed" style={{ color: "var(--color-gris-600)" }}>
-                  Consulta, ecocardiograma, Holter 24h y monitoreo de presión arterial
+                  Consulta, ecocardiograma, Holter 24h y monitoreo de presión arterial — para niños y adultos
                 </p>
               </div>
               <span
@@ -474,36 +474,6 @@ export function HeroSection({ slides }: Props) {
               </span>
             </div>
           </Link>
-
-          <a
-            href="https://wa.me/573009127565"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="bento-card group flex flex-col justify-between p-7 focus-visible:ring-2 focus-visible:ring-azul-600 focus-visible:ring-offset-2"
-            style={{ borderRadius: "28px", backgroundColor: "var(--color-azul-50)", boxShadow: "var(--shadow-card)" }}
-          >
-            <div
-              className="w-11 h-11 flex items-center justify-center mb-4 transition-opacity duration-200 group-hover:opacity-90"
-              style={{ backgroundColor: "var(--color-rojo-500)", borderRadius: "12px" }}
-              aria-hidden="true"
-            >
-              <Calendar size={20} style={{ color: "#fff" }} />
-            </div>
-            <div>
-              <h2 className="font-heading font-bold text-base mb-2" style={{ color: "var(--color-azul-900)" }}>
-                Agenda tu cita
-              </h2>
-              <p className="font-body text-sm leading-relaxed" style={{ color: "var(--color-gris-700)" }}>
-                Escríbenos por WhatsApp y te asignamos una cita con nuestros especialistas
-              </p>
-            </div>
-            <span
-              className="mt-4 font-heading font-semibold text-sm inline-flex items-center gap-1.5 group-hover:gap-2.5 transition-all duration-200"
-              style={{ color: "var(--color-rojo-500)" }}
-            >
-              Ir a WhatsApp →
-            </span>
-          </a>
 
         </div>
       </div>

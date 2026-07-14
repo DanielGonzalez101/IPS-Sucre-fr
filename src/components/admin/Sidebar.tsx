@@ -22,14 +22,15 @@ import {
 } from "lucide-react";
 import { signOut } from "@/actions/auth";
 
-// Grupos colapsables con subcategorías
+// Grupos colapsables con subcategorías. El campo `slug` debe coincidir con
+// src/lib/permisos.ts para que el filtrado por permisos funcione.
 const navGroups = [
   {
     key: "pagina-principal",
     label: "Página principal",
     Icon: Home,
     children: [
-      { href: "/hero", label: "Carrusel", Icon: SlidersHorizontal },
+      { href: "/hero", slug: "hero", label: "Carrusel", Icon: SlidersHorizontal },
     ],
   },
   {
@@ -37,28 +38,42 @@ const navGroups = [
     label: "Equipo",
     Icon: Users,
     children: [
-      { href: "/equipo/humano",      label: "Equipo humano",      Icon: UserRound },
-      { href: "/equipo/tecnologico", label: "Equipo tecnológico", Icon: Cpu       },
+      { href: "/equipo/humano",      slug: "equipo-humano",      label: "Equipo humano",      Icon: UserRound },
+      { href: "/equipo/tecnologico", slug: "equipo-tecnologico", label: "Equipo tecnológico", Icon: Cpu       },
     ],
   },
 ];
 
 // Items planos sin subcategorías
 const navItems = [
-  { href: "/dashboard",  label: "Dashboard",      Icon: LayoutDashboard },
-  { href: "/paginas",    label: "Páginas",         Icon: FileText       },
-  { href: "/servicios",  label: "Servicios",       Icon: Heart          },
-  { href: "/normativa",  label: "Normativa",       Icon: BookOpen       },
-  { href: "/pqrs",       label: "PQRS",            Icon: MessageSquare  },
-  { href: "/usuarios",   label: "Usuarios",        Icon: UserCircle     },
-  { href: "/sitio",      label: "Datos del sitio", Icon: Settings       },
+  { href: "/dashboard",  slug: "dashboard", label: "Dashboard",      Icon: LayoutDashboard },
+  { href: "/paginas",    slug: "paginas",   label: "Páginas",         Icon: FileText       },
+  { href: "/servicios",  slug: "servicios", label: "Servicios",       Icon: Heart          },
+  { href: "/normativa",  slug: "normativa", label: "Normativa",       Icon: BookOpen       },
+  { href: "/pqrs",       slug: "pqrs",      label: "PQRS",            Icon: MessageSquare  },
+  { href: "/usuarios",   slug: "usuarios",  label: "Usuarios",        Icon: UserCircle     },
+  { href: "/sitio",      slug: "sitio",     label: "Datos del sitio", Icon: Settings       },
 ];
 
-export default function Sidebar() {
+interface SidebarProps {
+  modulosPermitidos: string[];
+}
+
+export default function Sidebar({ modulosPermitidos }: SidebarProps) {
   const pathname = usePathname();
 
+  const navItemsVisibles = navItems.filter(
+    (item) => item.slug === "dashboard" || modulosPermitidos.includes(item.slug)
+  );
+  const navGroupsVisibles = navGroups
+    .map((group) => ({
+      ...group,
+      children: group.children.filter((child) => modulosPermitidos.includes(child.slug)),
+    }))
+    .filter((group) => group.children.length > 0);
+
   // Determinar qué grupos tienen un hijo activo para auto-expandirlos
-  const defaultOpen = navGroups
+  const defaultOpen = navGroupsVisibles
     .filter((g) =>
       g.children.some((c) => {
         const full = `/gestion-interna${c.href}`;
@@ -71,7 +86,7 @@ export default function Sidebar() {
 
   // Si la ruta cambia y el grupo padre no está abierto, abrirlo automáticamente
   useEffect(() => {
-    navGroups.forEach((g) => {
+    navGroupsVisibles.forEach((g) => {
       const hasActive = g.children.some((c) => {
         const full = `/gestion-interna${c.href}`;
         return pathname === full || pathname.startsWith(full + "/");
@@ -82,6 +97,7 @@ export default function Sidebar() {
         );
       }
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
   function toggleGroup(key: string) {
@@ -129,7 +145,7 @@ export default function Sidebar() {
         <ul className="space-y-0.5">
 
           {/* Dashboard siempre primero */}
-          {navItems.slice(0, 1).map(({ href, label, Icon }) => {
+          {navItemsVisibles.slice(0, 1).map(({ href, label, Icon }) => {
             const full = `/gestion-interna${href}`;
             const isActive = pathname === full || pathname.startsWith(full + "/");
             return (
@@ -140,7 +156,7 @@ export default function Sidebar() {
           })}
 
           {/* Grupos colapsables */}
-          {navGroups.map((group) => {
+          {navGroupsVisibles.map((group) => {
             const isOpen = openGroups.includes(group.key);
             const hasActiveChild = group.children.some((c) => {
               const full = `/gestion-interna${c.href}`;
@@ -241,7 +257,7 @@ export default function Sidebar() {
           })}
 
           {/* Resto de items planos */}
-          {navItems.slice(1).map(({ href, label, Icon }) => {
+          {navItemsVisibles.slice(1).map(({ href, label, Icon }) => {
             const full = `/gestion-interna${href}`;
             const isActive = pathname === full || pathname.startsWith(full + "/");
             return (

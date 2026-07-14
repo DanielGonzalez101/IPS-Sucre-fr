@@ -1,9 +1,11 @@
 import { z } from "zod";
+import { MODULO_SLUGS } from "@/lib/permisos";
 
 export const usuarioSchema = z.object({
   email: z.string().email("Correo electrónico inválido"),
   nombre: z.string().min(2).max(100),
   role: z.enum(["admin", "editor", "viewer"]).default("viewer"),
+  modulos_permitidos: z.array(z.enum(MODULO_SLUGS)).default([]),
 });
 
 export const loginSchema = z.object({

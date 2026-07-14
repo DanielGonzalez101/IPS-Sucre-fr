@@ -109,6 +109,10 @@ h6 {
   color: var(--color-azul-800);
   background-color: var(--color-azul-50);
 }
+.nav-link-active {
+  color: var(--color-azul-800);
+  background-color: var(--color-azul-50);
+}
 
 /* ── Nav dropdown ────────────────────────────────── */
 .nav-dropdown-group {
@@ -123,10 +127,11 @@ h6 {
   font-family: var(--font-heading);
   font-weight: 600;
   font-size: 0.875rem;
-  padding: 0.5rem 0.75rem;
+  padding: 0.5rem 0.625rem;
   border-radius: 0.5rem;
   background: none;
   border: none;
+  white-space: nowrap;
   cursor: pointer;
   transition:
     color 0.2s,
@@ -360,26 +365,24 @@ h6 {
 .hero-image-wrap {
   position: relative;
   width: 100%;
-  height: 260px;
-  overflow: hidden;
+  aspect-ratio: 4 / 3;
 }
 
 @media (min-width: 768px) {
   .hero-image-wrap {
-    height: 480px;
+    aspect-ratio: 768 / 480;
   }
 }
 
 @media (min-width: 1024px) {
   .hero-image-wrap {
-    height: 711px;
+    aspect-ratio: 1920 / 711;
   }
 }
 
 .hero-clip {
-  position: relative;
-  width: 100%;
-  height: 100%;
+  position: absolute;
+  inset: 0;
   overflow: hidden;
 }
 
@@ -402,11 +405,7 @@ h6 {
   flex-direction: column;
   align-items: flex-start;
   padding: 1.75rem 0 2rem;
-  background: linear-gradient(
-    180deg,
-    rgba(6, 36, 77, 0.5) 0%,
-    rgba(6, 36, 77, 0.42) 100%
-  );
+  background: var(--color-azul-900);
 }
 
 @media (min-width: 768px) {
@@ -416,7 +415,7 @@ h6 {
     flex-direction: column;
     align-items: flex-start;
     justify-content: center;
-    padding-block: 3rem;
+    padding-block: 4.5rem 2rem;
     background: transparent;
   }
 }
