@@ -13,6 +13,7 @@ interface Noticia {
   titulo: string;
   extracto: string;
   tag: string;
+  posicion: string;
   img_url: string;
   fecha: string;
   vistas: number;
