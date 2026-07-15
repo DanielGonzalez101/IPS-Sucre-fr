@@ -1343,6 +1343,11 @@ h6 {
   gap: 16px;
 }
 
+/* Si el último item queda solo en su fila, ocupa las 2 columnas */
+.noticias-bento-right > *:last-child:nth-child(odd) {
+  grid-column: span 2;
+}
+
 .noticias-bento-sm {
   border-radius: 12px;
   overflow: hidden;

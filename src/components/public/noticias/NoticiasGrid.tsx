@@ -184,9 +184,8 @@ function FeaturedSection({ noticias }: { noticias: Noticia[] }) {
   );
 }
 
-/* ── Sección 2: Publicaciones recientes + filtros ── */
+/* ── Sección 2: Noticias recientes (bento grid) ── */
 function RecentSection({ noticias }: { noticias: Noticia[] }) {
-  const [activo, setActivo] = useState("Todos");
   const sectionRef = useRef<HTMLElement>(null);
 
   useGSAP(
@@ -195,20 +194,11 @@ function RecentSection({ noticias }: { noticias: Noticia[] }) {
 
       const trigger = { trigger: sectionRef.current, start: "top 80%" };
 
-      gsap.from(".nr-header", {
-        y: 28,
-        opacity: 0,
-        duration: 0.6,
-        ease: "power2.out",
-        scrollTrigger: trigger,
-      });
-
       gsap.from(".nr-big", {
         scale: 0.95,
         opacity: 0,
         duration: 0.85,
         ease: "power3.out",
-        delay: 0.15,
         scrollTrigger: trigger,
       });
 
@@ -218,60 +208,25 @@ function RecentSection({ noticias }: { noticias: Noticia[] }) {
         duration: 0.55,
         stagger: 0.1,
         ease: "power2.out",
-        delay: 0.25,
+        delay: 0.15,
         scrollTrigger: trigger,
       });
     },
     { scope: sectionRef }
   );
 
-  const filtradas =
-    activo === "Todos" ? noticias : noticias.filter((n) => n.tag === activo);
-
-  const bentoMain = filtradas[0];
-  const bentoGrid = filtradas.slice(1, 5);
+  const bentoMain = noticias[0];
+  const bentoGrid = noticias.slice(1);
 
   return (
     <section
       ref={sectionRef}
-      className="py-12 md:py-16 border-b"
+      className="py-12 md:py-16"
       style={{ borderColor: "var(--color-gris-200)" }}
-      aria-labelledby="recientes-titulo"
     >
       <div className="container-main">
 
-        {/* Header + tabs */}
-        <div className="nr-header flex flex-wrap items-center justify-between gap-4 mb-8">
-          <h2
-            id="recientes-titulo"
-            className="font-heading font-bold text-2xl"
-            style={{ color: "var(--color-azul-900)" }}
-          >
-            Publicaciones recientes
-          </h2>
-          <div className="flex flex-wrap gap-2" role="group" aria-label="Filtrar por categoría">
-            {CATEGORIAS.map((cat) => {
-              const activa = activo === cat;
-              return (
-                <button
-                  key={cat}
-                  onClick={() => setActivo(cat)}
-                  aria-pressed={activa}
-                  className="font-heading font-semibold text-xs rounded-full px-4 py-1.5 transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-1"
-                  style={
-                    activa
-                      ? { backgroundColor: "var(--color-azul-900)", color: "#fff" }
-                      : { backgroundColor: "var(--color-gris-100)", color: "var(--color-gris-600)" }
-                  }
-                >
-                  {cat.toUpperCase()}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {filtradas.length === 0 ? (
+        {noticias.length === 0 ? (
           <p className="text-center py-16 font-body" style={{ color: "var(--color-gris-400)" }}>
             No hay publicaciones en esta categoría.
           </p>
@@ -364,13 +319,64 @@ function RecentSection({ noticias }: { noticias: Noticia[] }) {
 
 /* ── Export principal ────────────────────────────── */
 export default function NoticiasGrid({ noticias }: { noticias: Noticia[] }) {
-  const destacadas = noticias.filter((n) => n.posicion === "destacada").slice(0, 3);
-  const recientes  = noticias.filter((n) => n.posicion === "reciente");
+  const [filtroActivo, setFiltroActivo] = useState("Todos");
+
+  const filtradas = filtroActivo === "Todos"
+    ? noticias
+    : noticias.filter((n) => n.tag === filtroActivo);
+
+  const destacadas = filtradas.filter((n) => n.posicion === "destacada").slice(0, 3);
+  const recientes  = filtradas.filter((n) => n.posicion === "reciente");
 
   return (
     <>
-      <FeaturedSection noticias={destacadas} />
-      <RecentSection noticias={recientes} />
+      {/* Header: título + filtros — justo debajo del hero */}
+      <div
+        className="border-b"
+        style={{ borderColor: "var(--color-gris-200)", backgroundColor: "#fff" }}
+      >
+        <div className="container-main py-6 flex flex-wrap items-center justify-between gap-4">
+          <h1
+            className="font-heading font-bold text-2xl"
+            style={{ color: "var(--color-azul-900)" }}
+          >
+            Noticias
+          </h1>
+          <div className="flex flex-wrap gap-2" role="group" aria-label="Filtrar por categoría">
+            {CATEGORIAS.map((cat) => {
+              const activa = filtroActivo === cat;
+              return (
+                <button
+                  key={cat}
+                  onClick={() => setFiltroActivo(cat)}
+                  aria-pressed={activa}
+                  className="font-heading font-semibold text-xs rounded-full px-4 py-1.5 transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-1"
+                  style={
+                    activa
+                      ? { backgroundColor: "var(--color-azul-900)", color: "#fff" }
+                      : { backgroundColor: "var(--color-gris-100)", color: "var(--color-gris-600)" }
+                  }
+                >
+                  {cat.toUpperCase()}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {filtradas.length === 0 ? (
+        <div className="container-main py-24 text-center">
+          <p className="font-body" style={{ color: "var(--color-gris-400)" }}>
+            No hay noticias en esta categoría.
+          </p>
+        </div>
+      ) : (
+        <>
+          <FeaturedSection noticias={destacadas} />
+          <RecentSection noticias={recientes} />
+        </>
+      )}
     </>
   );
 }
