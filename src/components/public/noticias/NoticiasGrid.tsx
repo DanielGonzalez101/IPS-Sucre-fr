@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Eye, ArrowUpRight } from "lucide-react";
+import { Eye, ArrowUpRight, Quote } from "lucide-react";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "@/lib/gsap";
 
@@ -200,18 +200,11 @@ function FeaturedSection() {
 
           {/* Bloque cita */}
           <div className="nf-quote noticias-featured-quote">
-            <span
-              className="font-heading font-black"
-              style={{
-                fontSize: "clamp(1.8rem, 3vw, 2.5rem)",
-                lineHeight: 1,
-                color: "var(--color-rojo-500)",
-                opacity: 0.3,
-              }}
+            <Quote
+              size={28}
               aria-hidden="true"
-            >
-              "
-            </span>
+              style={{ color: "var(--color-rojo-500)", opacity: 0.35 }}
+            />
             <p
               className="font-heading font-semibold leading-snug"
               style={{ fontSize: "clamp(0.95rem, 1.4vw, 1.1rem)", color: "var(--color-azul-900)" }}
