@@ -38,6 +38,7 @@ export async function createServicio(fields: {
   descripcion: string;
   icono: string;
   orden: number;
+  preparacion?: string;
 }) {
   const supabase = await createClient();
   const { error } = await supabase.from("servicios").insert(fields);
@@ -56,6 +57,7 @@ export async function updateServicio(
     icono: string;
     orden: number;
     activo: boolean;
+    preparacion: string;
   }>,
 ) {
   const supabase = await createClient();

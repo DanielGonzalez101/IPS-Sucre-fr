@@ -220,10 +220,6 @@ export default function Sidebar({ modulosPermitidos }: SidebarProps) {
                               backgroundColor: isActive
                                 ? "rgba(255,255,255,0.10)"
                                 : "transparent",
-                              borderLeft: "2px solid",
-                              borderColor: isActive
-                                ? "var(--color-rojo-400)"
-                                : "rgba(255,255,255,0.12)",
                             }}
                             onMouseEnter={(e) => {
                               if (!isActive)
