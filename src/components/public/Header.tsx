@@ -17,7 +17,7 @@ const navLinksMiddle = [
   { href: "/servicios", label: "Servicios" },
   { href: "/multimedia", label: "Multimedia" },
   { href: "/calidad", label: "Calidad" },
-  { href: "/blog", label: "Blog" },
+  { href: "/noticias", label: "Noticias" },
 ];
 
 const HORARIO_FALLBACK =

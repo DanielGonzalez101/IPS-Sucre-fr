@@ -19,6 +19,7 @@ import {
   UserRound,
   Cpu,
   Settings,
+  Newspaper,
 } from "lucide-react";
 import { signOut } from "@/actions/auth";
 
@@ -49,6 +50,7 @@ const navItems = [
   { href: "/dashboard",  slug: "dashboard", label: "Dashboard",      Icon: LayoutDashboard },
   { href: "/paginas",    slug: "paginas",   label: "Páginas",         Icon: FileText       },
   { href: "/servicios",  slug: "servicios", label: "Servicios",       Icon: Heart          },
+  { href: "/noticias",   slug: "noticias",  label: "Noticias",        Icon: Newspaper      },
   { href: "/normativa",  slug: "normativa", label: "Normativa",       Icon: BookOpen       },
   { href: "/pqrs",       slug: "pqrs",      label: "PQRS",            Icon: MessageSquare  },
   { href: "/usuarios",   slug: "usuarios",  label: "Usuarios",        Icon: UserCircle     },
