@@ -21,6 +21,12 @@ const LIMITES = {
 const TAGS = ["Tecnología", "Eventos", "Institucional"] as const;
 type Tag = (typeof TAGS)[number];
 
+const POSICIONES = [
+  { value: "destacada", label: "Destacada", desc: "Sección principal — máx. 3" },
+  { value: "reciente",  label: "Publicaciones recientes", desc: "Listado general" },
+] as const;
+type Posicion = "destacada" | "reciente";
+
 // ── Utilidades ───────────────────────────────────────────────
 
 function toSlug(text: string): string {
@@ -126,6 +132,7 @@ interface Noticia {
   titulo: string;
   extracto: string;
   tag: string;
+  posicion: string;
   img_url: string;
   fecha: string;
   vistas: number;
@@ -226,6 +233,7 @@ function NoticiaCard({
     titulo: noticia.titulo,
     extracto: noticia.extracto,
     tag: noticia.tag,
+    posicion: noticia.posicion as Posicion,
     slug: noticia.slug,
     img_url: noticia.img_url,
     fecha: noticia.fecha,
@@ -401,7 +409,7 @@ function NoticiaCard({
       {!collapsed && (
         <div className="p-5 space-y-5">
 
-          {/* Fila 1: título + tag + fecha */}
+          {/* Fila 1: título + tag */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             <div className="lg:col-span-2">
               <FieldLabel label="Título" required value={form.titulo} max={LIMITES.titulo} />
@@ -425,6 +433,31 @@ function NoticiaCard({
                   <option key={t} value={t}>{t}</option>
                 ))}
               </select>
+            </div>
+          </div>
+
+          {/* Fila 1b: posición en la página */}
+          <div>
+            <FieldLabel label="Posición en la página" required />
+            <div className="flex gap-3 mt-1">
+              {POSICIONES.map((p) => {
+                const selected = form.posicion === p.value;
+                return (
+                  <button
+                    key={p.value}
+                    type="button"
+                    onClick={() => set("posicion", p.value as Posicion)}
+                    className="flex-1 rounded-lg border px-3 py-2 text-left text-sm transition-all"
+                    style={selected
+                      ? { borderColor: "var(--color-azul-700)", backgroundColor: "var(--color-azul-50)", color: "var(--color-azul-900)" }
+                      : { borderColor: "var(--color-gris-200)", backgroundColor: "#fff", color: "var(--color-gris-600)" }
+                    }
+                  >
+                    <span className="font-semibold block">{p.label}</span>
+                    <span className="text-xs opacity-70">{p.desc}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -534,6 +567,7 @@ function NuevaNoticiaCard({
     titulo: "",
     extracto: "",
     tag: "Tecnología" as Tag,
+    posicion: "reciente" as Posicion,
     slug: "",
     img_url: "",
     fecha: new Date().toISOString().slice(0, 10),
@@ -631,6 +665,31 @@ function NuevaNoticiaCard({
                 <option key={t} value={t}>{t}</option>
               ))}
             </select>
+          </div>
+        </div>
+
+        {/* Posición en la página */}
+        <div>
+          <FieldLabel label="Posición en la página" required />
+          <div className="flex gap-3 mt-1">
+            {POSICIONES.map((p) => {
+              const selected = form.posicion === p.value;
+              return (
+                <button
+                  key={p.value}
+                  type="button"
+                  onClick={() => set("posicion", p.value as Posicion)}
+                  className="flex-1 rounded-lg border px-3 py-2 text-left text-sm transition-all"
+                  style={selected
+                    ? { borderColor: "var(--color-azul-700)", backgroundColor: "var(--color-azul-50)", color: "var(--color-azul-900)" }
+                    : { borderColor: "var(--color-gris-200)", backgroundColor: "#fff", color: "var(--color-gris-600)" }
+                  }
+                >
+                  <span className="font-semibold block">{p.label}</span>
+                  <span className="text-xs opacity-70">{p.desc}</span>
+                </button>
+              );
+            })}
           </div>
         </div>
 

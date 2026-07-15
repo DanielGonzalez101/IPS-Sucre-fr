@@ -362,144 +362,15 @@ function RecentSection({ noticias }: { noticias: Noticia[] }) {
   );
 }
 
-/* ── Sección 3: Lista + artículo grande ─────────── */
-function ListAndBigSection({ noticias }: { noticias: Noticia[] }) {
-  const sectionRef = useRef<HTMLElement>(null);
-
-  useGSAP(
-    () => {
-      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
-      const trigger = { trigger: sectionRef.current, start: "top 90%", once: true };
-
-      gsap.set(".nl-item", { y: 28, opacity: 0 });
-      gsap.set(".nl-big", { y: 32, opacity: 0, scale: 0.97 });
-
-      gsap.to(".nl-item", {
-        y: 0,
-        opacity: 1,
-        duration: 0.55,
-        stagger: 0.09,
-        ease: "power2.out",
-        scrollTrigger: trigger,
-      });
-
-      gsap.to(".nl-big", {
-        y: 0,
-        opacity: 1,
-        scale: 1,
-        duration: 0.8,
-        ease: "power3.out",
-        delay: 0.15,
-        scrollTrigger: trigger,
-      });
-    },
-    { scope: sectionRef }
-  );
-
-  const listItems = noticias.slice(0, 4);
-  const bigArticle = noticias[noticias.length - 1];
-
-  if (!bigArticle) return null;
-
-  return (
-    <section ref={sectionRef} className="py-12 md:py-16">
-      <div className="container-main">
-        <div className="noticias-list-grid">
-
-          {/* Columna lista */}
-          <div>
-            {listItems.map((n) => (
-              <Link key={n.slug} href={`/noticias/${n.slug}`} className="nl-item noticias-list-item group">
-                <div className="noticias-list-img">
-                  <Image
-                    src={n.img_url}
-                    alt={n.titulo}
-                    fill
-                    style={{ objectFit: "cover", objectPosition: "top center" }}
-                    sizes="96px"
-                  />
-                </div>
-                <div className="noticias-list-body">
-                  <span className="news-tag" style={{ fontSize: "0.72rem" }}>{n.tag}</span>
-                  <p
-                    className="font-heading font-bold text-sm leading-snug"
-                    style={{ color: "var(--color-azul-900)" }}
-                  >
-                    {n.titulo}
-                  </p>
-                  <div
-                    className="flex items-center gap-3"
-                    style={{ color: "var(--color-gris-400)", fontSize: "0.78rem" }}
-                  >
-                    <span>{formatDate(n.fecha)}</span>
-                    <span className="flex items-center gap-1">
-                      <Eye size={11} aria-hidden="true" />{n.vistas}
-                    </span>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-
-          {/* Artículo grande derecha */}
-          <Link href={`/noticias/${bigArticle.slug}`} className="nl-big noticias-big-right group">
-            <Image
-              src={bigArticle.img_url}
-              alt={bigArticle.titulo}
-              fill
-              style={{ objectFit: "cover", objectPosition: "top center" }}
-              sizes="(min-width: 1024px) 50vw, 100vw"
-            />
-            <div
-              className="absolute inset-0"
-              style={{
-                background:
-                  "linear-gradient(to top, rgba(6,36,77,0.92) 0%, rgba(6,36,77,0.3) 55%, transparent 100%)",
-              }}
-              aria-hidden="true"
-            />
-            <div className="absolute bottom-0 left-0 right-0 p-8 z-10">
-              <span
-                className="font-heading font-semibold text-xs rounded-full px-3 py-1 mb-3 inline-block"
-                style={{ backgroundColor: "rgba(238,53,56,0.2)", color: "#fff" }}
-              >
-                {bigArticle.tag.toUpperCase()}
-              </span>
-              <h3
-                className="font-heading font-bold text-white leading-snug mb-2"
-                style={{ fontSize: "clamp(1.1rem, 1.8vw, 1.5rem)" }}
-              >
-                {bigArticle.titulo}
-              </h3>
-              <p
-                className="font-body text-sm leading-relaxed mb-4"
-                style={{ color: "rgba(255,255,255,0.80)" }}
-              >
-                {bigArticle.extracto}
-              </p>
-              <span
-                className="inline-flex items-center gap-1 font-heading font-semibold text-sm"
-                style={{ color: "rgba(255,255,255,0.7)" }}
-              >
-                Leer nota <ArrowUpRight size={14} aria-hidden="true" />
-              </span>
-            </div>
-          </Link>
-
-        </div>
-      </div>
-    </section>
-  );
-}
-
 /* ── Export principal ────────────────────────────── */
 export default function NoticiasGrid({ noticias }: { noticias: Noticia[] }) {
+  const destacadas = noticias.filter((n) => n.posicion === "destacada").slice(0, 3);
+  const recientes  = noticias.filter((n) => n.posicion === "reciente");
+
   return (
     <>
-      <FeaturedSection noticias={noticias} />
-      <RecentSection noticias={noticias} />
-      <ListAndBigSection noticias={noticias} />
+      <FeaturedSection noticias={destacadas} />
+      <RecentSection noticias={recientes} />
     </>
   );
 }

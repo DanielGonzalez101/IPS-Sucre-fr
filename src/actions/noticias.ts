@@ -37,6 +37,7 @@ export async function createNoticia(fields: {
   titulo: string;
   extracto: string;
   tag: string;
+  posicion: string;
   img_url: string;
   fecha: string;
 }) {
@@ -57,6 +58,7 @@ export async function updateNoticia(
     titulo: string;
     extracto: string;
     tag: string;
+    posicion: string;
     img_url: string;
     fecha: string;
     activo: boolean;
