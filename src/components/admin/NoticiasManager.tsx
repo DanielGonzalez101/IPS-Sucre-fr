@@ -325,22 +325,20 @@ function NoticiaCard({
 
         <div className="flex items-center gap-2 shrink-0">
           {/* Toggle activo */}
-          <label className="flex items-center gap-1.5 cursor-pointer select-none">
+          <div className="flex items-center gap-1.5 cursor-pointer select-none" onClick={onToggleActivo}>
             <span className="text-xs text-gray-500">
               {noticia.activo ? "Activa" : "Oculta"}
             </span>
-            <button
-              onClick={onToggleActivo}
-              disabled={isPending}
-              className="relative inline-flex h-4 w-8 items-center rounded-full transition-colors disabled:opacity-50"
+            <div
+              className="relative inline-flex h-4 w-8 items-center rounded-full transition-colors"
               style={{ backgroundColor: noticia.activo ? "var(--color-azul-800)" : "#D1D5DB" }}
             >
               <span
                 className="inline-block h-3 w-3 rounded-full bg-white shadow transition-transform"
                 style={{ transform: noticia.activo ? "translateX(17px)" : "translateX(2px)" }}
               />
-            </button>
-          </label>
+            </div>
+          </div>
 
           {/* Eliminar */}
           {confirmDelete ? (
