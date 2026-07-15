@@ -73,6 +73,13 @@ const ICONOS_DISPONIBLES = Object.keys(ICON_MAP).filter(
   (k) => !["Dumbbell", "RotateCw"].includes(k)
 );
 
+const CATEGORIAS = [
+  "Cardiología Pediátrica",
+  "Cardiología Adultos",
+  "Gastroenterología Pediátrica",
+  "Diagnóstico por Imágenes",
+];
+
 interface Servicio {
   id: string;
   titulo: string;
@@ -81,6 +88,7 @@ interface Servicio {
   icono: string;
   orden: number;
   activo: boolean;
+  preparacion?: string | null;
 }
 
 interface Props {
@@ -203,28 +211,94 @@ export function ServiciosManager({ servicios: initialServicios }: Props) {
     });
   }
 
+  // Agrupar por categoría para la vista, manteniendo el índice real de
+  // cada servicio dentro del array completo (moveUp/moveDown operan sobre
+  // el orden global, no dentro de la categoría).
+  const grupos = CATEGORIAS.map((categoria) => ({
+    categoria,
+    items: servicios
+      .map((servicio, index) => ({ servicio, index }))
+      .filter(({ servicio }) => servicio.categoria === categoria),
+  })).filter((g) => g.items.length > 0);
+
+  const categoriasConocidas = new Set(CATEGORIAS);
+  const sinCategoria = servicios
+    .map((servicio, index) => ({ servicio, index }))
+    .filter(({ servicio }) => !categoriasConocidas.has(servicio.categoria));
+
   return (
-    <div className="space-y-3">
-      {servicios.map((servicio, index) => (
-        <ServicioCard
-          key={servicio.id}
-          servicio={servicio}
-          index={index}
-          total={servicios.length}
-          onMoveUp={() => moveUp(index)}
-          onMoveDown={() => moveDown(index)}
-          onToggleActivo={() => {
-            const next = servicios.map((s) =>
-              s.id === servicio.id ? { ...s, activo: !s.activo } : s
-            );
-            setServicios(next);
-            startTransition(async () => {
-              await updateServicio(servicio.id, { activo: !servicio.activo });
-            });
-          }}
-          onDeleted={() => setServicios((prev) => prev.filter((s) => s.id !== servicio.id))}
-        />
+    <div className="space-y-6">
+      {grupos.map(({ categoria, items }) => (
+        <div key={categoria}>
+          <h2
+            className="font-heading font-semibold text-sm uppercase tracking-wide mb-3"
+            style={{ color: "var(--color-azul-700)" }}
+          >
+            {categoria}
+            <span className="ml-2 text-xs font-normal normal-case text-gray-400">
+              {items.length} {items.length === 1 ? "servicio" : "servicios"}
+            </span>
+          </h2>
+          <div className="space-y-3">
+            {items.map(({ servicio, index }) => (
+              <ServicioCard
+                key={servicio.id}
+                servicio={servicio}
+                index={index}
+                total={servicios.length}
+                onMoveUp={() => moveUp(index)}
+                onMoveDown={() => moveDown(index)}
+                onToggleActivo={() => {
+                  const next = servicios.map((s) =>
+                    s.id === servicio.id ? { ...s, activo: !s.activo } : s
+                  );
+                  setServicios(next);
+                  startTransition(async () => {
+                    await updateServicio(servicio.id, { activo: !servicio.activo });
+                  });
+                }}
+                onDeleted={() => setServicios((prev) => prev.filter((s) => s.id !== servicio.id))}
+              />
+            ))}
+          </div>
+        </div>
       ))}
+
+      {sinCategoria.length > 0 && (
+        <div>
+          <h2
+            className="font-heading font-semibold text-sm uppercase tracking-wide mb-3"
+            style={{ color: "#DC2626" }}
+          >
+            Sin categoría reconocida
+            <span className="ml-2 text-xs font-normal normal-case text-gray-400">
+              {sinCategoria.length} {sinCategoria.length === 1 ? "servicio" : "servicios"}
+            </span>
+          </h2>
+          <div className="space-y-3">
+            {sinCategoria.map(({ servicio, index }) => (
+              <ServicioCard
+                key={servicio.id}
+                servicio={servicio}
+                index={index}
+                total={servicios.length}
+                onMoveUp={() => moveUp(index)}
+                onMoveDown={() => moveDown(index)}
+                onToggleActivo={() => {
+                  const next = servicios.map((s) =>
+                    s.id === servicio.id ? { ...s, activo: !s.activo } : s
+                  );
+                  setServicios(next);
+                  startTransition(async () => {
+                    await updateServicio(servicio.id, { activo: !servicio.activo });
+                  });
+                }}
+                onDeleted={() => setServicios((prev) => prev.filter((s) => s.id !== servicio.id))}
+              />
+            ))}
+          </div>
+        </div>
+      )}
 
       {showNew ? (
         <NuevoServicioCard
@@ -283,6 +357,7 @@ function ServicioCard({
     categoria: servicio.categoria,
     descripcion: servicio.descripcion,
     icono: servicio.icono,
+    preparacion: servicio.preparacion ?? "",
   });
 
   const HeaderIcon = ICON_MAP[servicio.icono] ?? Stethoscope;
@@ -428,13 +503,18 @@ function ServicioCard({
             </div>
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">Categoría</label>
-              <input
-                type="text"
+              <select
                 value={form.categoria}
                 onChange={(e) => setForm((f) => ({ ...f, categoria: e.target.value }))}
-                className="w-full rounded border border-gray-200 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-azul-600"
-                placeholder="Cardiología Pediátrica"
-              />
+                className="w-full rounded border border-gray-200 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-azul-600 bg-white"
+              >
+                {!CATEGORIAS.includes(form.categoria) && (
+                  <option value={form.categoria}>{form.categoria} (sin migrar)</option>
+                )}
+                {CATEGORIAS.map((cat) => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
+              </select>
             </div>
           </div>
           <div className="space-y-3">
@@ -452,6 +532,19 @@ function ServicioCard({
                 placeholder="Descripción breve del servicio para la página pública"
               />
             </div>
+          </div>
+
+          <div className="lg:col-span-2">
+            <label className="block text-xs font-medium text-gray-600 mb-1">
+              Preparación del paciente (opcional)
+            </label>
+            <textarea
+              value={form.preparacion}
+              onChange={(e) => setForm((f) => ({ ...f, preparacion: e.target.value }))}
+              rows={3}
+              className="w-full rounded border border-gray-200 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-azul-600 resize-none"
+              placeholder="Ej: Requiere ayuno de 8 horas / Requiere medio de contraste oral"
+            />
           </div>
 
           <div className="lg:col-span-2">
@@ -495,9 +588,10 @@ function NuevoServicioCard({
   const [error, setError] = useState<string | null>(null);
   const [form, setForm] = useState({
     titulo: "",
-    categoria: "",
+    categoria: CATEGORIAS[0],
     descripcion: "",
     icono: "Stethoscope",
+    preparacion: "",
   });
 
   function handleCreate() {
@@ -542,13 +636,15 @@ function NuevoServicioCard({
           </div>
           <div>
             <label className="block text-xs font-medium text-gray-600 mb-1">Categoría *</label>
-            <input
-              type="text"
+            <select
               value={form.categoria}
               onChange={(e) => setForm((f) => ({ ...f, categoria: e.target.value }))}
-              className="w-full rounded border border-gray-200 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-azul-600"
-              placeholder="Cardiología Pediátrica"
-            />
+              className="w-full rounded border border-gray-200 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-azul-600 bg-white"
+            >
+              {CATEGORIAS.map((cat) => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
+            </select>
           </div>
         </div>
         <div className="space-y-3">
@@ -566,6 +662,19 @@ function NuevoServicioCard({
               placeholder="Descripción breve del servicio"
             />
           </div>
+        </div>
+
+        <div className="lg:col-span-2">
+          <label className="block text-xs font-medium text-gray-600 mb-1">
+            Preparación del paciente (opcional)
+          </label>
+          <textarea
+            value={form.preparacion}
+            onChange={(e) => setForm((f) => ({ ...f, preparacion: e.target.value }))}
+            rows={3}
+            className="w-full rounded border border-gray-200 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-azul-600 resize-none"
+            placeholder="Ej: Requiere ayuno de 8 horas / Requiere medio de contraste oral"
+          />
         </div>
 
         <div className="lg:col-span-2">

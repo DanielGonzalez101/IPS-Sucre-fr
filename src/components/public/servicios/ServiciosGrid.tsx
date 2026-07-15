@@ -5,12 +5,19 @@ import { useGSAP } from "@gsap/react";
 import { gsap } from "@/lib/gsap";
 import ServicioCard, { type ServicioCardData } from "./ServicioCard";
 
-type Filtro = "todos" | "Cardiología Pediátrica" | "Radiología / Diagnóstico";
+type Filtro =
+  | "todos"
+  | "Cardiología Pediátrica"
+  | "Cardiología Adultos"
+  | "Gastroenterología Pediátrica"
+  | "Diagnóstico por Imágenes";
 
 const FILTROS: { value: Filtro; label: string }[] = [
   { value: "todos", label: "Todos" },
   { value: "Cardiología Pediátrica", label: "Cardiología Pediátrica" },
-  { value: "Radiología / Diagnóstico", label: "Radiología / Diagnóstico" },
+  { value: "Cardiología Adultos", label: "Cardiología Adultos" },
+  { value: "Gastroenterología Pediátrica", label: "Gastroenterología Pediátrica" },
+  { value: "Diagnóstico por Imágenes", label: "Diagnóstico por Imágenes" },
 ];
 
 interface ServicioConCategoria extends ServicioCardData {

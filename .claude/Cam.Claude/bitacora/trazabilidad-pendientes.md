@@ -10,15 +10,15 @@ Registro de cosas por hacer, decisiones tomadas y cosas descartadas con su razó
 
 | Prioridad | Tarea | Contexto | Fecha agregada |
 |-----------|-------|----------|----------------|
-| Alta | Módulo PQRSD completo (14 campos + lógica anónimo) | Ítems rojos 259-268, azules 265-269. El enlace actual devuelve 404. Es lo más crítico. | 2026-06-20 |
-| Alta | Página `/pqrsd/seguimiento` — consulta por radicado | Ítem sin color 253 — ciudadano ingresa radicado y ve estado | 2026-06-20 |
+| ~~Alta~~ | ~~Módulo PQRSD completo (14 campos + lógica anónimo)~~ | **Resuelto 2026-07-11** vía merge de release/Release-2: `PqrsForm.tsx` con los 6 tipos, lógica de anonimato, documento, modalidad de respuesta y adjuntos. Pendiente de verificación funcional: bucket `pqrsd-adjuntos` en Supabase (ver `backend-2026-07-10-pqrsd-storage.md`). | 2026-06-20 |
+| ~~Alta~~ | ~~Página `/pqrsd/seguimiento` — consulta por radicado~~ | **Resuelto 2026-07-11**: `PqrsConsulta.tsx` + `/pqrs/consulta` + `/api/pqrsd/consulta`. | 2026-06-20 |
 | Alta | Módulo de noticias completo | Ítem rojo 271 — listado `/noticias`, detalle `/noticias/[slug]`, 3 en home, CRUD admin | 2026-06-20 |
 | Alta | Footer con enlaces a políticas legales | Ítem rojo 33 — Términos, Privacidad, Derechos de autor | 2026-06-20 |
 | Alta | Páginas `/politicas/terminos`, `/politicas/privacidad`, `/politicas/derechos-autor` | Ítems rojos 34-36. Texto lo aprueba el cliente. | 2026-06-20 |
 | Alta | Organigrama en `/quienes-somos` | Ítem rojo 43. BLOQUEANTE: cliente debe entregar el archivo. | 2026-06-20 |
-| Media | Sección entes que vigilan (Supersalud) en Transparencia | Ítems sin color 70-76. Datos: nombre, dirección, teléfono, email, enlace. | 2026-06-20 |
+| Media | Sección entes que vigilan (Supersalud) en Transparencia | Ítems sin color 70-76. Datos: nombre, dirección, teléfono, email, enlace. Verificar si `TransparenciaFinanciera.tsx` (agregado 2026-07-11) ya cubre esto o sigue pendiente. | 2026-06-20 |
 | Media | Upload PDFs a Transparencia: manual contratación, distribución presupuestal, normativa | Ítems rojos 101, 112 y sin color 78-86. Los PDFs ya existen en la IPS. | 2026-06-20 |
-| Media | Acuse de recibo automático PQRSD con radicado | Ítem sin color 249-250 — mensaje de confirmación + email 24h hábiles | 2026-06-20 |
+| ~~Media~~ | ~~Acuse de recibo automático PQRSD con radicado~~ | **Resuelto 2026-07-11**: `PqrsConfirmation.tsx` muestra el radicado tras el envío. Verificar si el envío de email de confirmación quedó implementado en `/api/pqrsd/route.ts`. | 2026-06-20 |
 
 ### Técnicos del stack
 
@@ -38,6 +38,8 @@ Registro de cosas por hacer, decisiones tomadas y cosas descartadas con su razó
 | Prioridad | Tarea | Contexto | Fecha agregada |
 |-----------|-------|----------|----------------|
 | Media | URLs Google Maps embed para Carmen de Bolívar y Magangué | Sin estas URLs no se puede activar el cambio de mapa con animación en SedesSection | 2026-06-22 |
+| Media | Página `/calidad` usa datos mock (`src/data/calidad.mock.ts`) | Agregada 2026-07-11 vía merge release-2. Falta integrar con Supabase igual que se hizo con Servicios. | 2026-07-11 |
+| Alta | Verificar bucket `pqrsd-adjuntos` y políticas RLS en Supabase | Solicitud ya enviada en `backend-2026-07-10-pqrsd-storage.md`. Sin esto el POST a `/api/pqrsd` falla al subir adjuntos. | 2026-07-11 |
 
 ---
 
@@ -60,6 +62,8 @@ Registro de cosas por hacer, decisiones tomadas y cosas descartadas con su razó
 | 2026-06-20 | Trazabilidad en archivos separados por tema | Evitar un único .md que crezca sin control y sea difícil de consultar |
 | 2026-06-20 | Backend requests en .md por solicitud con fecha | Permite enviarle a la IA del compañero un archivo limpio y con contexto completo |
 | 2026-06-20 | Claude no hace push ni merge sin autorización explícita de Camilo | Regla de seguridad del proyecto |
+| 2026-07-11 | `.gitignore` combina reglas de `camilo` (`.claude/`) y `release/Release-2` (`tsconfig.tsbuildinfo`) en vez de elegir una sola versión | Ambas reglas eran aditivas, no excluyentes — combinarlas evita perder cobertura de ignore de cualquiera de las dos ramas |
+| 2026-07-11 | `tsconfig.tsbuildinfo` se elimina del repo y se deja de versionar | Es un artefacto autogenerado por `tsc`, coherente con agregarlo al `.gitignore` |
 
 ---
 

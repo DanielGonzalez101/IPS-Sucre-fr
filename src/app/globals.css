@@ -3,7 +3,7 @@
 @theme {
   /* ── Fuentes ─────────────────────────────────── */
   --font-heading: "Inter", sans-serif;
-  --font-body: "Inter", sans-serif;
+  --font-body: var(--font-heading);
 
   /* ── Paleta Cardiocentro ─────────────────────── */
   --color-azul-50: #eef3fb;
@@ -109,6 +109,10 @@ h6 {
   color: var(--color-azul-800);
   background-color: var(--color-azul-50);
 }
+.nav-link-active {
+  color: var(--color-azul-800);
+  background-color: var(--color-azul-50);
+}
 
 /* ── Nav dropdown ────────────────────────────────── */
 .nav-dropdown-group {
@@ -123,10 +127,11 @@ h6 {
   font-family: var(--font-heading);
   font-weight: 600;
   font-size: 0.875rem;
-  padding: 0.5rem 0.75rem;
+  padding: 0.5rem 0.625rem;
   border-radius: 0.5rem;
   background: none;
   border: none;
+  white-space: nowrap;
   cursor: pointer;
   transition:
     color 0.2s,
@@ -360,26 +365,24 @@ h6 {
 .hero-image-wrap {
   position: relative;
   width: 100%;
-  height: 260px;
-  overflow: hidden;
+  aspect-ratio: 4 / 3;
 }
 
 @media (min-width: 768px) {
   .hero-image-wrap {
-    height: 480px;
+    aspect-ratio: 768 / 480;
   }
 }
 
 @media (min-width: 1024px) {
   .hero-image-wrap {
-    height: 711px;
+    aspect-ratio: 1920 / 711;
   }
 }
 
 .hero-clip {
-  position: relative;
-  width: 100%;
-  height: 100%;
+  position: absolute;
+  inset: 0;
   overflow: hidden;
 }
 
@@ -402,11 +405,7 @@ h6 {
   flex-direction: column;
   align-items: flex-start;
   padding: 1.75rem 0 2rem;
-  background: linear-gradient(
-    180deg,
-    rgba(6, 36, 77, 0.5) 0%,
-    rgba(6, 36, 77, 0.42) 100%
-  );
+  background: var(--color-azul-900);
 }
 
 @media (min-width: 768px) {
@@ -416,7 +415,7 @@ h6 {
     flex-direction: column;
     align-items: flex-start;
     justify-content: center;
-    padding-block: 3rem;
+    padding-block: 4.5rem 2rem;
     background: transparent;
   }
 }
@@ -1606,6 +1605,12 @@ h6 {
   z-index: 3;
 }
 
+/* Card Misión — ícono brújula gira suave en hover */
+.mision-card:hover .mision-icon-wrap {
+  transform: rotate(20deg);
+  background-color: var(--color-azul-100);
+}
+
 /* ── Bento grid (layout Image 10) ── */
 .equipo-bento-section {
   padding-block: 4rem;
@@ -1715,11 +1720,10 @@ h6 {
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: 260px 688px;
+  grid-template-columns: 300px minmax(0, 1fr);
   gap: 4rem;
   align-items: start;
-  width: fit-content;
-  margin-inline: auto;
+  width: 100%;
 }
 
 /* Sidebar izquierdo */
@@ -1731,7 +1735,7 @@ h6 {
 .equipo-sidebar-heading {
   font-family: var(--font-heading);
   font-weight: 800;
-  font-size: clamp(1.6rem, 2.8vw, 2.4rem);
+  font-size: clamp(1.75rem, 3vw, 2.75rem);
   color: #fff;
   line-height: 1.15;
   margin-bottom: 1rem;
@@ -1740,6 +1744,7 @@ h6 {
 .equipo-sidebar-desc {
   font-family: var(--font-body);
   font-size: 1rem;
+  font-weight: 400;
   color: #fff;
   line-height: 1.65;
   margin-bottom: 1.75rem;

@@ -229,13 +229,13 @@ export default function ContactanosDropdown({
               </Link>
             </p>
             <a
-              href={whatsappUrl}
+              href="https://cardiocentro.gomedicaltm.co/portal-pacientes"
               target="_blank"
               rel="noopener noreferrer"
               onClick={closeDropdown}
               className="shrink-0 rounded-full bg-[var(--color-rojo-500)] px-4 py-2 font-heading text-sm font-semibold text-white transition-colors hover:bg-[var(--color-rojo-600)]"
             >
-              Agenda tu cita
+              Tus resultados
             </a>
           </div>
         </div>

@@ -87,6 +87,48 @@ export async function updateSede(
   return { error: null };
 }
 
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+export async function createSede(
+  ciudad: string
+): Promise<{ data: Sede | null; error: string | null }> {
+  const supabase = createAdminClient();
+
+  const baseId = slugify(ciudad) || "sede";
+  const { data: existentes } = await supabase.from("sedes").select("id, orden");
+  const idsExistentes = new Set((existentes ?? []).map((s) => s.id));
+
+  let id = baseId;
+  let n = 2;
+  while (idsExistentes.has(id)) {
+    id = `${baseId}-${n}`;
+    n++;
+  }
+
+  const orden = (existentes ?? []).reduce((max, s) => Math.max(max, s.orden ?? 0), 0) + 1;
+
+  const nuevaSede = { id, ciudad, direccion: "", telefono: "", horario: "", map_url: "", orden };
+  const { data, error } = await supabase.from("sedes").insert(nuevaSede).select().single();
+  if (error) return { data: null, error: error.message };
+  revalidateAll();
+  return { data, error: null };
+}
+
+export async function deleteSede(id: string): Promise<{ error: string | null }> {
+  const supabase = createAdminClient();
+  const { error } = await supabase.from("sedes").delete().eq("id", id);
+  if (error) return { error: error.message };
+  revalidateAll();
+  return { error: null };
+}
+
 export async function getEmailContacto(): Promise<string> {
   try {
     const supabase = createAdminClient();
