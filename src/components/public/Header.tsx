@@ -1,8 +1,12 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { Phone, Mail, ChevronDown, Users, Cpu } from "lucide-react";
 import type { Sede } from "@/actions/sitio";
 import ContactanosDropdown from "@/components/public/navbar/ContactanosDropdown";
+import MobileMenu from "@/components/public/navbar/MobileMenu";
 
 const navLinksBeforeEquipo = [
   { href: "/", label: "Inicio" },
@@ -16,8 +20,6 @@ const navLinksMiddle = [
   { href: "/blog", label: "Blog" },
 ];
 
-const navLinksEnd = [{ href: "/consulta-examen", label: "Consulta tu examen" }];
-
 const HORARIO_FALLBACK =
   "Lunes a Viernes 7:00 a.m. – 12:00 m. / 1:00 p.m. – 6:00 p.m.\nSábados 7:00 a.m. – 11:00 a.m.";
 
@@ -28,6 +30,11 @@ interface HeaderProps {
 }
 
 export default function Header({ sedes, emailContacto, whatsappUrl }: HeaderProps) {
+  const pathname = usePathname();
+  const isActive = (href: string) =>
+    href === "/" ? pathname === "/" : pathname.startsWith(href);
+  const isEquipoActive = pathname.startsWith("/equipo");
+
   return (
     <header>
       {/* Top bar */}
@@ -55,21 +62,24 @@ export default function Header({ sedes, emailContacto, whatsappUrl }: HeaderProp
           <div className="flex items-center gap-4">
             <Link
               href="/transparencia"
-              className="text-white/85 hover:text-white transition-colors"
+              className="transition-colors"
+              style={{ color: isActive("/transparencia") ? "#fff" : "rgba(255,255,255,0.85)" }}
             >
               Información Pública
             </Link>
             <Link
               href="/pqrs"
-              className="text-white/85 hover:text-white transition-colors"
+              className="transition-colors"
+              style={{ color: isActive("/pqrs") ? "#fff" : "rgba(255,255,255,0.85)" }}
             >
               Peticiones y Solicitudes
             </Link>
             <Link
               href="/participa"
-              className="text-white/85 hover:text-white transition-colors"
+              className="transition-colors"
+              style={{ color: isActive("/participa") ? "#fff" : "rgba(255,255,255,0.85)" }}
             >
-              Voz Ciudadana
+              Participación Ciudadana
             </Link>
           </div>
         </div>
@@ -81,11 +91,11 @@ export default function Header({ sedes, emailContacto, whatsappUrl }: HeaderProp
         style={{ boxShadow: "0 1px 3px 0 rgb(0 0 0 / 0.06)" }}
         aria-label="Navegación principal"
       >
-        <div className="container-main flex items-center justify-between py-4">
+        <div className="container-main grid grid-cols-[1fr_auto_1fr] items-center py-4 xl:flex xl:justify-between">
           {/* Logo */}
           <Link
             href="/"
-            className="flex items-center focus-visible:ring-2 focus-visible:ring-azul-600 focus-visible:ring-offset-2 rounded-lg"
+            className="flex items-center justify-self-center col-start-2 xl:col-start-auto xl:justify-self-auto focus-visible:ring-2 focus-visible:ring-azul-600 focus-visible:ring-offset-2 rounded-lg"
           >
             <Image
               src="/logo.png"
@@ -98,12 +108,13 @@ export default function Header({ sedes, emailContacto, whatsappUrl }: HeaderProp
           </Link>
 
           {/* Links desktop */}
-          <ul className="hidden lg:flex items-center gap-1" role="list">
+          <ul className="hidden xl:flex col-start-1 items-center gap-0.5" role="list">
             {navLinksBeforeEquipo.map(({ href, label }) => (
               <li key={href}>
                 <Link
                   href={href}
-                  className="nav-link font-heading font-semibold text-sm px-3 py-2 rounded-lg transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-azul-600 focus-visible:ring-offset-1"
+                  aria-current={isActive(href) ? "page" : undefined}
+                  className={`nav-link font-heading font-semibold text-sm px-2.5 py-2 rounded-lg whitespace-nowrap transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-azul-600 focus-visible:ring-offset-1 ${isActive(href) ? "nav-link-active" : ""}`}
                 >
                   {label}
                 </Link>
@@ -113,9 +124,10 @@ export default function Header({ sedes, emailContacto, whatsappUrl }: HeaderProp
             {/* Dropdown Equipo — posición 3 */}
             <li className="nav-dropdown-group">
               <button
-                className="nav-dropdown-trigger"
+                className={`nav-dropdown-trigger ${isEquipoActive ? "nav-link-active" : ""}`}
                 aria-haspopup="true"
                 aria-label="Menú Equipo"
+                aria-current={isEquipoActive ? "page" : undefined}
               >
                 Equipo
                 <ChevronDown size={14} className="nav-dropdown-chevron" aria-hidden="true" />
@@ -148,7 +160,8 @@ export default function Header({ sedes, emailContacto, whatsappUrl }: HeaderProp
               <li key={href}>
                 <Link
                   href={href}
-                  className="nav-link font-heading font-semibold text-sm px-3 py-2 rounded-lg transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-azul-600 focus-visible:ring-offset-1"
+                  aria-current={isActive(href) ? "page" : undefined}
+                  className={`nav-link font-heading font-semibold text-sm px-2.5 py-2 rounded-lg whitespace-nowrap transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-azul-600 focus-visible:ring-offset-1 ${isActive(href) ? "nav-link-active" : ""}`}
                 >
                   {label}
                 </Link>
@@ -162,55 +175,30 @@ export default function Header({ sedes, emailContacto, whatsappUrl }: HeaderProp
               telefono={sedes[0]?.telefono ?? "(+57) 300 912 7565"}
               horario={sedes[0]?.horario ?? HORARIO_FALLBACK}
             />
-
-            {navLinksEnd.map(({ href, label }) => (
-              <li key={href}>
-                <Link
-                  href={href}
-                  className="nav-link font-heading font-semibold text-sm px-3 py-2 rounded-lg transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-azul-600 focus-visible:ring-offset-1"
-                >
-                  {label}
-                </Link>
-              </li>
-            ))}
           </ul>
 
           {/* CTA */}
           <a
-            href="https://wa.me/573009127565"
+            href="https://cardiocentro.gomedicaltm.co/portal-pacientes"
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden lg:inline-flex items-center gap-2 font-heading font-semibold text-sm text-white rounded-full px-5 py-2.5 hover:opacity-90 focus-visible:ring-2 focus-visible:ring-azul-600 focus-visible:ring-offset-2 transition-all duration-200"
+            className="hidden xl:inline-flex col-start-3 justify-self-end items-center gap-2 font-heading font-semibold text-sm text-white rounded-full px-5 py-2.5 whitespace-nowrap hover:opacity-90 focus-visible:ring-2 focus-visible:ring-azul-600 focus-visible:ring-offset-2 transition-all duration-200"
             style={{
               backgroundColor: "var(--color-azul-800)",
               boxShadow: "var(--shadow-button)",
             }}
           >
-            Agenda tu cita
+            Tus resultados
           </a>
 
-          {/* Hamburguesa mobile — placeholder funcional */}
-          <button
-            className="lg:hidden p-2 rounded-lg focus-visible:ring-2 focus-visible:ring-azul-600"
-            aria-label="Abrir menú de navegación"
-            aria-expanded="false"
-            style={{ color: "var(--color-azul-900)" }}
-          >
-            <svg
-              width="22"
-              height="22"
-              viewBox="0 0 22 22"
-              fill="none"
-              aria-hidden="true"
-            >
-              <path
-                d="M3 6h16M3 11h16M3 16h16"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-            </svg>
-          </button>
+          {/* Menú mobile/tablet */}
+          <div className="col-start-3 justify-self-end xl:hidden">
+            <MobileMenu
+              telefono={sedes[0]?.telefono ?? "(+57) 300 912 7565"}
+              emailContacto={emailContacto}
+              whatsappUrl={whatsappUrl}
+            />
+          </div>
         </div>
       </nav>
     </header>

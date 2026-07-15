@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { MapPin, Phone, Mail, Clock, Link2, Save, CheckCircle2, MessageCircle } from "lucide-react";
-import { updateSede, updateEmailContacto, updateRedesSociales } from "@/actions/sitio";
+import { MapPin, Phone, Mail, Clock, Link2, Save, CheckCircle2, MessageCircle, ChevronDown, Trash2, Plus, X } from "lucide-react";
+import { updateSede, updateEmailContacto, updateRedesSociales, createSede, deleteSede } from "@/actions/sitio";
 import type { Sede, RedesSociales } from "@/actions/sitio";
 
 interface Props {
@@ -12,13 +12,22 @@ interface Props {
 }
 
 export function SitioManager({ sedes: initialSedes, emailContacto: initialEmail, redes }: Props) {
+  const [sedes, setSedes] = useState(initialSedes);
+
   return (
     <div className="space-y-6">
       <EmailCard initialEmail={initialEmail} />
       <RedesCard initialRedes={redes} />
-      {initialSedes.map((sede) => (
-        <SedeCard key={sede.id} sede={sede} />
-      ))}
+      <div className="space-y-3">
+        {sedes.map((sede) => (
+          <SedeCard
+            key={sede.id}
+            sede={sede}
+            onDeleted={() => setSedes((prev) => prev.filter((s) => s.id !== sede.id))}
+          />
+        ))}
+        <NuevaSedeCard onCreated={(sede) => setSedes((prev) => [...prev, sede])} />
+      </div>
     </div>
   );
 }
@@ -129,9 +138,11 @@ function RedesCard({ initialRedes }: { initialRedes: RedesSociales }) {
   );
 }
 
-// ── Card por sede ─────────────────────────────────────────────────
+// ── Card por sede (colapsable) ──────────────────────────────────────
 
-function SedeCard({ sede }: { sede: Sede }) {
+function SedeCard({ sede, onDeleted }: { sede: Sede; onDeleted: () => void }) {
+  const [expanded, setExpanded] = useState(false);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [fields, setFields] = useState({
     ciudad: sede.ciudad,
     direccion: sede.direccion,
@@ -142,6 +153,7 @@ function SedeCard({ sede }: { sede: Sede }) {
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [isDeleting, startDeleteTransition] = useTransition();
 
   function set(key: keyof typeof fields) {
     return (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -164,70 +176,198 @@ function SedeCard({ sede }: { sede: Sede }) {
     });
   }
 
+  function handleDelete() {
+    startDeleteTransition(async () => {
+      const r = await deleteSede(sede.id);
+      if (r.error) { setError(r.error); setConfirmingDelete(false); return; }
+      onDeleted();
+    });
+  }
+
   return (
     <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-      {/* Header */}
-      <div className="px-5 py-3 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
+      {/* Header — siempre visible, controla el colapso */}
+      <button
+        type="button"
+        onClick={() => setExpanded((v) => !v)}
+        aria-expanded={expanded}
+        className="w-full px-5 py-3 border-b border-gray-100 bg-gray-50 flex items-center justify-between text-left"
+      >
         <div className="flex items-center gap-2">
           <MapPin size={15} className="text-gray-500" />
           <span className="text-sm font-semibold text-gray-700">Sede — {sede.ciudad}</span>
+          {!fields.map_url && (
+            <span className="text-xs text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">
+              Sin mapa
+            </span>
+          )}
         </div>
-        <SaveButton onClick={handleSave} isPending={isPending} saved={saved} />
-      </div>
+        <ChevronDown
+          size={16}
+          className={`text-gray-400 transition-transform duration-200 ${expanded ? "rotate-180" : ""}`}
+        />
+      </button>
 
-      {/* Campos */}
-      <div className="p-5 grid grid-cols-1 gap-4 md:grid-cols-2">
-        <Field
-          label="Ciudad"
-          icon={<MapPin size={13} className="text-gray-400" />}
-          value={fields.ciudad}
-          onChange={set("ciudad")}
-          placeholder="Ej: Sincelejo"
-        />
-        <Field
-          label="Teléfono"
-          icon={<Phone size={13} className="text-gray-400" />}
-          value={fields.telefono}
-          onChange={set("telefono")}
-          placeholder="(+57) 300 912 7565"
-        />
-        <Field
-          label="Dirección"
-          icon={<MapPin size={13} className="text-gray-400" />}
-          value={fields.direccion}
-          onChange={set("direccion")}
-          placeholder="Calle 14 No. 17-72 / Barrio Ford"
-          className="md:col-span-2"
-        />
-        <div className={`flex flex-col gap-1 md:col-span-2`}>
-          <label className="flex items-center gap-1.5 text-xs font-medium text-gray-600">
-            <Clock size={13} className="text-gray-400" />
-            Horario
-          </label>
-          <textarea
-            value={fields.horario}
-            onChange={set("horario")}
-            rows={2}
-            placeholder={"L–V 7:00 a.m.–12:00 m. / 1:00–6:00 p.m.\nSáb 7:00–11:00 a.m."}
-            className="w-full rounded border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-azul-600 resize-none"
-          />
-          <p className="text-xs text-gray-400">Usa salto de línea para separar horarios.</p>
-        </div>
-        <Field
-          label="URL del mapa (Google Maps embed)"
-          icon={<Link2 size={13} className="text-gray-400" />}
-          value={fields.map_url}
-          onChange={set("map_url")}
-          placeholder="https://www.google.com/maps/embed?pb=..."
-          className="md:col-span-2"
-        />
-      </div>
+      {/* Campos — solo si está expandida */}
+      {expanded && (
+        <>
+          <div className="p-5 grid grid-cols-1 gap-4 md:grid-cols-2">
+            <Field
+              label="Ciudad"
+              icon={<MapPin size={13} className="text-gray-400" />}
+              value={fields.ciudad}
+              onChange={set("ciudad")}
+              placeholder="Ej: Sincelejo"
+            />
+            <Field
+              label="Teléfono"
+              icon={<Phone size={13} className="text-gray-400" />}
+              value={fields.telefono}
+              onChange={set("telefono")}
+              placeholder="(+57) 300 912 7565"
+            />
+            <Field
+              label="Dirección"
+              icon={<MapPin size={13} className="text-gray-400" />}
+              value={fields.direccion}
+              onChange={set("direccion")}
+              placeholder="Calle 14 No. 17-72 / Barrio Ford"
+              className="md:col-span-2"
+            />
+            <div className={`flex flex-col gap-1 md:col-span-2`}>
+              <label className="flex items-center gap-1.5 text-xs font-medium text-gray-600">
+                <Clock size={13} className="text-gray-400" />
+                Horario
+              </label>
+              <textarea
+                value={fields.horario}
+                onChange={set("horario")}
+                rows={2}
+                placeholder={"L–V 7:00 a.m.–12:00 m. / 1:00–6:00 p.m.\nSáb 7:00–11:00 a.m."}
+                className="w-full rounded border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-azul-600 resize-none"
+              />
+              <p className="text-xs text-gray-400">Usa salto de línea para separar horarios.</p>
+            </div>
+            <Field
+              label="URL del mapa (Google Maps embed)"
+              icon={<Link2 size={13} className="text-gray-400" />}
+              value={fields.map_url}
+              onChange={set("map_url")}
+              placeholder="https://www.google.com/maps/embed?pb=..."
+              className="md:col-span-2"
+            />
+          </div>
 
-      {error && (
-        <p className="px-5 pb-4 text-xs text-red-600 bg-red-50 border-t border-red-100 py-2">
-          {error}
-        </p>
+          {error && (
+            <p className="px-5 pb-3 text-xs text-red-600">{error}</p>
+          )}
+
+          {/* Acciones */}
+          <div className="px-5 py-3 border-t border-gray-100 bg-gray-50 flex items-center justify-between">
+            {confirmingDelete ? (
+              <div className="flex items-center gap-2 text-xs">
+                <span className="text-gray-600">¿Eliminar esta sede?</span>
+                <button
+                  type="button"
+                  onClick={handleDelete}
+                  disabled={isDeleting}
+                  className="px-2.5 py-1 rounded-lg text-white font-semibold disabled:opacity-50"
+                  style={{ backgroundColor: "#dc2626" }}
+                >
+                  {isDeleting ? "Eliminando…" : "Sí, eliminar"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setConfirmingDelete(false)}
+                  className="px-2.5 py-1 rounded-lg text-gray-600 border border-gray-200"
+                >
+                  Cancelar
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setConfirmingDelete(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-red-600 hover:bg-red-50 transition-colors"
+              >
+                <Trash2 size={13} />
+                Eliminar sede
+              </button>
+            )}
+            <SaveButton onClick={handleSave} isPending={isPending} saved={saved} />
+          </div>
+        </>
       )}
+    </div>
+  );
+}
+
+// ── Nueva sede ────────────────────────────────────────────────────
+
+function NuevaSedeCard({ onCreated }: { onCreated: (sede: Sede) => void }) {
+  const [open, setOpen] = useState(false);
+  const [ciudad, setCiudad] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
+
+  function handleCreate() {
+    if (!ciudad.trim()) { setError("Escribe el nombre de la ciudad"); return; }
+    setError(null);
+    startTransition(async () => {
+      const r = await createSede(ciudad.trim());
+      if (r.error || !r.data) { setError(r.error ?? "No se pudo crear la sede"); return; }
+      onCreated(r.data);
+      setCiudad("");
+      setOpen(false);
+    });
+  }
+
+  if (!open) {
+    return (
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border border-dashed border-gray-300 text-sm font-semibold text-gray-500 hover:border-azul-600 hover:text-azul-800 transition-colors"
+      >
+        <Plus size={15} />
+        Nueva sede
+      </button>
+    );
+  }
+
+  return (
+    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <div className="px-5 py-3 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
+        <span className="text-sm font-semibold text-gray-700">Nueva sede</span>
+        <button
+          type="button"
+          onClick={() => { setOpen(false); setCiudad(""); setError(null); }}
+          aria-label="Cancelar"
+          className="text-gray-400 hover:text-gray-600"
+        >
+          <X size={16} />
+        </button>
+      </div>
+      <div className="p-5 flex gap-3 items-start">
+        <input
+          type="text"
+          value={ciudad}
+          onChange={(e) => setCiudad(e.target.value)}
+          placeholder="Nombre de la ciudad, ej: La Fe"
+          className="flex-1 rounded border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-azul-600"
+        />
+        <button
+          type="button"
+          onClick={handleCreate}
+          disabled={isPending}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white disabled:opacity-50"
+          style={{ backgroundColor: "var(--color-azul-800)" }}
+        >
+          <Plus size={13} />
+          {isPending ? "Creando…" : "Crear sede"}
+        </button>
+      </div>
+      {error && <p className="px-5 pb-4 text-xs text-red-600">{error}</p>}
     </div>
   );
 }

@@ -40,6 +40,8 @@ export interface ServicioCardData {
   descripcion: string;
   icono: string;
   slug: string;
+  categoria?: string;
+  preparacion?: string | null;
 }
 
 interface ServicioCardProps {

@@ -222,6 +222,29 @@ Fotos panorámicas grupales no son compatibles con overlay de mucho contenido en
 
 ---
 
+### [2026-07-11] — Conflictos al hacer merge de release/Release-2 en camilo
+**Estado:** Resuelto
+
+**Síntoma:** `git merge origin/release/Release-2` falló con:
+```
+CONFLICT (content): Merge conflict in .gitignore
+CONFLICT (modify/delete): tsconfig.tsbuildinfo deleted in origin/release/Release-2 and modified in HEAD.
+```
+
+**Diagnóstico:**
+1. `.gitignore` — ambas ramas modificaron el mismo bloque final: `camilo` agregó reglas para `.claude`/`.claude/`, `release/Release-2` agregó `tsconfig.tsbuildinfo`. No eran reglas excluyentes, solo se pisaban por estar en las mismas líneas.
+2. `tsconfig.tsbuildinfo` — `release/Release-2` lo eliminó del repo (correcto: es un artefacto autogenerado por `tsc`, nunca debería versionarse) y lo agregó al `.gitignore`. En `camilo` el archivo seguía modificándose en cada build local. Git no puede resolver automáticamente un archivo borrado en una rama y modificado en la otra.
+
+**Solución aplicada:**
+1. `.gitignore` resuelto a mano combinando ambos bloques (se mantienen `.claude`/`.claude/` y se agrega `tsconfig.tsbuildinfo`).
+2. `git rm tsconfig.tsbuildinfo` — se acepta el borrado propuesto por release-2, coherente con ya haberlo agregado al `.gitignore`.
+
+**Archivos modificados:** `.gitignore`, `tsconfig.tsbuildinfo` (eliminado)
+
+**Lección aprendida:** Antes de resolver un conflicto de merge, revisar si las reglas en conflicto son realmente incompatibles o solo se pisan por vivir en las mismas líneas — en este caso ambas eran aditivas y se podían combinar sin perder ninguna. Los archivos autogenerados (`tsconfig.tsbuildinfo`, `.next/`, etc.) nunca deberían versionarse; si aparecen conflictos de modify/delete sobre ellos, la resolución correcta casi siempre es aceptar el borrado y añadirlos al `.gitignore`.
+
+---
+
 ## Patrones recurrentes — alertas para Claude
 
 ### [2026-06-22] — Claude incumplió normativa de tamaños mínimos en NewsSection
