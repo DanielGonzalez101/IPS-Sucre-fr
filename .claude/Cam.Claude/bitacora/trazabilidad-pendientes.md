@@ -40,6 +40,9 @@ Registro de cosas por hacer, decisiones tomadas y cosas descartadas con su razó
 | Media | URLs Google Maps embed para Carmen de Bolívar y Magangué | Sin estas URLs no se puede activar el cambio de mapa con animación en SedesSection | 2026-06-22 |
 | Media | Página `/calidad` usa datos mock (`src/data/calidad.mock.ts`) | Agregada 2026-07-11 vía merge release-2. Falta integrar con Supabase igual que se hizo con Servicios. | 2026-07-11 |
 | Alta | Verificar bucket `pqrsd-adjuntos` y políticas RLS en Supabase | Solicitud ya enviada en `backend-2026-07-10-pqrsd-storage.md`. Sin esto el POST a `/api/pqrsd` falla al subir adjuntos. | 2026-07-11 |
+| Alta | Backend de Participa: tablas `participa_*`, route `POST /api/participa/inscripcion` | Ver solicitud completa en `.claude/Cam.Claude/backend/backend-2026-07-14-participa.md`. Sin esto el formulario de inscripción muestra "próximamente" | 2026-07-14 |
+| Media | Agregar `/participa` al menú de navegación (`Header.tsx`) | No se tocó en la tarea del 2026-07-14 porque prohibía modificar componentes de otras páginas. Hoy la ruta solo se accede por URL directa | 2026-07-14 |
+| Media | Verificación visual en navegador real de `/participa` (desktop y móvil) | No se pudo hacer con Playwright/chromium-cli (no instalado, no se permite instalar dependencias). Solo se verificó por build + curl | 2026-07-14 |
 
 ---
 
@@ -49,7 +52,8 @@ Registro de cosas por hacer, decisiones tomadas y cosas descartadas con su razó
 |-------|-----------------|
 | Textos de las 3 políticas legales | No se puede publicar `/politicas/*` sin contenido aprobado |
 | Organigrama institucional | Ítem rojo 43 — no hay desarrollo que suplir esto |
-| Visión actualizada (la actual dice "2022") | Está visible en la web como error |
+| Texto completo de la Visión (contenido, no el año) | El año ya se corrigió con código dinámico el 2026-07-14 — falta que el cliente valide/actualice el resto del contenido |
+| PDFs reales de Participa: política PPSS (Res. 2063/2017), estrategia rendición de cuentas, PAAC, informes PPSS 2024-2025 | `ParticipaDocumentos.tsx` ya muestra "Documento en actualización" como fallback — sin estos PDFs los 6 documentos quedan así indefinidamente |
 | Mínimo 3-5 noticias para lanzamiento | El módulo de noticias necesita contenido para probar y mostrar |
 | Correo de notificaciones judiciales | Ítem sin color 31 — puede ser el correo general si no tienen uno específico |
 

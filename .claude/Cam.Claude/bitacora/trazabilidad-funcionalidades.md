@@ -421,3 +421,110 @@ y deja de versionar tsconfig.tsbuildinfo por ser un artefacto autogenerado.
 ```
 
 ---
+
+### [2026-07-14] — Visión en Quiénes Somos: año dinámico en vez de "2022" fijo
+**Tipo:** Modificación
+**Archivos afectados:**
+- `src/components/quienes-somos/QuienesSomosSection.tsx`
+
+**Descripción:**
+El texto de la Visión decía "En el año 2022 seremos..." — año desactualizado y visible como error en la web. Se reemplazó el literal `2022` por `{new Date().getFullYear()}`, que se calcula en cada render (el componente ya es `"use client"`). Así el año mostrado siempre es el actual, sin necesidad de tocar código cada año.
+
+**Nota:** Esto es un parche técnico, no resuelve el fondo — el contenido completo de la Visión sigue pendiente de aprobación por el cliente (ver `trazabilidad-pendientes.md`, bloqueante actualizado).
+
+**Commit sugerido:**
+```
+git add src/components/quienes-somos/QuienesSomosSection.tsx .claude/Cam.Claude/bitacora/
+git commit -m "fix: año de Visión en Quiénes Somos ahora es dinámico (getFullYear) en vez de 2022 fijo"
+```
+
+---
+
+### [2026-07-14] — Nueva sección pública "Participa" (ítems ITA 1934-1943)
+**Tipo:** Nueva funcionalidad
+**Rama:** `feature/participa` (creada desde `feature/Contacto`, sin merge)
+**Archivos afectados:**
+- `src/app/(public)/participa/page.tsx` (nueva ruta `/participa`)
+- `src/components/public/participa/ParticipaHero.tsx`
+- `src/components/public/participa/ParticipaQueEs.tsx`
+- `src/components/public/participa/ParticipaMecanismos.tsx`
+- `src/components/public/participa/ParticipaDocumentos.tsx`
+- `src/components/public/participa/ParticipaConvocatorias.tsx`
+- `src/components/public/participa/ParticipaForm.tsx`
+- `src/data/participa.mock.ts` (todo el contenido tipado, hoy mock)
+- `src/lib/participa.ts` (capa de acceso a datos, hoy lee los mocks)
+- `src/lib/validations/participa.ts` (schema Zod del formulario de inscripción)
+- `src/app/globals.css` (clases `.participa-hero-blob*`, `.participa-hero-dots`, `.participa-mesh-blob`)
+- `.claude/Cam.Claude/backend/backend-2026-07-14-participa.md` (solicitud a backend)
+
+**Descripción:**
+Página única de Participación Ciudadana con 6 secciones: Hero (gradiente + blobs liquid glass, sin imagen de stock), "¿Qué es Participa?" con las 3 respuestas obligatorias del ítem 1934, grilla de Mecanismos (Asociación de Usuarios, PQRSD, encuestas, canales), grilla de Documentos institucionales (con fallback "Documento en actualización" cuando `url` es `null`), Convocatorias (badge Abierta/Cerrada calculado por fecha) + Calendario de actividades, y formulario de inscripción con validación Zod.
+
+Sigue los patrones ya existentes del repo: animaciones GSAP + `useGSAP`/`ScrollTrigger` (mismo estilo que `CTASection.tsx`/`CalidadHero.tsx`), tarjetas glass (`backdrop-filter: blur`) igual que `TeamSection`/`CTASection`, `.container-main`, variables `--color-azul-*`/`--color-rojo-*`, y el patrón de mocks tipados (`_MOCK` + interfaz) igual que `calidad.mock.ts`.
+
+**Formulario sin backend real:** `ParticipaForm.tsx` valida en cliente pero no envía nada — no existen ni la tabla `participa_inscripciones` ni la route `src/app/api/participa/inscripcion/route.ts` (excluido explícitamente de esta tarea). Al enviar, muestra "disponible próximamente". Queda marcado con la constante `BACKEND_PENDING = true` y un comentario `TODO(backend)` señalando el único cambio necesario cuando el endpoint exista.
+
+**Mapeo de ítems ITA cubiertos (sección 8.1 Participa):**
+| Ítem | Cobertura |
+|------|-----------|
+| 1934 | `ParticipaQueEs.tsx` — las 3 respuestas visibles simultáneamente |
+| 1935 | `ParticipaMecanismos.tsx` — mecanismos de participación disponibles |
+| 1936-1939 | `ParticipaDocumentos.tsx` — política, estrategia rendición de cuentas, PAAC, informes |
+| 1940 | `ParticipaConvocatorias.tsx` — convocatorias activas |
+| 1941 | `ParticipaConvocatorias.tsx` — calendario de actividades |
+| 1942 | `ParticipaForm.tsx` — formulario de inscripción (validación lista, envío pendiente de backend) |
+| 1943 | `ParticipaMecanismos.tsx` — canales de contacto |
+
+**Verificación realizada:** `npm run build` pasa sin errores de tipos y `/participa` prerenderiza como ruta estática (○). Se confirmó por `curl` en dev server que todas las secciones y textos clave renderizan (200 OK). **No se hizo verificación visual en navegador real** (no hay `chromium-cli`/Playwright instalado en el entorno y la tarea prohíbe instalar dependencias nuevas) — falta una revisión visual manual en desktop/móvil antes de dar la sección por cerrada.
+
+**Pendiente — no se agregó al menú de navegación:** `Header.tsx` no se tocó porque la tarea prohibía modificar componentes existentes de otras páginas. Hoy `/participa` solo es accesible escribiendo la URL directamente.
+
+**Commit sugerido:**
+```
+git add "src/app/(public)/participa" src/components/public/participa src/data/participa.mock.ts src/lib/participa.ts src/lib/validations/participa.ts src/app/globals.css .claude/Cam.Claude/backend/backend-2026-07-14-participa.md .claude/Cam.Claude/bitacora/
+git commit -m "feat: agregar sección pública Participa (ítems ITA 1934-1943) con mocks tipados y formulario pendiente de backend"
+```
+
+---
+
+### [2026-07-15] — Glass/Liquid Glass en Participa: primera pasada + auditoría/selección final
+**Tipo:** Modificación (solo estilos)
+**Rama:** `feature/participa`
+**Archivos afectados:**
+- `src/app/globals.css` (clases `.participa-glass`, `.participa-glass--interactive`, `.participa-glass--grid`, `.participa-glass-dark`, `.participa-solid-card`, `.participa-section-blobs`, `.participa-dark-input`, `.participa-dark-select`, fix de autofill)
+- `src/components/public/participa/{ParticipaHero,ParticipaQueEs,ParticipaMecanismos,ParticipaDocumentos,ParticipaConvocatorias,ParticipaForm}.tsx`
+
+**Descripción:**
+Trabajo en dos pasadas. Primero se aplicó glass claro (`.participa-glass`, `backdrop-blur`) a todas las tarjetas/paneles de la página (panel "¿Qué es Participa?", mecanismos, documentos, convocatorias, calendario, formulario). Luego, en una auditoría de diseño posterior, se decidió NO dejar glass en todo — se armó un plan sección por sección (dark glass / glass claro / glass ultra-transparente / sin glass) para dar ritmo visual y no sobrecargar de blur:
+
+| Sección | Variante final | Razón |
+|---|---|---|
+| Hero | Fondo dark full + blobs (sin cambio); badge = ultra-transparente (`.participa-glass-dark`) | Es el origen del gradiente, no un panel superpuesto |
+| ¿Qué es Participa? | Glass claro (`.participa-glass`) | Panel protagonista, pero justo después del hero oscuro — ponerlo dark habría creado dos franjas oscuras seguidas |
+| Mecanismos (4 tarjetas) | Glass claro con blur reducido (`.participa-glass--grid`, 8px en vez de 14px) | Grilla mediana, se bajó el blur por costo de repetición en móvil |
+| Documentos (6 tarjetas) | **Sin glass** (`.participa-solid-card`, sólida) | Es la grilla más grande; aplicar blur a 6 tarjetas es justo el caso que la guía de performance pide evitar. También le da ritmo a la página (dark → glass → glass → sólido → glass → dark) |
+| Convocatorias | Glass claro (`.participa-glass`), se mantiene | Contenido tipo CTA, protagonista |
+| Calendario | **Sin glass**, fila plana con borde fino | Ítems secundarios y densos; el glass ultra-transparente (pensado para fondos oscuros) es invisible sobre el fondo blanco de esta sección |
+| Formulario de inscripción | Dark glass (`bg-[#1B2B5E]/80 backdrop-blur-xl`, mismo patrón que `ContactanosDropdown.tsx`) | Bloque protagonista de cierre, hace de "bookend" con el hero — hay suficiente contenido claro en el medio para que la alternancia no se sienta pesada |
+
+**Ajustes de contraste (AA, Res. 1519):** en el formulario dark glass, los mensajes de error se movieron de `#EE3538` (~3.3:1 sobre el navy, no pasa AA texto normal) a `#FCA5A5` (~7:1). El banner "disponible próximamente" se repintó de azul claro/texto azul-800 (invisible sobre el panel oscuro) a blanco/8% + texto blanco + link en `#FCA5A5`. El asterisco de campo obligatorio se dejó en `#EE3538` por instrucción explícita — es un glifo decorativo/suplementario, el indicador real de error es el mensaje en coral claro.
+
+**Autofill:** se agregó `:-webkit-autofill` (box-shadow inset color navy + `-webkit-text-fill-color: #fff`), scoped a `.participa-dark-input` para no afectar los formularios claros de PQRSD/Contacto.
+
+**Verificación:** `tsc --noEmit` limpio, `/participa` responde 200 contra el dev server del usuario (no se corrió `npm run build` mientras ese servidor estaba activo, para no repetir el incidente de `.next` corrompido del mismo día).
+
+**Pendiente — backend para que la sección quede 100% funcional (ver `.claude/Cam.Claude/backend/backend-2026-07-14-participa.md` para el detalle con SQL):**
+1. Crear las 6 tablas de contenido en Supabase: `participa_hero`, `participa_que_es`, `participa_mecanismos`, `participa_documentos`, `participa_convocatorias`, `participa_calendario`, con RLS de lectura pública solo para filas `visible = true`.
+2. Crear la tabla `participa_inscripciones` (sin lectura pública, solo insert vía `service_role`).
+3. Crear el endpoint `POST /api/participa/inscripcion` (payload, respuestas y rate-limit ya especificados en el documento de solicitud) — hoy el formulario valida pero no envía nada, muestra "disponible próximamente" (`BACKEND_PENDING = true` en `ParticipaForm.tsx`).
+4. Definir dónde viven los PDFs de `participa_documentos.url` (bucket público existente de Transparencia/Calidad si aplica, o uno nuevo `participa-documentos`).
+5. Panel admin: CRUD sobre las 6 tablas de contenido + listado simple de `participa_inscripciones` (igual al listado de `pqrsd`).
+6. (No es backend, es frontend/contenido) Agregar `/participa` al menú de navegación — no se tocó `Header.tsx` porque las tareas de esta sección prohibían modificar componentes de otras páginas.
+
+**Commit sugerido:**
+```
+git add src/components/public/participa src/app/globals.css .claude/Cam.Claude/bitacora/
+git commit -m "style: auditoría y aplicación selectiva de glass en Participa (dark/claro/sólido por sección) con ajustes de contraste AA"
+```
+
+---

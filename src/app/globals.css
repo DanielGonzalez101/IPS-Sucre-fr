@@ -2129,3 +2129,228 @@ h6 {
     padding-inline: 3rem;
   }
 }
+
+/* ── Participa: blobs decorativos liquid glass ────── */
+.participa-hero-blobs {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.participa-hero-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+}
+
+.participa-hero-blob--red {
+  top: -10%;
+  right: -5%;
+  width: 42vw;
+  height: 42vw;
+  max-width: 520px;
+  max-height: 520px;
+  background: radial-gradient(
+    circle,
+    rgba(238, 53, 56, 0.28) 0%,
+    rgba(238, 53, 56, 0.08) 55%,
+    transparent 75%
+  );
+}
+
+.participa-hero-blob--blue {
+  bottom: -15%;
+  left: -8%;
+  width: 38vw;
+  height: 38vw;
+  max-width: 460px;
+  max-height: 460px;
+  background: radial-gradient(
+    circle,
+    rgba(26, 92, 184, 0.35) 0%,
+    rgba(26, 92, 184, 0.1) 55%,
+    transparent 75%
+  );
+}
+
+.participa-hero-dots {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 28px 28px;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.participa-mesh-blob {
+  position: absolute;
+  top: 10%;
+  right: -10%;
+  width: 40%;
+  height: 70%;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(26, 92, 184, 0.1) 0%,
+    rgba(8, 51, 143, 0.04) 45%,
+    transparent 70%
+  );
+  filter: blur(80px);
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ── Participa: liquid glass (tarjetas, paneles, formulario) ── */
+.participa-glass {
+  background-color: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow:
+    0 8px 30px -10px rgba(27, 43, 94, 0.18),
+    0 1px 3px 0 rgba(27, 43, 94, 0.06);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.participa-glass--interactive:hover {
+  border-color: rgba(230, 59, 46, 0.35);
+  box-shadow:
+    0 16px 40px -12px rgba(27, 43, 94, 0.22),
+    0 2px 10px 0 rgba(230, 59, 46, 0.12);
+  transform: translateY(-3px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .participa-glass--interactive:hover {
+    transform: none;
+  }
+}
+
+/* Glass sobre fondo oscuro (badges/paneles dentro del hero) */
+.participa-glass-dark {
+  background-color: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Blobs muy sutiles detrás de cada grilla, para que el blur del glass
+   tenga algo que refractar (primario + acento coral, opacidad ≤ 15%). */
+.participa-section-blobs {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.participa-section-blobs::before,
+.participa-section-blobs::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+}
+
+.participa-section-blobs::before {
+  top: -12%;
+  left: -8%;
+  width: 32vw;
+  height: 32vw;
+  max-width: 420px;
+  max-height: 420px;
+  background: radial-gradient(circle, rgba(27, 43, 94, 0.14) 0%, transparent 70%);
+}
+
+.participa-section-blobs::after {
+  bottom: -12%;
+  right: -8%;
+  width: 28vw;
+  height: 28vw;
+  max-width: 380px;
+  max-height: 380px;
+  background: radial-gradient(circle, rgba(230, 59, 46, 0.12) 0%, transparent 70%);
+}
+
+/* ── Participa: campos del formulario dark glass ────── */
+.participa-dark-input {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+.participa-dark-input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.participa-dark-input:focus {
+  outline: none;
+  background-color: rgba(255, 255, 255, 0.15);
+  border-color: rgba(230, 59, 46, 0.6);
+  box-shadow: 0 0 0 2px rgba(230, 59, 46, 0.35);
+}
+
+.participa-dark-input.participa-dark-input--error {
+  border-color: rgba(252, 165, 165, 0.7);
+}
+
+.participa-dark-input.participa-dark-input--error:focus {
+  box-shadow: 0 0 0 2px rgba(252, 165, 165, 0.35);
+}
+
+/* Evita que el autocompletado del navegador pinte el input de blanco */
+.participa-dark-input:-webkit-autofill,
+.participa-dark-input:-webkit-autofill:hover,
+.participa-dark-input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #fff;
+  -webkit-box-shadow: 0 0 0 1000px rgba(27, 43, 94, 0.95) inset;
+  box-shadow: 0 0 0 1000px rgba(27, 43, 94, 0.95) inset;
+  caret-color: #fff;
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+/* Chevron custom (blanco/60) porque el nativo no hereda bien sobre fondo oscuro */
+.participa-dark-select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.6)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 16px;
+  padding-right: 2.75rem;
+}
+
+.participa-dark-select option {
+  color: #111827;
+  background-color: #fff;
+}
+
+/* Modificador para grillas medianas: mismo glass claro pero con menos
+   costo de blur (varias tarjetas repitiendo backdrop-filter en móvil). */
+.participa-glass.participa-glass--grid {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Tarjeta sólida (sin glass), para grillas grandes o secciones donde el
+   ritmo visual pide un bloque "que respire" entre dos paneles de glass. */
+.participa-solid-card {
+  background-color: #fff;
+  border: 1px solid var(--color-gris-200);
+  box-shadow: var(--shadow-card);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.participa-solid-card:hover {
+  border-color: rgba(230, 59, 46, 0.35);
+  box-shadow: var(--shadow-card-hover);
+  transform: translateY(-3px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .participa-solid-card:hover {
+    transform: none;
+  }
+}

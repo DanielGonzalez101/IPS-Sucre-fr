@@ -416,7 +416,7 @@ export default function QuienesSomosSection() {
               className="vision-fade font-body text-base leading-relaxed"
               style={{ color: "var(--color-gris-600)" }}
             >
-              En el año 2022 seremos una empresa sólida y reconocida por la excelente prestación de servicio en la
+              En el año {new Date().getFullYear()} seremos una empresa sólida y reconocida por la excelente prestación de servicio en la
               atención especializada en Cardiología pediátrica, Radiología, y Diagnóstico por imágenes; por su calidad
               técnica, excelente atención, seguridad y oportunidad; buscando la exquisitez, satisfaciendo las
               perspectivas y necesidades de nuestros usuarios.
