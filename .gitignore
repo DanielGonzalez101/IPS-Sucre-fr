@@ -42,3 +42,6 @@ Thumbs.db
 # Ocultar los scripts de supabase
 db/
 tsconfig.tsbuildinfo
+
+# Matriz de cumplimiento — archivo interno, no debe subirse
+.claude/formatoMatrizCumplimiento*.xlsx
