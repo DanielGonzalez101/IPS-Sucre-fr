@@ -4,13 +4,12 @@ import { useRef } from "react";
 import { FileText, Download, Clock } from "lucide-react";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "@/lib/gsap";
-import { getDocumentos } from "@/lib/participa";
+import type { DocumentoInstitucional } from "@/data/participa.mock";
 
-// Ítems ITA 1936-1939: política de participación social en salud,
-// estrategia de rendición de cuentas, PAAC e informes de implementación.
-export default function ParticipaDocumentos() {
+interface Props { documentos: DocumentoInstitucional[] }
+
+export default function ParticipaDocumentos({ documentos }: Props) {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const documentos = getDocumentos();
 
   useGSAP(
     () => {

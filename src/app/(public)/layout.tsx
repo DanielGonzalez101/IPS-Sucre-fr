@@ -1,3 +1,4 @@
+import Script from "next/script";
 import Header from "@/components/public/Header";
 import Footer from "@/components/public/Footer";
 import FloatingWhatsApp from "@/components/public/FloatingWhatsApp";
@@ -18,6 +19,12 @@ export default async function PublicLayout({ children }: { children: React.React
 
   return (
     <>
+      {process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY && (
+        <Script
+          src={`https://www.google.com/recaptcha/api.js?render=${process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}`}
+          strategy="lazyOnload"
+        />
+      )}
       <Header sedes={sedes} emailContacto={emailContacto} whatsappUrl={whatsappUrl} />
       <main className="min-h-screen">{children}</main>
       <Footer emailContacto={emailContacto} sedePrincipal={sedePrincipal} redes={redes} />

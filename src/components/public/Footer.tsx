@@ -21,6 +21,7 @@ const politicas = [
   { href: "/politicas/terminos-y-condiciones", label: "Términos y condiciones" },
   { href: "/politicas/privacidad",             label: "Política de privacidad" },
   { href: "/politicas/derechos-de-autor",      label: "Derechos de autor" },
+  { href: "/politicas/seguridad-digital",      label: "Seguridad digital" },
 ];
 
 export default function Footer({

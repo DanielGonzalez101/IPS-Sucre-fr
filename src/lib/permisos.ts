@@ -18,6 +18,7 @@ export const MODULOS: ModuloDef[] = [
   { slug: "pqrs",               label: "PQRS",                        ruta: "/pqrs" },
   { slug: "usuarios",           label: "Usuarios",                    ruta: "/usuarios" },
   { slug: "sitio",              label: "Datos del sitio",             ruta: "/sitio" },
+  { slug: "participa",          label: "Participa",                   ruta: "/participa" },
 ];
 
 export const MODULO_SLUGS = MODULOS.map((m) => m.slug) as [string, ...string[]];

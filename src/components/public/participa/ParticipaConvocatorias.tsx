@@ -4,15 +4,15 @@ import { useRef } from "react";
 import { CalendarClock, CalendarDays } from "lucide-react";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "@/lib/gsap";
-import { getConvocatorias, getCalendario } from "@/lib/participa";
-import { estadoConvocatoria } from "@/data/participa.mock";
+import { estadoConvocatoria, type Convocatoria, type ActividadCalendario } from "@/data/participa.mock";
 
-// Ítem ITA 1940: convocatorias activas de participación.
-// Ítem ITA 1941: calendario de actividades de participación del año.
-export default function ParticipaConvocatorias() {
+interface Props {
+  convocatorias: Convocatoria[];
+  calendario: ActividadCalendario[];
+}
+
+export default function ParticipaConvocatorias({ convocatorias, calendario }: Props) {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const convocatorias = getConvocatorias();
-  const calendario = getCalendario();
 
   useGSAP(
     () => {

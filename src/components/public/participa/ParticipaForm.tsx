@@ -1,23 +1,12 @@
 "use client";
 
-import { useState, useId } from "react";
-import { AlertCircle, CheckCircle2 } from "lucide-react";
+import { useState, useId, useRef, useEffect } from "react";
+import { useRecaptcha } from "@/hooks/useRecaptcha";
+import { AlertCircle, CheckCircle2, ChevronDown, Check } from "lucide-react";
 import { DOC_TYPES, type DocType } from "@/lib/validations/pqrs";
 import { participaInscripcionSchema } from "@/lib/validations/participa";
-import { getMecanismos } from "@/lib/participa";
+import type { MecanismoParticipacion } from "@/data/participa.mock";
 
-// Ítem ITA 1942: formulario de inscripción a espacios de participación.
-//
-// BACKEND_PENDING: no existe todavía `src/app/api/participa/inscripcion/route.ts`
-// ni la tabla `participa_inscripciones` (ver requerimiento en
-// .claude/Cam.Claude/backend/backend-2026-07-14-participa.md). Por instrucción
-// explícita de esta tarea NO se crea el endpoint ni la tabla — el formulario
-// valida en cliente con el mismo contrato que tendría el POST real, y al
-// enviarse muestra un estado "próximamente" en vez de hacer la petición.
-// Cuando el endpoint exista, solo hay que reemplazar el bloque marcado
-// abajo por un `fetch("/api/participa/inscripcion", ...)` igual al de
-// PqrsForm.tsx.
-const BACKEND_PENDING = true;
 
 interface FormState {
   full_name: string;
@@ -42,7 +31,7 @@ const INITIAL: FormState = {
 function FieldError({ id, message }: { id: string; message?: string }) {
   if (!message) return null;
   return (
-    <p id={id} role="alert" className="flex items-center gap-2 mt-2 text-sm" style={{ color: "#FCA5A5" }}>
+    <p id={id} role="alert" className="flex items-center gap-2 mt-2 text-sm" style={{ color: "var(--color-rojo-500)" }}>
       <AlertCircle size={14} aria-hidden="true" className="flex-shrink-0" />
       {message}
     </p>
@@ -51,7 +40,7 @@ function FieldError({ id, message }: { id: string; message?: string }) {
 
 function Label({ htmlFor, required, children }: { htmlFor: string; required?: boolean; children: React.ReactNode }) {
   return (
-    <label htmlFor={htmlFor} className="block text-sm font-semibold mb-2" style={{ color: "rgba(255,255,255,0.9)" }}>
+    <label htmlFor={htmlFor} className="block text-sm font-semibold mb-2" style={{ color: "var(--color-gris-700)" }}>
       {children}
       {required && (
         <span style={{ color: "var(--color-rojo-500)" }} aria-hidden="true"> *</span>
@@ -62,32 +51,182 @@ function Label({ htmlFor, required, children }: { htmlFor: string; required?: bo
 
 function inputClass(hasError: boolean) {
   return [
-    "w-full px-4 py-3 rounded-xl border text-base transition-all duration-200",
-    "participa-dark-input",
-    hasError ? "participa-dark-input--error" : "",
+    "w-full px-4 py-3 rounded-xl border text-base transition-all duration-200 bg-white",
+    "text-gray-900 placeholder-gray-400",
+    "focus:outline-none focus:ring-2 focus:ring-offset-0",
+    hasError
+      ? "border-red-400 focus:ring-red-200"
+      : "border-gray-300 focus:border-blue-600 focus:ring-blue-100",
   ]
     .filter(Boolean)
     .join(" ");
 }
 
-function selectClass(hasError: boolean) {
-  return [inputClass(hasError), "participa-dark-select"].join(" ");
+interface SelectOption { value: string; label: string }
+
+interface CustomSelectProps {
+  id: string;
+  value: string;
+  onChange: (value: string) => void;
+  options: SelectOption[];
+  placeholder?: string;
+  hasError?: boolean;
+  "aria-describedby"?: string;
 }
 
-export default function ParticipaForm() {
+function CustomSelect({ id, value, onChange, options, placeholder = "Seleccione…", hasError = false, "aria-describedby": describedBy }: CustomSelectProps) {
+  const [open, setOpen] = useState(false);
+  const [focused, setFocused] = useState(-1);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLUListElement>(null);
+  const buttonId = id;
+  const listId = `${id}-list`;
+
+  const selected = options.find((o) => o.value === value);
+
+  useEffect(() => {
+    if (!open) return;
+    function onOutside(e: MouseEvent) {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", onOutside);
+    return () => document.removeEventListener("mousedown", onOutside);
+  }, [open]);
+
+  useEffect(() => {
+    if (open && focused >= 0) {
+      const item = listRef.current?.children[focused] as HTMLElement | undefined;
+      item?.scrollIntoView({ block: "nearest" });
+    }
+  }, [focused, open]);
+
+  function toggle() {
+    setOpen((prev) => {
+      if (!prev) {
+        const idx = options.findIndex((o) => o.value === value);
+        setFocused(idx >= 0 ? idx : 0);
+      }
+      return !prev;
+    });
+  }
+
+  function select(val: string) {
+    onChange(val);
+    setOpen(false);
+  }
+
+  function onKeyDown(e: React.KeyboardEvent) {
+    if (!open) {
+      if (e.key === "Enter" || e.key === " " || e.key === "ArrowDown") {
+        e.preventDefault();
+        setOpen(true);
+        setFocused(options.findIndex((o) => o.value === value) || 0);
+      }
+      return;
+    }
+    if (e.key === "Escape") { setOpen(false); return; }
+    if (e.key === "ArrowDown") { e.preventDefault(); setFocused((f) => Math.min(f + 1, options.length - 1)); return; }
+    if (e.key === "ArrowUp") { e.preventDefault(); setFocused((f) => Math.max(f - 1, 0)); return; }
+    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); if (focused >= 0) select(options[focused].value); return; }
+    if (e.key === "Tab") { setOpen(false); }
+  }
+
+  const triggerBorder = hasError
+    ? "border-red-400 ring-2 ring-red-200"
+    : open
+      ? "border-blue-600 ring-2 ring-blue-100"
+      : "border-gray-300";
+
+  return (
+    <div ref={containerRef} className="relative">
+      <button
+        type="button"
+        id={buttonId}
+        role="combobox"
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        aria-controls={listId}
+        aria-invalid={hasError}
+        aria-describedby={describedBy}
+        onClick={toggle}
+        onKeyDown={onKeyDown}
+        className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border text-base bg-white transition-all duration-200 text-left cursor-pointer focus:outline-none ${triggerBorder}`}
+      >
+        <span className={selected ? "text-gray-900" : "text-gray-400"}>
+          {selected ? selected.label : placeholder}
+        </span>
+        <ChevronDown
+          size={18}
+          aria-hidden="true"
+          className={`flex-shrink-0 ml-2 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+          style={{ color: "var(--color-gris-400)" }}
+        />
+      </button>
+
+      {open && (
+        <ul
+          ref={listRef}
+          id={listId}
+          role="listbox"
+          aria-labelledby={buttonId}
+          className="absolute z-50 mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg overflow-auto max-h-56 py-1"
+        >
+          {options.map((opt, i) => {
+            const isSelected = opt.value === value;
+            const isFocused = i === focused;
+            return (
+              <li
+                key={opt.value}
+                role="option"
+                aria-selected={isSelected}
+                onMouseDown={(e) => { e.preventDefault(); select(opt.value); }}
+                onMouseEnter={() => setFocused(i)}
+                className={[
+                  "flex items-center justify-between px-4 py-2.5 text-sm cursor-pointer select-none transition-colors duration-100",
+                  isSelected
+                    ? "font-semibold"
+                    : "font-normal text-gray-700",
+                  isFocused && !isSelected
+                    ? "bg-blue-50 text-blue-700"
+                    : "",
+                  isSelected
+                    ? "bg-blue-600 text-white"
+                    : "",
+                ].filter(Boolean).join(" ")}
+              >
+                <span>{opt.label}</span>
+                {isSelected && <Check size={14} aria-hidden="true" className="flex-shrink-0 ml-2" />}
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+interface Props { mecanismos: MecanismoParticipacion[] }
+
+export default function ParticipaForm({ mecanismos }: Props) {
   const [form, setForm] = useState<FormState>(INITIAL);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [status, setStatus] = useState<"idle" | "pending-info">("idle");
-  const mecanismos = getMecanismos();
+  const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
+  const [submitting, setSubmitting] = useState(false);
   const uid = useId();
   const id = (field: string) => `${uid}-${field}`;
+  const { getToken } = useRecaptcha();
+
+  const docTypeOptions: SelectOption[] = DOC_TYPES.map((t) => ({ value: t, label: t }));
+  const espacioOptions: SelectOption[] = mecanismos.map((m) => ({ value: m.id, label: m.titulo }));
 
   function set(field: keyof FormState, value: string) {
     setForm((prev) => ({ ...prev, [field]: value }));
     setErrors((prev) => ({ ...prev, [field]: "" }));
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
     const result = participaInscripcionSchema.safeParse({
@@ -107,24 +246,45 @@ export default function ParticipaForm() {
       return;
     }
 
-    if (BACKEND_PENDING) {
-      setStatus("pending-info");
-      return;
-    }
+    setSubmitting(true);
+    try {
+      const recaptchaToken = await getToken("participa_inscripcion");
+      const res = await fetch("/api/participa/inscripcion", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...result.data, recaptcha_token: recaptchaToken }),
+      });
+      const json = await res.json();
 
-    // TODO(backend): reemplazar por fetch("/api/participa/inscripcion", { method: "POST", body: JSON.stringify(result.data) })
-    // cuando el endpoint y la tabla participa_inscripciones existan.
+      if (!res.ok) {
+        if (json.fields) {
+          const newErrors: Record<string, string> = {};
+          for (const [key, msgs] of Object.entries(json.fields as Record<string, string[]>)) {
+            if (msgs[0]) newErrors[key] = msgs[0];
+          }
+          setErrors(newErrors);
+        } else {
+          setErrors({ _global: json.error ?? "Error al enviar la inscripción." });
+        }
+        return;
+      }
+
+      setStatus("success");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch {
+      setErrors({ _global: "Error de conexión. Verifique su internet e intente nuevamente." });
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
     <section
       id="inscripcion"
-      className="relative py-16 md:py-20 overflow-hidden"
+      className="py-16 md:py-20"
       style={{ backgroundColor: "var(--color-gris-50)" }}
       aria-labelledby="inscripcion-title"
     >
-      <div className="participa-section-blobs" aria-hidden="true" />
-
       <div className="container-main relative z-10 max-w-3xl">
         <h2
           id="inscripcion-title"
@@ -141,27 +301,17 @@ export default function ParticipaForm() {
           onSubmit={handleSubmit}
           noValidate
           aria-label="Formulario de inscripción a espacios de participación"
-          className="rounded-3xl border border-white/10 bg-[#1B2B5E]/80 shadow-2xl shadow-[#1B2B5E]/40 backdrop-blur-xl p-6 md:p-8"
+          className="rounded-3xl border border-gray-200 bg-white shadow-lg p-6 md:p-8"
         >
-          {status === "pending-info" && (
+          {status === "success" && (
             <div
-              className="flex items-start gap-3 p-4 rounded-xl mb-6 text-sm"
+              className="flex items-start gap-3 p-4 rounded-xl mb-6 text-sm bg-green-50 border border-green-200 text-green-800"
               role="status"
               aria-live="polite"
-              style={{
-                backgroundColor: "rgba(255,255,255,0.08)",
-                border: "1px solid rgba(255,255,255,0.18)",
-                color: "#fff",
-              }}
             >
-              <CheckCircle2 size={18} aria-hidden="true" className="flex-shrink-0 mt-0.5" style={{ color: "#fff" }} />
+              <CheckCircle2 size={18} aria-hidden="true" className="flex-shrink-0 mt-0.5 text-green-600" />
               <span>
-                Este formulario estará disponible próximamente. Tus datos no fueron enviados —
-                mientras tanto puedes escribirnos por nuestros{" "}
-                <a href="#mecanismos" className="underline font-semibold" style={{ color: "#FCA5A5" }}>
-                  canales de contacto
-                </a>
-                .
+                ¡Inscripción enviada! Nos pondremos en contacto contigo pronto.
               </span>
             </div>
           )}
@@ -185,19 +335,14 @@ export default function ParticipaForm() {
 
             <div>
               <Label htmlFor={id("doc_type")} required>Tipo de documento</Label>
-              <select
+              <CustomSelect
                 id={id("doc_type")}
                 value={form.doc_type}
-                onChange={(e) => set("doc_type", e.target.value)}
-                className={selectClass(!!errors.doc_type)}
-                aria-invalid={!!errors.doc_type}
+                onChange={(v) => set("doc_type", v)}
+                options={docTypeOptions}
+                hasError={!!errors.doc_type}
                 aria-describedby={errors.doc_type ? id("doc_type-error") : undefined}
-              >
-                <option value="">Seleccione…</option>
-                {DOC_TYPES.map((t) => (
-                  <option key={t} value={t}>{t}</option>
-                ))}
-              </select>
+              />
               <FieldError id={id("doc_type-error")} message={errors.doc_type} />
             </div>
 
@@ -207,11 +352,12 @@ export default function ParticipaForm() {
                 id={id("doc_number")}
                 type="text"
                 value={form.doc_number}
-                onChange={(e) => set("doc_number", e.target.value.replace(/[^a-zA-Z0-9]/g, "").slice(0, 20))}
+                onChange={(e) => set("doc_number", e.target.value.replace(/\D/g, "").slice(0, 20))}
                 className={inputClass(!!errors.doc_number)}
                 aria-invalid={!!errors.doc_number}
                 aria-describedby={errors.doc_number ? id("doc_number-error") : undefined}
                 placeholder="Número de documento"
+                inputMode="numeric"
               />
               <FieldError id={id("doc_number-error")} message={errors.doc_number} />
             </div>
@@ -251,19 +397,14 @@ export default function ParticipaForm() {
 
             <div className="md:col-span-2">
               <Label htmlFor={id("espacio_id")} required>Espacio de participación</Label>
-              <select
+              <CustomSelect
                 id={id("espacio_id")}
                 value={form.espacio_id}
-                onChange={(e) => set("espacio_id", e.target.value)}
-                className={selectClass(!!errors.espacio_id)}
-                aria-invalid={!!errors.espacio_id}
+                onChange={(v) => set("espacio_id", v)}
+                options={espacioOptions}
+                hasError={!!errors.espacio_id}
                 aria-describedby={errors.espacio_id ? id("espacio_id-error") : undefined}
-              >
-                <option value="">Seleccione…</option>
-                {mecanismos.map((m) => (
-                  <option key={m.id} value={m.id}>{m.titulo}</option>
-                ))}
-              </select>
+              />
               <FieldError id={id("espacio_id-error")} message={errors.espacio_id} />
             </div>
 
@@ -273,7 +414,7 @@ export default function ParticipaForm() {
                 id={id("message")}
                 value={form.message}
                 onChange={(e) => set("message", e.target.value)}
-                className={inputClass(!!errors.message)}
+                className={`${inputClass(!!errors.message)} resize-none`}
                 rows={4}
                 maxLength={500}
                 placeholder="Cuéntanos brevemente por qué quieres participar"
@@ -282,17 +423,24 @@ export default function ParticipaForm() {
             </div>
           </div>
 
-          <div className="border-t border-white/10 pt-6 mt-6">
+          <div className="border-t border-gray-200 pt-6 mt-6">
+            {errors._global && (
+              <p className="flex items-center gap-2 mb-4 text-sm" role="alert" style={{ color: "var(--color-rojo-500)" }}>
+                <AlertCircle size={14} aria-hidden="true" />
+                {errors._global}
+              </p>
+            )}
             <button
               type="submit"
-              className="inline-flex items-center justify-center font-bold text-base rounded-full px-8 py-3.5 transition-all duration-200 hover:opacity-90 hover:-translate-y-0.5 active:scale-95 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#1B2B5E] cursor-pointer"
+              disabled={submitting || status === "success"}
+              className="inline-flex items-center justify-center font-bold text-base rounded-full px-8 py-3.5 transition-all duration-200 hover:opacity-90 hover:-translate-y-0.5 active:scale-95 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
               style={{
                 backgroundColor: "var(--color-rojo-500)",
                 color: "#fff",
                 boxShadow: "0 4px 20px 0 rgba(238,53,56,0.35)",
               }}
             >
-              Enviar inscripción
+              {submitting ? "Enviando…" : "Enviar inscripción"}
             </button>
           </div>
         </form>

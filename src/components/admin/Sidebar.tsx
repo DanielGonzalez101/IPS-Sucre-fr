@@ -20,6 +20,7 @@ import {
   Cpu,
   Settings,
   Newspaper,
+  HandHeart,
 } from "lucide-react";
 import { signOut } from "@/actions/auth";
 
@@ -55,6 +56,7 @@ const navItems = [
   { href: "/pqrs",       slug: "pqrs",      label: "PQRS",            Icon: MessageSquare  },
   { href: "/usuarios",   slug: "usuarios",  label: "Usuarios",        Icon: UserCircle     },
   { href: "/sitio",      slug: "sitio",     label: "Datos del sitio", Icon: Settings       },
+  { href: "/participa",  slug: "participa", label: "Participa",       Icon: HandHeart      },
 ];
 
 interface SidebarProps {

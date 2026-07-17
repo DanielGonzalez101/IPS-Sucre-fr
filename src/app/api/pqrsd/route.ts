@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { pqrsdSchema } from "@/lib/validations/pqrs";
 import { rateLimit } from "@/lib/rate-limit";
+import { verifyRecaptcha } from "@/lib/recaptcha";
 
 const ALLOWED_MIME_TYPES = ["application/pdf", "image/jpeg", "image/png"];
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
@@ -62,6 +63,17 @@ export async function POST(req: NextRequest) {
     formData = await req.formData();
   } catch {
     return NextResponse.json({ error: "Solicitud inválida" }, { status: 400 });
+  }
+
+  const recaptchaToken = formData.get("recaptcha_token");
+  if (typeof recaptchaToken === "string" && recaptchaToken) {
+    const ok = await verifyRecaptcha(recaptchaToken);
+    if (!ok) {
+      return NextResponse.json(
+        { error: "Verificación de seguridad fallida. Intente nuevamente." },
+        { status: 422 }
+      );
+    }
   }
 
   // Extract and validate files

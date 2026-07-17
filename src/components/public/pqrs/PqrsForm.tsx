@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useId } from "react";
+import { useRecaptcha } from "@/hooks/useRecaptcha";
 import { Upload, X, FileText, AlertCircle } from "lucide-react";
 import {
   PQRSD_TYPES,
@@ -207,6 +208,7 @@ export default function PqrsForm() {
   const [submitting, setSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const uid = useId();
+  const { getToken } = useRecaptcha();
 
   const id = (field: string) => `${uid}-${field}`;
 
@@ -268,7 +270,7 @@ export default function PqrsForm() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
-    // TODO: Integrar reCAPTCHA v3 aquí antes de enviar
+    const recaptchaToken = await getToken("pqrsd");
 
     const result = pqrsdSchema.safeParse({
       ...form,
@@ -307,6 +309,7 @@ export default function PqrsForm() {
       fd.append("subject", form.subject);
       fd.append("description", form.description);
       fd.append("accepted_terms", "true");
+      if (recaptchaToken) fd.append("recaptcha_token", recaptchaToken);
       for (const f of files) fd.append("adjuntos", f);
 
       const res = await fetch("/api/pqrsd", { method: "POST", body: fd });

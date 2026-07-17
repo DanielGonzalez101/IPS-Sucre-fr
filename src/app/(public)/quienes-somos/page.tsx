@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import QuienesSomosHero    from "@/components/quienes-somos/QuienesSomosHero";
 import QuienesSomosSection from "@/components/quienes-somos/QuienesSomosSection";
+import EntesVigilancia     from "@/components/quienes-somos/EntesVigilancia";
 
 export const metadata: Metadata = {
   title: "Quiénes Somos",
@@ -13,6 +14,7 @@ export default function QuienesSomosPage() {
     <div id="main-content">
       <QuienesSomosHero />
       <QuienesSomosSection />
+      <EntesVigilancia />
     </div>
   );
 }

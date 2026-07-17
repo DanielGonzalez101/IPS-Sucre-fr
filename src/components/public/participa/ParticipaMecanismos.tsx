@@ -5,7 +5,6 @@ import Link from "next/link";
 import { Users, MessageSquareText, ClipboardList, Phone, ArrowRight } from "lucide-react";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "@/lib/gsap";
-import { getMecanismos } from "@/lib/participa";
 import type { MecanismoParticipacion } from "@/data/participa.mock";
 
 const ICONS: Record<MecanismoParticipacion["icono"], typeof Users> = {
@@ -15,11 +14,10 @@ const ICONS: Record<MecanismoParticipacion["icono"], typeof Users> = {
   canales: Phone,
 };
 
-// Ítems ITA 1935 (mecanismos de participación disponibles) y 1943
-// (canales de contacto para participar).
-export default function ParticipaMecanismos() {
+interface Props { mecanismos: MecanismoParticipacion[] }
+
+export default function ParticipaMecanismos({ mecanismos }: Props) {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const mecanismos = getMecanismos();
 
   useGSAP(
     () => {
