@@ -15,14 +15,15 @@ import { getDashboardStats } from "@/actions/dashboard";
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Dashboard — Admin" };
 
-const TIPO_LABEL: Record<string, { label: string; color: string; bg: string }> = {
-  peticion:   { label: "Petición",   color: "#1D4ED8", bg: "#EFF6FF" },
-  queja:      { label: "Queja",      color: "#B45309", bg: "#FFFBEB" },
-  reclamo:    { label: "Reclamo",    color: "#DC2626", bg: "#FEF2F2" },
-  solicitud:  { label: "Solicitud",  color: "#065F46", bg: "#ECFDF5" },
-  denuncia:   { label: "Denuncia",   color: "#7C3AED", bg: "#F5F3FF" },
-  sugerencia: { label: "Sugerencia", color: "#065F46", bg: "#ECFDF5" },
-};
+const TIPO_LABEL: Record<string, { label: string; color: string; bg: string }> =
+  {
+    peticion: { label: "Petición", color: "#1D4ED8", bg: "#EFF6FF" },
+    queja: { label: "Queja", color: "#B45309", bg: "#FFFBEB" },
+    reclamo: { label: "Reclamo", color: "#DC2626", bg: "#FEF2F2" },
+    solicitud: { label: "Solicitud", color: "#065F46", bg: "#ECFDF5" },
+    denuncia: { label: "Denuncia", color: "#7C3AED", bg: "#F5F3FF" },
+    sugerencia: { label: "Sugerencia", color: "#065F46", bg: "#ECFDF5" },
+  };
 
 export default async function DashboardPage() {
   const stats = await getDashboardStats();
@@ -67,17 +68,24 @@ export default async function DashboardPage() {
   ];
 
   const accesos = [
-    { href: "/gestion-interna/hero",              label: "Carrusel principal",  Icon: SlidersHorizontal },
-    { href: "/gestion-interna/servicios",          label: "Servicios",           Icon: Heart             },
-    { href: "/gestion-interna/equipo/humano",      label: "Equipo humano",       Icon: Users             },
-    { href: "/gestion-interna/normativa",          label: "Documentos",          Icon: FileText          },
-    { href: "/gestion-interna/pqrs",               label: "PQRS",                Icon: MessageSquare     },
-    { href: "/gestion-interna/paginas",            label: "Páginas",             Icon: BookOpen          },
+    {
+      href: "/gestion-interna/hero",
+      label: "Carrusel principal",
+      Icon: SlidersHorizontal,
+    },
+    { href: "/gestion-interna/servicios", label: "Servicios", Icon: Heart },
+    {
+      href: "/gestion-interna/equipo/humano",
+      label: "Equipo humano",
+      Icon: Users,
+    },
+    { href: "/gestion-interna/normativa", label: "Documentos", Icon: FileText },
+    { href: "/gestion-interna/pqrs", label: "PQRS", Icon: MessageSquare },
+    { href: "/gestion-interna/paginas", label: "Páginas", Icon: BookOpen },
   ];
 
   return (
     <div className="space-y-8">
-
       {/* Encabezado */}
       <div>
         <h1 className="text-xl font-bold text-gray-900">Dashboard</h1>
@@ -109,7 +117,9 @@ export default async function DashboardPage() {
             </div>
             <div>
               <p className="text-2xl font-bold text-gray-900">{valor}</p>
-              <p className="text-xs font-medium text-gray-500 mt-0.5">{label}</p>
+              <p className="text-xs font-medium text-gray-500 mt-0.5">
+                {label}
+              </p>
               <p className="text-xs text-gray-400 mt-0.5 flex items-center gap-1">
                 <TrendingUp size={10} />
                 {sub}
@@ -121,11 +131,12 @@ export default async function DashboardPage() {
 
       {/* Fila inferior: PQRS recientes + Accesos rápidos */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-5">
-
         {/* PQRS recientes — ocupa 3/5 */}
         <div className="lg:col-span-3 bg-white rounded-xl border border-gray-200 overflow-hidden">
           <div className="px-5 py-3 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
-            <span className="text-sm font-semibold text-gray-700">PQRS recientes</span>
+            <span className="text-sm font-semibold text-gray-700">
+              PQRS recientes
+            </span>
             <Link
               href="/gestion-interna/pqrs"
               className="text-xs font-medium flex items-center gap-1 transition-colors"
@@ -143,10 +154,19 @@ export default async function DashboardPage() {
           ) : (
             <ul className="divide-y divide-gray-100">
               {stats.pqrsRecientes.map((p) => {
-                const tipo = TIPO_LABEL[p.type] ?? { label: p.type, color: "#374151", bg: "#F9FAFB" };
-                const fecha = new Date(p.created_at).toLocaleDateString("es-CO", {
-                  day: "2-digit", month: "short", year: "numeric",
-                });
+                const tipo = TIPO_LABEL[p.type] ?? {
+                  label: p.type,
+                  color: "#374151",
+                  bg: "#F9FAFB",
+                };
+                const fecha = new Date(p.created_at).toLocaleDateString(
+                  "es-CO",
+                  {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric",
+                  },
+                );
                 return (
                   <li key={p.id} className="px-5 py-3 flex items-center gap-3">
                     <span
@@ -158,7 +178,9 @@ export default async function DashboardPage() {
                     <span className="flex-1 text-sm text-gray-700 truncate">
                       {p.full_name ?? "Anónimo"}
                     </span>
-                    <span className="shrink-0 text-xs text-gray-400">{fecha}</span>
+                    <span className="shrink-0 text-xs text-gray-400">
+                      {fecha}
+                    </span>
                   </li>
                 );
               })}
@@ -169,7 +191,9 @@ export default async function DashboardPage() {
         {/* Accesos rápidos — ocupa 2/5 */}
         <div className="lg:col-span-2 bg-white rounded-xl border border-gray-200 overflow-hidden">
           <div className="px-5 py-3 border-b border-gray-100 bg-gray-50">
-            <span className="text-sm font-semibold text-gray-700">Accesos rápidos</span>
+            <span className="text-sm font-semibold text-gray-700">
+              Accesos rápidos
+            </span>
           </div>
           <ul className="divide-y divide-gray-100">
             {accesos.map(({ href, label, Icon }) => (
@@ -178,15 +202,20 @@ export default async function DashboardPage() {
                   href={href}
                   className="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors group"
                 >
-                  <Icon size={15} className="text-gray-400 group-hover:text-gray-600 transition-colors shrink-0" />
+                  <Icon
+                    size={15}
+                    className="text-gray-400 group-hover:text-gray-600 transition-colors shrink-0"
+                  />
                   <span className="flex-1">{label}</span>
-                  <ArrowRight size={12} className="text-gray-300 group-hover:text-gray-500 transition-colors" />
+                  <ArrowRight
+                    size={12}
+                    className="text-gray-300 group-hover:text-gray-500 transition-colors"
+                  />
                 </Link>
               </li>
             ))}
           </ul>
         </div>
-
       </div>
     </div>
   );

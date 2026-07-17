@@ -4,13 +4,13 @@ import { useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
-  Target,
   Eye,
   Building2,
   Users,
   Award,
   Handshake,
 } from "lucide-react";
+import { Compass } from "@phosphor-icons/react";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "@/lib/gsap";
 
@@ -53,6 +53,19 @@ export default function QuienesSomosSection() {
         });
         return;
       }
+
+      gsap.set(".mision-icon-wrap", { opacity: 0, scale: 0.6, rotate: -35 });
+      gsap.to(".mision-icon-wrap", {
+        opacity: 1,
+        scale: 1,
+        rotate: 0,
+        duration: 0.7,
+        ease: "back.out(1.7)",
+        scrollTrigger: {
+          trigger: ".mision-card",
+          start: "top 85%",
+        },
+      });
 
       gsap.set(".stat-fade", { opacity: 0, y: 24 });
       gsap.to(".stat-fade", {
@@ -110,7 +123,7 @@ export default function QuienesSomosSection() {
       className="py-16 md:py-24"
       style={{ backgroundColor: "#fff" }}
     >
-      <div className="container-main">
+      <div className="container-main mb-6 md:mb-8">
 
         {/* ── Bloque 1: Encabezado ── */}
         <div className="mb-10 md:mb-14">
@@ -199,7 +212,7 @@ export default function QuienesSomosSection() {
 
           {/* Card C — Misión (col-span-5) */}
           <div
-            className="col-span-12 md:col-span-5 flex flex-col p-7 md:p-8 transition-transform duration-200 hover:scale-[1.01]"
+            className="mision-card col-span-12 md:col-span-5 flex flex-col p-7 md:p-8 relative overflow-hidden transition-all duration-300 hover:-translate-y-1"
             style={{
               borderRadius: "1.5rem",
               backgroundColor: "#fff",
@@ -208,14 +221,14 @@ export default function QuienesSomosSection() {
             }}
           >
             <div
-              className="w-10 h-10 flex items-center justify-center mb-5"
+              className="mision-icon-wrap w-14 h-14 flex items-center justify-center mb-5 relative transition-transform duration-500"
               style={{
                 backgroundColor: "var(--color-azul-50)",
-                borderRadius: "12px",
+                borderRadius: "16px",
               }}
               aria-hidden="true"
             >
-              <Target size={20} style={{ color: "var(--color-azul-700)" }} />
+              <Compass size={28} weight="duotone" style={{ color: "var(--color-azul-700)" }} />
             </div>
 
             <span
@@ -237,7 +250,7 @@ export default function QuienesSomosSection() {
             </h2>
 
             <p
-              className="font-body text-sm leading-relaxed line-clamp-5"
+              className="font-body text-sm leading-relaxed"
               style={{ color: "var(--color-gris-700)" }}
             >
               Somos una organización que nos apasiona ofrecer un excelente servicio en la atención especializada en
@@ -274,23 +287,28 @@ export default function QuienesSomosSection() {
               Nuestra historia
             </h2>
 
-            {/* Timeline vertical en mobile, horizontal en desktop */}
-            <div className="flex flex-col md:flex-row md:items-start gap-0 md:gap-0">
-              {timeline.map((hito, i) => (
-                <div key={hito.year} className="flex flex-row md:flex-col flex-1 relative">
+            {/* Timeline vertical en mobile, grid simétrico horizontal en desktop */}
+            <div className="flex flex-col md:grid md:grid-cols-4 md:gap-4 relative">
+              {/* Línea conectora continua — solo desktop, detrás de los puntos */}
+              <div
+                className="hidden md:block absolute top-1.5 left-0 right-0 h-px"
+                style={{ backgroundColor: "var(--color-gris-300)" }}
+                aria-hidden="true"
+              />
 
-                  {/* Conector horizontal desktop / vertical mobile */}
-                  <div className="flex flex-col md:flex-row items-center md:items-start mb-4 md:mb-0">
-                    {/* Punto */}
+              {timeline.map((hito, i) => (
+                <div key={hito.year} className="flex flex-row md:flex-col relative">
+
+                  {/* Punto + línea vertical (mobile) */}
+                  <div className="flex flex-col md:block items-center mr-4 md:mr-0 md:mb-4">
                     <div
-                      className="w-3 h-3 rounded-full shrink-0 z-10"
+                      className="w-3 h-3 rounded-full shrink-0 z-10 relative"
                       style={{ backgroundColor: "var(--color-rojo-500)" }}
                       aria-hidden="true"
                     />
-                    {/* Línea conectora — no se muestra en el último */}
                     {i < timeline.length - 1 && (
                       <div
-                        className="flex-1 md:h-px md:w-full w-px h-full"
+                        className="md:hidden flex-1 w-px"
                         style={{ backgroundColor: "var(--color-gris-300)" }}
                         aria-hidden="true"
                       />
@@ -298,7 +316,7 @@ export default function QuienesSomosSection() {
                   </div>
 
                   {/* Contenido del hito */}
-                  <div className="pb-6 md:pb-0 pl-4 md:pl-0 md:pr-4 md:pt-3">
+                  <div className="pb-6 md:pb-0">
                     <p
                       className="font-heading font-black text-xl md:text-2xl leading-none mb-1.5"
                       style={{ color: "var(--color-rojo-500)" }}
@@ -306,7 +324,7 @@ export default function QuienesSomosSection() {
                       {hito.year}
                     </p>
                     <p
-                      className="font-body text-xs leading-relaxed"
+                      className="font-body text-sm leading-relaxed"
                       style={{ color: "var(--color-gris-700)" }}
                     >
                       {hito.text}
@@ -354,7 +372,7 @@ export default function QuienesSomosSection() {
               >
                 <Icon className="w-5 h-5" aria-hidden="true" style={{ color: "var(--color-rojo-500)" }} />
                 <p
-                  className="font-heading font-bold text-5xl"
+                  className="font-heading font-black text-3xl sm:text-4xl md:text-[2.75rem] leading-none"
                   style={{
                     color: "var(--color-azul-900)",
                     fontVariantNumeric: "tabular-nums",

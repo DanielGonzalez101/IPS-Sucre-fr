@@ -4,65 +4,69 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 
 function revalidateAll() {
-  revalidatePath("/servicios");
+  revalidatePath("/noticias");
   revalidatePath("/");
-  revalidatePath("/gestion-interna/servicios");
+  revalidatePath("/gestion-interna/noticias");
 }
 
-export async function getServicios() {
+export async function getNoticias() {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from("servicios")
+    .from("noticias")
     .select("*")
-    .order("orden");
+    .order("fecha", { ascending: false });
 
   if (error) return { data: null, error: error.message };
   return { data: data ?? [], error: null };
 }
 
-export async function getServiciosPublicos() {
+export async function getNoticiasPublicas() {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from("servicios")
+    .from("noticias")
     .select("*")
     .eq("activo", true)
-    .order("orden");
+    .order("fecha", { ascending: false });
 
   if (error) return { data: null, error: error.message };
   return { data: data ?? [], error: null };
 }
 
-export async function createServicio(fields: {
+export async function createNoticia(fields: {
+  slug: string;
   titulo: string;
-  categoria: string;
-  descripcion: string;
-  icono: string;
-  orden: number;
-  preparacion?: string;
+  extracto: string;
+  tag: string;
+  posicion: string;
+  img_url: string;
+  fecha: string;
 }) {
   const supabase = await createClient();
-  const { error } = await supabase.from("servicios").insert(fields);
+  const { error } = await supabase
+    .from("noticias")
+    .insert({ ...fields, activo: true, vistas: 0 });
 
   if (error) return { error: error.message };
   revalidateAll();
   return { error: null };
 }
 
-export async function updateServicio(
+export async function updateNoticia(
   id: string,
   fields: Partial<{
+    slug: string;
     titulo: string;
-    categoria: string;
-    descripcion: string;
-    icono: string;
-    orden: number;
+    extracto: string;
+    tag: string;
+    posicion: string;
+    img_url: string;
+    fecha: string;
     activo: boolean;
-    preparacion: string;
   }>,
 ) {
   const supabase = await createClient();
   const { error } = await supabase
-    .from("servicios")
+    .from("noticias")
     .update(fields)
     .eq("id", id);
 
@@ -71,21 +75,11 @@ export async function updateServicio(
   return { error: null };
 }
 
-export async function deleteServicio(id: string) {
+export async function deleteNoticia(id: string) {
   const supabase = await createClient();
-  const { error } = await supabase.from("servicios").delete().eq("id", id);
+  const { error } = await supabase.from("noticias").delete().eq("id", id);
 
   if (error) return { error: error.message };
-  revalidateAll();
-  return { error: null };
-}
-
-export async function reorderServicios(items: { id: string; orden: number }[]) {
-  const supabase = await createClient();
-  const updates = items.map(({ id, orden }) =>
-    supabase.from("servicios").update({ orden }).eq("id", id),
-  );
-  await Promise.all(updates);
   revalidateAll();
   return { error: null };
 }

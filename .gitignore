@@ -7,7 +7,7 @@ node_modules/
 # Build de Next.js
 .next/
 out/
-# Cam.Claude/
+Cam.Claude/
 
 # Variables de entorno — nunca commitear archivos con valores reales
 .env
@@ -41,7 +41,13 @@ Thumbs.db
 
 # Ocultar los scripts de supabase
 db/
+
 tsconfig.tsbuildinfo
 
 # Matriz de cumplimiento — archivo interno, no debe subirse
 .claude/formatoMatrizCumplimiento*.xlsx
+
+.claude
+.claude/
+sql/
+tareas/

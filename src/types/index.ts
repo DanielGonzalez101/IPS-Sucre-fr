@@ -10,7 +10,19 @@ export interface Profile {
   email: string;
   nombre: string;
   role: Role;
+  modulos_permitidos: string[];
+  estado: "activo" | "suspendido";
   created_at: string;
+}
+
+// Alias usado por el módulo de administración de usuarios.
+export type UsuarioAdmin = Profile;
+
+export interface UsuariosPage {
+  data: UsuarioAdmin[];
+  total: number;
+  pageCount: number;
+  error: string | null;
 }
 
 export interface Pqrs {

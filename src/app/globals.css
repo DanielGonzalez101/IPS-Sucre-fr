@@ -3,7 +3,7 @@
 @theme {
   /* ── Fuentes ─────────────────────────────────── */
   --font-heading: "Inter", sans-serif;
-  --font-body: "Inter", sans-serif;
+  --font-body: var(--font-heading);
 
   /* ── Paleta Cardiocentro ─────────────────────── */
   --color-azul-50: #eef3fb;
@@ -109,6 +109,10 @@ h6 {
   color: var(--color-azul-800);
   background-color: var(--color-azul-50);
 }
+.nav-link-active {
+  color: var(--color-azul-800);
+  background-color: var(--color-azul-50);
+}
 
 /* ── Nav dropdown ────────────────────────────────── */
 .nav-dropdown-group {
@@ -123,10 +127,11 @@ h6 {
   font-family: var(--font-heading);
   font-weight: 600;
   font-size: 0.875rem;
-  padding: 0.5rem 0.75rem;
+  padding: 0.5rem 0.625rem;
   border-radius: 0.5rem;
   background: none;
   border: none;
+  white-space: nowrap;
   cursor: pointer;
   transition:
     color 0.2s,
@@ -360,26 +365,24 @@ h6 {
 .hero-image-wrap {
   position: relative;
   width: 100%;
-  height: 260px;
-  overflow: hidden;
+  aspect-ratio: 4 / 3;
 }
 
 @media (min-width: 768px) {
   .hero-image-wrap {
-    height: 480px;
+    aspect-ratio: 768 / 480;
   }
 }
 
 @media (min-width: 1024px) {
   .hero-image-wrap {
-    height: 711px;
+    aspect-ratio: 1920 / 711;
   }
 }
 
 .hero-clip {
-  position: relative;
-  width: 100%;
-  height: 100%;
+  position: absolute;
+  inset: 0;
   overflow: hidden;
 }
 
@@ -402,11 +405,7 @@ h6 {
   flex-direction: column;
   align-items: flex-start;
   padding: 1.75rem 0 2rem;
-  background: linear-gradient(
-    180deg,
-    rgba(6, 36, 77, 0.5) 0%,
-    rgba(6, 36, 77, 0.42) 100%
-  );
+  background: var(--color-azul-900);
 }
 
 @media (min-width: 768px) {
@@ -416,7 +415,7 @@ h6 {
     flex-direction: column;
     align-items: flex-start;
     justify-content: center;
-    padding-block: 3rem;
+    padding-block: 4.5rem 2rem;
     background: transparent;
   }
 }
@@ -1213,6 +1212,235 @@ h6 {
   gap: 4px;
 }
 
+/* ── Página Noticias — layout magazine ────────────── */
+
+/* Featured top: big left + 2 stacked right */
+.noticias-featured-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+@media (min-width: 768px) {
+  .noticias-featured-grid {
+    grid-template-columns: 3fr 2fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 20px;
+    min-height: 480px;
+  }
+  .noticias-featured-main {
+    grid-row: 1 / 3;
+  }
+}
+
+.noticias-featured-main {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  min-height: 380px;
+  display: block;
+  text-decoration: none;
+  background-color: var(--color-azul-50);
+}
+
+.noticias-featured-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(6, 36, 77, 0.92) 0%,
+    rgba(6, 36, 77, 0.45) 50%,
+    transparent 100%
+  );
+  z-index: 1;
+}
+
+.noticias-featured-content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 28px 30px;
+  z-index: 2;
+}
+
+.noticias-featured-side-card {
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid var(--color-gris-200);
+  background: #fff;
+  display: flex;
+  flex-direction: row;
+  text-decoration: none;
+  transition: box-shadow 0.2s;
+  min-height: 120px;
+}
+
+.noticias-featured-side-card:hover {
+  box-shadow: var(--shadow-card-hover);
+}
+
+.noticias-featured-side-img {
+  position: relative;
+  width: 130px;
+  flex-shrink: 0;
+  background-color: var(--color-azul-50);
+}
+
+.noticias-featured-side-body {
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+}
+
+.noticias-featured-quote {
+  border-radius: 14px;
+  border: 1px solid var(--color-gris-200);
+  background-color: var(--color-gris-50);
+  padding: 22px 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+}
+
+/* Bento — recently added */
+.noticias-bento-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+@media (min-width: 1024px) {
+  .noticias-bento-grid {
+    grid-template-columns: 2fr 3fr;
+    align-items: start;
+  }
+}
+
+.noticias-bento-big {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  min-height: 400px;
+  display: block;
+  text-decoration: none;
+  background-color: var(--color-azul-50);
+}
+
+@media (min-width: 1024px) {
+  .noticias-bento-big {
+    min-height: 100%;
+  }
+}
+
+.noticias-bento-right {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* Si el último item queda solo en su fila, ocupa las 2 columnas */
+.noticias-bento-right > *:last-child:nth-child(odd) {
+  grid-column: span 2;
+}
+
+.noticias-bento-sm {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--color-gris-200);
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  transition: box-shadow 0.2s;
+}
+
+.noticias-bento-sm:hover {
+  box-shadow: var(--shadow-card-hover);
+}
+
+.noticias-bento-sm-img {
+  position: relative;
+  height: 148px;
+  flex-shrink: 0;
+  background-color: var(--color-azul-50);
+}
+
+.noticias-bento-sm-body {
+  padding: 14px 16px 16px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.noticias-bento-sm-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  color: var(--color-gris-400);
+  margin-top: auto;
+  padding-top: 8px;
+}
+
+/* Bottom: list col + big right */
+.noticias-list-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+@media (min-width: 1024px) {
+  .noticias-list-grid {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+}
+
+.noticias-list-item {
+  display: flex;
+  gap: 16px;
+  padding: 20px 0;
+  text-decoration: none;
+  transition: opacity 0.15s;
+}
+
+.noticias-list-item:hover {
+  opacity: 0.8;
+}
+
+.noticias-list-img {
+  position: relative;
+  width: 96px;
+  height: 76px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  overflow: hidden;
+  background-color: var(--color-azul-50);
+}
+
+.noticias-list-body {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  justify-content: center;
+}
+
+.noticias-big-right {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  min-height: 380px;
+  display: block;
+  text-decoration: none;
+  background-color: var(--color-azul-50);
+}
+
 /* ── Página Equipo ───────────────────────────────── */
 
 /* Hero con imagen de fondo */
@@ -1377,6 +1605,12 @@ h6 {
   z-index: 3;
 }
 
+/* Card Misión — ícono brújula gira suave en hover */
+.mision-card:hover .mision-icon-wrap {
+  transform: rotate(20deg);
+  background-color: var(--color-azul-100);
+}
+
 /* ── Bento grid (layout Image 10) ── */
 .equipo-bento-section {
   padding-block: 4rem;
@@ -1486,11 +1720,10 @@ h6 {
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: 260px 688px;
+  grid-template-columns: 300px minmax(0, 1fr);
   gap: 4rem;
   align-items: start;
-  width: fit-content;
-  margin-inline: auto;
+  width: 100%;
 }
 
 /* Sidebar izquierdo */
@@ -1502,7 +1735,7 @@ h6 {
 .equipo-sidebar-heading {
   font-family: var(--font-heading);
   font-weight: 800;
-  font-size: clamp(1.6rem, 2.8vw, 2.4rem);
+  font-size: clamp(1.75rem, 3vw, 2.75rem);
   color: #fff;
   line-height: 1.15;
   margin-bottom: 1rem;
@@ -1511,6 +1744,7 @@ h6 {
 .equipo-sidebar-desc {
   font-family: var(--font-body);
   font-size: 1rem;
+  font-weight: 400;
   color: #fff;
   line-height: 1.65;
   margin-bottom: 1.75rem;

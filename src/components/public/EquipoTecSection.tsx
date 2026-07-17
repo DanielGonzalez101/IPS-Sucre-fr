@@ -15,7 +15,7 @@ type Equipment = {
   img: string;
 };
 
-function EquipmentCard({ name, category, description, img }: Omit<Equipment, "id">) {
+function EquipmentCard({ name, description, img }: Omit<Equipment, "id" | "category">) {
   return (
     <div className="equipo-tec-card">
       <div className="equipo-tec-card-img">
@@ -29,7 +29,6 @@ function EquipmentCard({ name, category, description, img }: Omit<Equipment, "id
         />
       </div>
       <div className="equipo-tec-card-overlay" aria-hidden="true" />
-      <span className="equipo-tec-card-chip">{category}</span>
       <div className="equipo-tec-card-body">
         <p className="equipo-tec-card-name">{name}</p>
         <p className="equipo-tec-card-desc">{description}</p>
