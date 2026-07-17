@@ -10,15 +10,15 @@ Registro de cosas por hacer, decisiones tomadas y cosas descartadas con su razó
 
 | Prioridad | Tarea | Contexto | Fecha agregada |
 |-----------|-------|----------|----------------|
-| Alta | Módulo PQRSD completo (14 campos + lógica anónimo) | Ítems rojos 259-268, azules 265-269. El enlace actual devuelve 404. Es lo más crítico. | 2026-06-20 |
-| Alta | Página `/pqrsd/seguimiento` — consulta por radicado | Ítem sin color 253 — ciudadano ingresa radicado y ve estado | 2026-06-20 |
+| ~~Alta~~ | ~~Módulo PQRSD completo (14 campos + lógica anónimo)~~ | **Resuelto 2026-07-11** vía merge de release/Release-2: `PqrsForm.tsx` con los 6 tipos, lógica de anonimato, documento, modalidad de respuesta y adjuntos. Pendiente de verificación funcional: bucket `pqrsd-adjuntos` en Supabase (ver `backend-2026-07-10-pqrsd-storage.md`). | 2026-06-20 |
+| ~~Alta~~ | ~~Página `/pqrsd/seguimiento` — consulta por radicado~~ | **Resuelto 2026-07-11**: `PqrsConsulta.tsx` + `/pqrs/consulta` + `/api/pqrsd/consulta`. | 2026-06-20 |
 | Alta | Módulo de noticias completo | Ítem rojo 271 — listado `/noticias`, detalle `/noticias/[slug]`, 3 en home, CRUD admin | 2026-06-20 |
 | Alta | Footer con enlaces a políticas legales | Ítem rojo 33 — Términos, Privacidad, Derechos de autor | 2026-06-20 |
 | Alta | Páginas `/politicas/terminos`, `/politicas/privacidad`, `/politicas/derechos-autor` | Ítems rojos 34-36. Texto lo aprueba el cliente. | 2026-06-20 |
 | Alta | Organigrama en `/quienes-somos` | Ítem rojo 43. BLOQUEANTE: cliente debe entregar el archivo. | 2026-06-20 |
-| Media | Sección entes que vigilan (Supersalud) en Transparencia | Ítems sin color 70-76. Datos: nombre, dirección, teléfono, email, enlace. | 2026-06-20 |
+| Media | Sección entes que vigilan (Supersalud) en Transparencia | Ítems sin color 70-76. Datos: nombre, dirección, teléfono, email, enlace. Verificar si `TransparenciaFinanciera.tsx` (agregado 2026-07-11) ya cubre esto o sigue pendiente. | 2026-06-20 |
 | Media | Upload PDFs a Transparencia: manual contratación, distribución presupuestal, normativa | Ítems rojos 101, 112 y sin color 78-86. Los PDFs ya existen en la IPS. | 2026-06-20 |
-| Media | Acuse de recibo automático PQRSD con radicado | Ítem sin color 249-250 — mensaje de confirmación + email 24h hábiles | 2026-06-20 |
+| ~~Media~~ | ~~Acuse de recibo automático PQRSD con radicado~~ | **Resuelto 2026-07-11**: `PqrsConfirmation.tsx` muestra el radicado tras el envío. Verificar si el envío de email de confirmación quedó implementado en `/api/pqrsd/route.ts`. | 2026-06-20 |
 
 ### Técnicos del stack
 
@@ -38,6 +38,11 @@ Registro de cosas por hacer, decisiones tomadas y cosas descartadas con su razó
 | Prioridad | Tarea | Contexto | Fecha agregada |
 |-----------|-------|----------|----------------|
 | Media | URLs Google Maps embed para Carmen de Bolívar y Magangué | Sin estas URLs no se puede activar el cambio de mapa con animación en SedesSection | 2026-06-22 |
+| Media | Página `/calidad` usa datos mock (`src/data/calidad.mock.ts`) | Agregada 2026-07-11 vía merge release-2. Falta integrar con Supabase igual que se hizo con Servicios. | 2026-07-11 |
+| Alta | Verificar bucket `pqrsd-adjuntos` y políticas RLS en Supabase | Solicitud ya enviada en `backend-2026-07-10-pqrsd-storage.md`. Sin esto el POST a `/api/pqrsd` falla al subir adjuntos. | 2026-07-11 |
+| Alta | Backend de Participa: tablas `participa_*`, route `POST /api/participa/inscripcion` | Ver solicitud completa en `.claude/Cam.Claude/backend/backend-2026-07-14-participa.md`. Sin esto el formulario de inscripción muestra "próximamente" | 2026-07-14 |
+| Media | Agregar `/participa` al menú de navegación (`Header.tsx`) | No se tocó en la tarea del 2026-07-14 porque prohibía modificar componentes de otras páginas. Hoy la ruta solo se accede por URL directa | 2026-07-14 |
+| Media | Verificación visual en navegador real de `/participa` (desktop y móvil) | No se pudo hacer con Playwright/chromium-cli (no instalado, no se permite instalar dependencias). Solo se verificó por build + curl | 2026-07-14 |
 
 ---
 
@@ -47,7 +52,8 @@ Registro de cosas por hacer, decisiones tomadas y cosas descartadas con su razó
 |-------|-----------------|
 | Textos de las 3 políticas legales | No se puede publicar `/politicas/*` sin contenido aprobado |
 | Organigrama institucional | Ítem rojo 43 — no hay desarrollo que suplir esto |
-| Visión actualizada (la actual dice "2022") | Está visible en la web como error |
+| Texto completo de la Visión (contenido, no el año) | El año ya se corrigió con código dinámico el 2026-07-14 — falta que el cliente valide/actualice el resto del contenido |
+| PDFs reales de Participa: política PPSS (Res. 2063/2017), estrategia rendición de cuentas, PAAC, informes PPSS 2024-2025 | `ParticipaDocumentos.tsx` ya muestra "Documento en actualización" como fallback — sin estos PDFs los 6 documentos quedan así indefinidamente |
 | Mínimo 3-5 noticias para lanzamiento | El módulo de noticias necesita contenido para probar y mostrar |
 | Correo de notificaciones judiciales | Ítem sin color 31 — puede ser el correo general si no tienen uno específico |
 
@@ -60,6 +66,8 @@ Registro de cosas por hacer, decisiones tomadas y cosas descartadas con su razó
 | 2026-06-20 | Trazabilidad en archivos separados por tema | Evitar un único .md que crezca sin control y sea difícil de consultar |
 | 2026-06-20 | Backend requests en .md por solicitud con fecha | Permite enviarle a la IA del compañero un archivo limpio y con contexto completo |
 | 2026-06-20 | Claude no hace push ni merge sin autorización explícita de Camilo | Regla de seguridad del proyecto |
+| 2026-07-11 | `.gitignore` combina reglas de `camilo` (`.claude/`) y `release/Release-2` (`tsconfig.tsbuildinfo`) en vez de elegir una sola versión | Ambas reglas eran aditivas, no excluyentes — combinarlas evita perder cobertura de ignore de cualquiera de las dos ramas |
+| 2026-07-11 | `tsconfig.tsbuildinfo` se elimina del repo y se deja de versionar | Es un artefacto autogenerado por `tsc`, coherente con agregarlo al `.gitignore` |
 
 ---
 

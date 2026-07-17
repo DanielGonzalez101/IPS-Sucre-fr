@@ -1,6 +1,8 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
+import { createClient as createAdminClient } from "@supabase/supabase-js";
 import { rateLimit } from "@/lib/rate-limit";
+import { moduloDeRuta, MODULO_SIEMPRE_PERMITIDO } from "@/lib/permisos";
 
 function getClientIp(request: NextRequest): string {
   return (
@@ -91,6 +93,45 @@ export async function proxy(request: NextRequest) {
     const loginUrl = request.nextUrl.clone();
     loginUrl.pathname = "/gestion-interna/login";
     return NextResponse.redirect(loginUrl);
+  }
+
+  // Verificar estado (suspendido) y permiso de módulo del usuario autenticado.
+  // Si la tabla profiles aún no existe (migración pendiente en Supabase),
+  // se deja pasar — comportamiento de transición para no romper el panel.
+  if (isAdminRoute && !isLoginPage && user) {
+    const admin = createAdminClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      { auth: { autoRefreshToken: false, persistSession: false } }
+    );
+
+    const { data: perfil } = await admin
+      .from("profiles")
+      .select("estado, modulos_permitidos")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (perfil) {
+      if (perfil.estado === "suspendido") {
+        await supabase.auth.signOut();
+        const loginUrl = request.nextUrl.clone();
+        loginUrl.pathname = "/gestion-interna/login";
+        loginUrl.searchParams.set("motivo", "suspendido");
+        return NextResponse.redirect(loginUrl);
+      }
+
+      const modulo = moduloDeRuta(pathname);
+      if (
+        modulo &&
+        modulo.slug !== MODULO_SIEMPRE_PERMITIDO &&
+        !perfil.modulos_permitidos.includes(modulo.slug)
+      ) {
+        const dashboardUrl = request.nextUrl.clone();
+        dashboardUrl.pathname = "/gestion-interna/dashboard";
+        dashboardUrl.searchParams.set("motivo", "sin_permiso");
+        return NextResponse.redirect(dashboardUrl);
+      }
+    }
   }
 
   // Redirigir al dashboard si ya tiene sesión e intenta acceder al login

@@ -3,19 +3,30 @@
 import { useMemo, useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "@/lib/gsap";
-import ServicioCard from "./ServicioCard";
-import type { Servicio, ServicioCategoria } from "@/data/servicios.mock";
+import ServicioCard, { type ServicioCardData } from "./ServicioCard";
 
-type Filtro = "todos" | ServicioCategoria;
+type Filtro =
+  | "todos"
+  | "Cardiología Pediátrica"
+  | "Cardiología Adultos"
+  | "Gastroenterología Pediátrica"
+  | "Diagnóstico por Imágenes";
 
 const FILTROS: { value: Filtro; label: string }[] = [
   { value: "todos", label: "Todos" },
-  { value: "cardiologia", label: "Cardiología Pediátrica" },
-  { value: "radiologia", label: "Radiología / Diagnóstico por Imágenes" },
+  { value: "Cardiología Pediátrica", label: "Cardiología Pediátrica" },
+  { value: "Cardiología Adultos", label: "Cardiología Adultos" },
+  { value: "Gastroenterología Pediátrica", label: "Gastroenterología Pediátrica" },
+  { value: "Diagnóstico por Imágenes", label: "Diagnóstico por Imágenes" },
 ];
 
+interface ServicioConCategoria extends ServicioCardData {
+  categoria: string;
+  orden: number;
+}
+
 interface ServiciosGridProps {
-  servicios: Servicio[];
+  servicios: ServicioConCategoria[];
 }
 
 export default function ServiciosGrid({ servicios }: ServiciosGridProps) {
@@ -24,7 +35,9 @@ export default function ServiciosGrid({ servicios }: ServiciosGridProps) {
 
   const serviciosFiltrados = useMemo(() => {
     const lista =
-      filtro === "todos" ? servicios : servicios.filter((s) => s.categoria === filtro);
+      filtro === "todos"
+        ? servicios
+        : servicios.filter((s) => s.categoria.startsWith(filtro));
     return [...lista].sort((a, b) => a.orden - b.orden);
   }, [servicios, filtro]);
 
@@ -75,7 +88,11 @@ export default function ServiciosGrid({ servicios }: ServiciosGridProps) {
           </h2>
         </div>
 
-        <div className="flex flex-wrap gap-3 mb-10" role="tablist" aria-label="Filtrar servicios por categoría">
+        <div
+          className="flex flex-wrap gap-3 mb-10"
+          role="tablist"
+          aria-label="Filtrar servicios por categoría"
+        >
           {FILTROS.map(({ value, label }) => {
             const activo = filtro === value;
             return (
@@ -85,12 +102,12 @@ export default function ServiciosGrid({ servicios }: ServiciosGridProps) {
                 role="tab"
                 aria-selected={activo}
                 onClick={() => setFiltro(value)}
-                className={`font-heading font-semibold text-sm px-5 py-2.5 rounded-full transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 ${
+                className="font-heading font-semibold text-sm px-5 py-2.5 rounded-full transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-offset-2"
+                style={
                   activo
-                    ? "text-white"
-                    : "text-gray-600 bg-gray-100 hover:bg-gray-200"
-                }`}
-                style={activo ? { backgroundColor: "var(--color-azul-900)" } : undefined}
+                    ? { backgroundColor: "var(--color-azul-900)", color: "#fff" }
+                    : { backgroundColor: "#F3F4F6", color: "#4B5563" }
+                }
               >
                 {label}
               </button>

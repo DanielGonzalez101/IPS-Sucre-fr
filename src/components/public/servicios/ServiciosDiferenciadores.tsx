@@ -47,13 +47,27 @@ export default function ServiciosDiferenciadores() {
               className={`flex flex-col items-start gap-3 lg:px-6 ${i === 0 ? "lg:pl-0" : ""} ${
                 i !== DIFERENCIADORES.length - 1 ? "lg:border-r" : ""
               }`}
-              style={i !== DIFERENCIADORES.length - 1 ? { borderColor: "var(--color-gris-200)" } : undefined}
+              style={
+                i !== DIFERENCIADORES.length - 1
+                  ? { borderColor: "var(--color-gris-200)" }
+                  : undefined
+              }
             >
-              <Icon className="w-6 h-6" aria-hidden="true" style={{ color: "var(--color-rojo-500)" }} />
-              <p className="font-heading font-bold text-base" style={{ color: "var(--color-azul-900)" }}>
+              <Icon
+                className="w-6 h-6"
+                aria-hidden="true"
+                style={{ color: "var(--color-rojo-500)" }}
+              />
+              <p
+                className="font-heading font-bold text-base"
+                style={{ color: "var(--color-azul-900)" }}
+              >
                 {titulo}
               </p>
-              <p className="font-body text-sm leading-relaxed" style={{ color: "var(--color-gris-600)" }}>
+              <p
+                className="font-body text-sm leading-relaxed"
+                style={{ color: "var(--color-gris-600)" }}
+              >
                 {descripcion}
               </p>
             </div>

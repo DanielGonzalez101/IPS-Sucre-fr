@@ -8,6 +8,9 @@ import { BentoCtaRow }    from "@/components/home/BentoCtaRow";
 import { TeamSection }    from "@/components/home/TeamSection";
 import { NewsSection }     from "@/components/home/NewsSection";
 import { SedesSection }    from "@/components/home/SedesSection";
+import { CoberturaRegional } from "@/components/home/CoberturaRegional";
+import { getServiciosPublicos } from "@/actions/servicios";
+import { getSedes } from "@/actions/sitio";
 
 export const dynamic = "force-dynamic";
 
@@ -55,18 +58,39 @@ async function getHeroSlides(): Promise<HeroSlide[]> {
   }
 }
 
+// Selección acotada para el Home — la grilla completa vive en /servicios.
+// Mantiene el orden dentro de cada categoría (campo `orden`, ya viene
+// ordenado por getServiciosPublicos()).
+function seleccionParaHome<T extends { categoria: string }>(servicios: T[]): T[] {
+  const tomar = (categoria: string, cantidad: number) =>
+    servicios.filter((s) => s.categoria === categoria).slice(0, cantidad);
+
+  return [
+    ...tomar("Cardiología Pediátrica", 3),
+    ...tomar("Cardiología Adultos", 3),
+    ...tomar("Diagnóstico por Imágenes", 2),
+  ];
+}
+
 export default async function HomePage() {
-  const slides = await getHeroSlides();
+  const [slides, { data: servicios }, { data: sedes }] = await Promise.all([
+    getHeroSlides(),
+    getServiciosPublicos(),
+    getSedes(),
+  ]);
+
+  const serviciosHome = seleccionParaHome(servicios ?? []);
 
   return (
     <div id="main-content">
       <HeroSection slides={slides} />
       <StatsSection />
-      <ServicesSection />
+      <ServicesSection servicios={serviciosHome} />
       <BentoCtaRow />
       <TeamSection />
       <NewsSection />
-      <SedesSection />
+      <SedesSection sedes={sedes} />
+      <CoberturaRegional />
     </div>
   );
 }

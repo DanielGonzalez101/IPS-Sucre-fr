@@ -7,7 +7,7 @@ export async function getAuditDocuments() {
   const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("documents")
-    .select("id, title, file_url, description, uploaded_at")
+    .select("id, title, file_url, description, uploaded_at, is_public")
     .eq("is_audit_doc", true)
     .order("uploaded_at", { ascending: false });
   if (error) return { data: null, error: error.message };
@@ -18,6 +18,7 @@ export async function uploadAndCreateAuditDocument(formData: FormData) {
   const file = formData.get("file") as File | null;
   const title = (formData.get("title") as string | null)?.trim();
   const description = (formData.get("description") as string | null)?.trim() || null;
+  const is_public = formData.get("is_public") === "true";
 
   if (!file || file.size === 0) return { error: "Archivo requerido", file_url: null };
   if (!title) return { error: "Título requerido", file_url: null };
@@ -41,7 +42,7 @@ export async function uploadAndCreateAuditDocument(formData: FormData) {
     file_url: publicUrl,
     description,
     is_audit_doc: true,
-    is_public: true,
+    is_public,
   });
 
   if (dbError) return { error: dbError.message, file_url: null };
@@ -50,10 +51,30 @@ export async function uploadAndCreateAuditDocument(formData: FormData) {
   return { error: null, file_url: publicUrl };
 }
 
+export async function toggleDocumentPublic(id: string, is_public: boolean) {
+  const supabase = createAdminClient();
+  const { error } = await supabase.from("documents").update({ is_public }).eq("id", id);
+  if (error) return { error: error.message };
+  revalidatePath("/gestion-interna/normativa");
+  return { error: null };
+}
+
 export async function deleteAuditDocument(id: string) {
   const supabase = createAdminClient();
   const { error } = await supabase.from("documents").delete().eq("id", id);
   if (error) return { error: error.message };
   revalidatePath("/gestion-interna/normativa");
   return { error: null };
+}
+
+export async function getPublicFinancialDocuments() {
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("documents")
+    .select("id, title, file_url, description, uploaded_at")
+    .eq("is_audit_doc", true)
+    .eq("is_public", true)
+    .order("uploaded_at", { ascending: false });
+  if (error) return { data: null, error: error.message };
+  return { data, error: null };
 }

@@ -8,7 +8,7 @@ export default async function AdminEquipoTecPage() {
   const { data: equipos, error } = await getEquipoTecnologico();
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div>
       <div className="mb-6">
         <h1 className="text-xl font-bold text-gray-900">Equipo tecnológico</h1>
         <p className="text-sm text-gray-500 mt-1">
