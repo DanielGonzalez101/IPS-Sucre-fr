@@ -1,4 +1,3 @@
-import Link from "next/link";
 import {
   Stethoscope,
   HeartPulse,
@@ -16,7 +15,6 @@ import {
 } from "lucide-react";
 
 const ICONS: Record<string, LucideIcon> = {
-  // Nombres Phosphor → equivalente Lucide (los que están en la BD)
   Stethoscope,
   Heartbeat: HeartPulse,
   Pulse: Activity,
@@ -25,7 +23,6 @@ const ICONS: Record<string, LucideIcon> = {
   Waves,
   DropHalf: Radar,
   FirstAid: ShieldPlus,
-  // Nombres adicionales para futuros servicios
   HeartPulse,
   Dumbbell,
   RotateCw,
@@ -55,56 +52,33 @@ export default function ServicioCard({ servicio, index, featured = false }: Serv
   const numero = String(index + 1).padStart(2, "0");
 
   return (
-    <Link
-      href={`/servicios/${servicio.slug}`}
-      className={`servicio-card group relative flex flex-col overflow-hidden rounded-2xl p-6 transition-all duration-200 hover:shadow-md hover:scale-[1.02] focus-visible:ring-2 focus-visible:ring-offset-2 ${
-        featured ? "text-white focus-visible:ring-white" : "bg-white border"
-      }`}
-      style={
-        featured
-          ? { backgroundColor: "var(--color-azul-900)" }
-          : { borderColor: "var(--color-gris-100)", boxShadow: "var(--shadow-card)" }
-      }
+    <div
+      className="servicio-card group relative flex flex-col overflow-hidden rounded-2xl p-6 transition-all duration-300 hover:shadow-md hover:scale-[1.02] border bg-white border-[var(--color-gris-100)] hover:bg-[var(--color-azul-900)]! hover:border-transparent"
+      style={{ boxShadow: "var(--shadow-card)" }}
     >
       <span
         aria-hidden="true"
-        className="absolute top-2 right-4 font-heading font-bold text-6xl leading-none opacity-10 select-none"
-        style={{ color: featured ? "#fff" : "var(--color-azul-900)" }}
+        className="absolute top-2 right-4 font-heading font-bold text-6xl leading-none opacity-10 select-none transition-colors duration-300 text-[var(--color-azul-900)] group-hover:text-white"
       >
         {numero}
       </span>
 
-      <div
-        className="relative z-10 w-8 h-8 flex items-center justify-center rounded-xl mb-5"
-        style={{ backgroundColor: featured ? "rgba(255,255,255,0.20)" : "var(--color-azul-50)" }}
-      >
+      <div className="relative z-10 w-8 h-8 flex items-center justify-center rounded-xl mb-5 transition-colors duration-300 bg-[var(--color-azul-50)] group-hover:bg-white/20">
         <Icon
-          className="w-5 h-5"
+          className="w-5 h-5 transition-colors duration-300 text-[var(--color-azul-800)] group-hover:text-white"
           aria-hidden="true"
-          style={{ color: featured ? "#fff" : "var(--color-azul-800)" }}
         />
       </div>
 
-      <h3
-        className={`relative z-10 font-heading font-bold text-lg mb-2 ${featured ? "text-white" : ""}`}
-        style={!featured ? { color: "var(--color-azul-900)" } : undefined}
-      >
+      <h3 className="relative z-10 font-heading font-bold text-lg mb-2 transition-colors duration-300 text-[var(--color-azul-900)] group-hover:text-white">
         {servicio.titulo}
       </h3>
 
       <p
-        className="relative z-10 font-body text-sm leading-relaxed line-clamp-2 mb-6"
-        style={{ color: featured ? "rgba(255,255,255,0.80)" : "var(--color-gris-600)" }}
+        className="relative z-10 font-body text-sm leading-relaxed line-clamp-2 transition-colors duration-300 text-[var(--color-gris-600)] group-hover:text-white/80"
       >
         {servicio.descripcion}
       </p>
-
-      <span
-        className="relative z-10 mt-auto font-heading font-medium text-sm"
-        style={{ color: featured ? "#fff" : "var(--color-rojo-500)" }}
-      >
-        Ver detalle →
-      </span>
-    </Link>
+    </div>
   );
 }
