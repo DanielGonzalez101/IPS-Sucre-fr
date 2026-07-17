@@ -168,7 +168,7 @@ export function ServicesSection({ servicios }: Props) {
               return (
                 <Link
                   key={id}
-                  href={`/servicios/${slug}`}
+                  href="/servicios"
                   className="service-card group flex flex-col justify-between bg-white p-5 focus-visible:ring-2 focus-visible:ring-offset-2"
                   style={{
                     borderRadius: "16px",

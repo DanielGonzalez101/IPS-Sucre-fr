@@ -66,3 +66,15 @@ export async function deleteAuditDocument(id: string) {
   revalidatePath("/gestion-interna/normativa");
   return { error: null };
 }
+
+export async function getPublicFinancialDocuments() {
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("documents")
+    .select("id, title, file_url, description, uploaded_at")
+    .eq("is_audit_doc", true)
+    .eq("is_public", true)
+    .order("uploaded_at", { ascending: false });
+  if (error) return { data: null, error: error.message };
+  return { data, error: null };
+}
