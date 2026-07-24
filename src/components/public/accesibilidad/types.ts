@@ -4,11 +4,8 @@ export type ProfileKey =
   | "daltonismo"
   | "visual"
   | "epilepsia"
-  | "tdah"
-  | "aprendizaje"
   | "mayor"
-  | "dislexia"
-  | "wcag";
+  | "dislexia";
 
 export type ColorMode =
   | "off"
@@ -23,8 +20,6 @@ export type CursorMode = "off" | "blanco" | "negro";
 
 export type FontTarget = "size" | "line" | "word" | "letter";
 
-export type CustomColorTarget = "fondos" | "encabezados" | "contenido";
-
 export type A11yState = {
   profiles: Record<ProfileKey, boolean>;
 
@@ -33,12 +28,9 @@ export type A11yState = {
   navTeclado: boolean;
   navInteligente: boolean;
   lectorTexto: boolean;
-  comandosVoz: boolean;
 
   // Color
   colorMode: ColorMode;
-  colorPersonalizado: Record<CustomColorTarget, string | null>;
-
   // Contenido — fuente
   fontSize: number; // 0..4 pasos
   lineHeight: number;
@@ -56,7 +48,6 @@ export type A11yState = {
   descripcionImagenes: boolean;
   resaltarEnlaces: boolean;
   resaltarTitulos: boolean;
-  modoLegible: boolean;
   lupaTexto: boolean;
   estructuraPagina: boolean;
   leerEnfoque: boolean;
@@ -72,19 +63,14 @@ export const DEFAULT_STATE: A11yState = {
     daltonismo: false,
     visual: false,
     epilepsia: false,
-    tdah: false,
-    aprendizaje: false,
     mayor: false,
     dislexia: false,
-    wcag: false,
   },
   lectorPantalla: false,
   navTeclado: false,
   navInteligente: false,
   lectorTexto: false,
-  comandosVoz: false,
   colorMode: "off",
-  colorPersonalizado: { fondos: null, encabezados: null, contenido: null },
   fontSize: 0,
   lineHeight: 0,
   wordSpacing: 0,
@@ -97,7 +83,6 @@ export const DEFAULT_STATE: A11yState = {
   descripcionImagenes: false,
   resaltarEnlaces: false,
   resaltarTitulos: false,
-  modoLegible: false,
   lupaTexto: false,
   estructuraPagina: false,
   leerEnfoque: false,

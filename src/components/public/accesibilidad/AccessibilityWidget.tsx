@@ -17,7 +17,7 @@ function A11yIcon() {
 
 export function AccessibilityWidget() {
   const [open, setOpen] = useState(false);
-  useA11y(); // asegura contexto
+  useA11y();
 
   return (
     <>

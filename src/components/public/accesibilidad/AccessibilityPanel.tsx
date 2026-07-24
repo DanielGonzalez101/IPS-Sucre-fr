@@ -4,19 +4,15 @@ import { useState } from "react";
 import { useA11y } from "./A11yContext";
 import { ProfilesSection } from "./sections/ProfilesSection";
 import { VoiceNavSection } from "./sections/VoiceNavSection";
-import { ColorSection } from "./sections/ColorSection";
-import { CustomColorSection } from "./sections/CustomColorSection";
 import { ContentSection } from "./sections/ContentSection";
 
-type SectionKey = "profiles" | "voice" | "color" | "custom" | "content";
+type SectionKey = "profiles" | "voice" | "content";
 
 export function AccessibilityPanel({ onClose }: { onClose: () => void }) {
   const { reset } = useA11y();
   const [openSections, setOpenSections] = useState<Record<SectionKey, boolean>>({
     profiles: true,
     voice: true,
-    color: true,
-    custom: true,
     content: true,
   });
 
@@ -47,22 +43,6 @@ export function AccessibilityPanel({ onClose }: { onClose: () => void }) {
         onToggle={() => toggle("voice")}
       >
         <VoiceNavSection />
-      </Section>
-
-      <Section
-        title="Ajuste de color"
-        open={openSections.color}
-        onToggle={() => toggle("color")}
-      >
-        <ColorSection />
-      </Section>
-
-      <Section
-        title="Color personalizado"
-        open={openSections.custom}
-        onToggle={() => toggle("custom")}
-      >
-        <CustomColorSection />
       </Section>
 
       <Section

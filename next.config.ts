@@ -37,8 +37,8 @@ const securityHeaders = [
       `font-src 'self'`,
       // Supabase API calls
       `connect-src 'self' ${process.env.NEXT_PUBLIC_SUPABASE_URL ?? ""} wss://*.supabase.co`,
-      "frame-src https://www.google.com/maps/",
-      "frame-ancestors 'none'",
+      "frame-src 'self' https://www.google.com/maps/",
+      "frame-ancestors 'self'",
       "base-uri 'self'",
       "form-action 'self'",
     ].join("; "),
