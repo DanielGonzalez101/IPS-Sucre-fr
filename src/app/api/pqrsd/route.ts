@@ -50,7 +50,7 @@ async function generateTrackingCode(
 
 export async function POST(req: NextRequest) {
   const ip = req.headers.get("x-forwarded-for") ?? "unknown";
-  const limit = rateLimit(`pqrsd:${ip}`, 5, 60 * 60 * 1000);
+  const limit = rateLimit(`pqrsd:${ip}`, 50, 60 * 60 * 1000);
   if (!limit.allowed) {
     return NextResponse.json(
       { error: "Demasiadas solicitudes. Intente más tarde." },
