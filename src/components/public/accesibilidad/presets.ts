@@ -15,7 +15,7 @@ export const PROFILE_PRESETS: Record<ProfileKey, Partial<A11yState>> = {
     colorMode: "monocromo",
   },
   visual: {
-    fontSize: 3,
+    fontSize: 2,
     letraLegible: true,
     resaltarEnlaces: true,
     resaltarTitulos: true,
@@ -24,17 +24,6 @@ export const PROFILE_PRESETS: Record<ProfileKey, Partial<A11yState>> = {
   epilepsia: {
     bloquearParpadeos: true,
     colorMode: "baja-saturacion",
-  },
-  tdah: {
-    guiaLectura: true,
-    leerEnfoque: true,
-    resaltarEnlaces: true,
-  },
-  aprendizaje: {
-    letraLegible: true,
-    modoLegible: true,
-    guiaLectura: true,
-    diccionario: true,
   },
   mayor: {
     fontSize: 2,
@@ -46,12 +35,5 @@ export const PROFILE_PRESETS: Record<ProfileKey, Partial<A11yState>> = {
     letraLegible: true,
     lineHeight: 2,
     letterSpacing: 1,
-    modoLegible: true,
-  },
-  wcag: {
-    resaltarEnlaces: true,
-    resaltarTitulos: true,
-    letraLegible: true,
-    colorMode: "contraste-alto",
   },
 };

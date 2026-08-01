@@ -44,7 +44,6 @@ export function A11yApplier() {
       ["letraLegible", "a11y-letra-legible"],
       ["resaltarEnlaces", "a11y-resaltar-enlaces"],
       ["resaltarTitulos", "a11y-resaltar-titulos"],
-      ["modoLegible", "a11y-modo-legible"],
       ["lupaTexto", "a11y-lupa-texto"],
       ["navTeclado", "a11y-nav-teclado"],
       ["leerEnfoque", "a11y-leer-enfoque"],
@@ -53,21 +52,6 @@ export function A11yApplier() {
     toggles.forEach(([k, cls]) => {
       if (state[k]) html.classList.add(cls);
     });
-
-    // Color personalizado
-    const { fondos, encabezados, contenido } = state.colorPersonalizado;
-    if (fondos) {
-      html.style.setProperty("--a11y-bg", fondos);
-      html.classList.add("a11y-color-fondos");
-    }
-    if (encabezados) {
-      html.style.setProperty("--a11y-heading", encabezados);
-      html.classList.add("a11y-color-encabezados");
-    }
-    if (contenido) {
-      html.style.setProperty("--a11y-text", contenido);
-      html.classList.add("a11y-color-contenido");
-    }
 
     return () => {
       Array.from(html.classList).forEach((c) => {
