@@ -12,7 +12,7 @@ import { SedesSection }    from "@/components/home/SedesSection";
 import { CoberturaRegional } from "@/components/home/CoberturaRegional";
 import { getServiciosPublicos } from "@/actions/servicios";
 import { getSedes } from "@/actions/sitio";
-import { SERVICIOS_ALFABETICO_MOCK } from "@/data/servicios-alfabetico.mock";
+import { SERVICIOS_ALFABETICO } from "@/data/servicios-alfabetico";
 
 export const dynamic = "force-dynamic";
 
@@ -82,7 +82,7 @@ export default async function HomePage() {
   ]);
 
   const serviciosHome = seleccionParaHome(servicios ?? []);
-  const serviciosAlfabetico = SERVICIOS_ALFABETICO_MOCK.filter((s) => s.visible).sort(
+  const serviciosAlfabetico = SERVICIOS_ALFABETICO.filter((s) => s.visible).sort(
     (a, b) => a.sort_order - b.sort_order
   );
 

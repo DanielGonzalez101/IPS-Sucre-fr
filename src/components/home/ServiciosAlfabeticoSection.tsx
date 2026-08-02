@@ -6,7 +6,7 @@ import { gsap } from "@/lib/gsap";
 import { CursorClick } from "@phosphor-icons/react";
 import { ServiciosAlfabeticoFiltro } from "./ServiciosAlfabeticoFiltro";
 import { ServiciosAlfabeticoResultados } from "./ServiciosAlfabeticoResultados";
-import type { ServicioAlfabetico } from "@/data/servicios-alfabetico.mock";
+import type { ServicioAlfabetico } from "@/data/servicios-alfabetico";
 
 interface Props {
   servicios: ServicioAlfabetico[];
@@ -25,6 +25,16 @@ export function ServiciosAlfabeticoSection({ servicios }: Props) {
     return () => clearTimeout(timeout);
   }, [busquedaInput]);
 
+  const handleLetraChange = (letra: string | null) => {
+    setLetraActiva(letra);
+    if (letra) setBusquedaInput("");
+  };
+
+  const handleBusquedaChange = (valor: string) => {
+    setBusquedaInput(valor);
+    if (valor) setLetraActiva(null);
+  };
+
   const letras = useMemo(
     () => Array.from(new Set(servicios.map((s) => s.letra))).sort(),
     [servicios]
@@ -33,13 +43,50 @@ export function ServiciosAlfabeticoSection({ servicios }: Props) {
   const interactuando = letraActiva !== null || busqueda.length > 0;
 
   const resultados = useMemo(() => {
-    if (!interactuando) return [];
-    return servicios.filter((s) => {
-      const coincideLetra = !letraActiva || s.letra === letraActiva;
-      const coincideBusqueda = !busqueda || s.nombre.toLowerCase().includes(busqueda);
-      return coincideLetra && coincideBusqueda;
+    const filtrados = letraActiva
+      ? servicios.filter((s) => s.letra === letraActiva)
+      : busqueda
+        ? servicios.filter((s) => s.nombre.toLowerCase().includes(busqueda))
+        : [];
+    return [...filtrados].sort((a, b) => a.nombre.localeCompare(b.nombre, "es"));
+  }, [servicios, letraActiva, busqueda]);
+
+  const [resultadosCongelados, setResultadosCongelados] = useState<ServicioAlfabetico[]>([]);
+  const [panelVisible, setPanelVisible] = useState(interactuando);
+  const estabaInteractuandoRef = useRef(interactuando);
+
+  useEffect(() => {
+    if (interactuando) setResultadosCongelados(resultados);
+  }, [resultados, interactuando]);
+
+  useEffect(() => {
+    if (interactuando) {
+      estabaInteractuandoRef.current = true;
+      setPanelVisible(true);
+      return;
+    }
+    if (!estabaInteractuandoRef.current) return;
+    estabaInteractuandoRef.current = false;
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || !resultadosRef.current) {
+      setPanelVisible(false);
+      return;
+    }
+
+    const cards = resultadosRef.current.querySelectorAll(".servicios-alfabetico-card");
+    if (cards.length === 0) {
+      setPanelVisible(false);
+      return;
+    }
+
+    gsap.to(cards, {
+      opacity: 0,
+      y: 12,
+      duration: 0.25,
+      ease: "power2.in",
+      onComplete: () => setPanelVisible(false),
     });
-  }, [servicios, letraActiva, busqueda, interactuando]);
+  }, [interactuando]);
 
   useGSAP(
     () => {
@@ -69,16 +116,20 @@ export function ServiciosAlfabeticoSection({ servicios }: Props) {
 
   useGSAP(
     () => {
+      if (!interactuando) return;
       if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
       if (!resultadosRef.current) return;
 
+      const cards = resultadosRef.current.querySelectorAll(".servicios-alfabetico-card");
+      if (cards.length === 0) return;
+
       gsap.fromTo(
-        resultadosRef.current.children,
+        cards,
         { opacity: 0, y: 12 },
         { opacity: 1, y: 0, duration: 0.35, stagger: 0.04, ease: "power2.out" }
       );
     },
-    { dependencies: [resultados], scope: resultadosRef }
+    { dependencies: [resultados, interactuando], scope: resultadosRef }
   );
 
   if (servicios.length === 0) return null;
@@ -119,14 +170,16 @@ export function ServiciosAlfabeticoSection({ servicios }: Props) {
               letras={letras}
               letraActiva={letraActiva}
               busqueda={busquedaInput}
-              onLetraChange={setLetraActiva}
-              onBusquedaChange={setBusquedaInput}
+              onLetraChange={handleLetraChange}
+              onBusquedaChange={handleBusquedaChange}
             />
           </div>
 
           <div ref={resultadosRef} className="servicios-alfabetico-panel">
-            {interactuando ? (
-              <ServiciosAlfabeticoResultados servicios={resultados} />
+            {panelVisible ? (
+              <ServiciosAlfabeticoResultados
+                servicios={interactuando ? resultados : resultadosCongelados}
+              />
             ) : (
               <div
                 className="participa-glass rounded-3xl flex flex-col items-center justify-center text-center gap-3 py-16 px-6"

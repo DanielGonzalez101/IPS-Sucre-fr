@@ -1,35 +1,25 @@
 "use client";
 
 import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 import {
   Stethoscope,
   Heartbeat,
-  Pulse,
-  Timer,
-  Gauge,
-  Waves,
   Heart,
   Bone,
-  Baby,
-  Flask,
+  Waves,
   Microscope,
-  ArrowUpRight,
   MagnifyingGlass,
   type Icon,
 } from "@phosphor-icons/react";
-import type { ServicioAlfabetico } from "@/data/servicios-alfabetico.mock";
+import type { ServicioAlfabetico } from "@/data/servicios-alfabetico";
 
 const ICON_MAP: Record<string, Icon> = {
   Stethoscope,
   Heartbeat,
-  Pulse,
-  Timer,
-  Gauge,
-  Waves,
   Heart,
   Bone,
-  Baby,
-  Flask,
+  Waves,
   Microscope,
 };
 
@@ -56,45 +46,63 @@ export function ServiciosAlfabeticoResultados({ servicios }: Props) {
   }
 
   return (
-    <div
-      className="servicios-alfabetico-grid grid sm:grid-cols-2 gap-4"
-      role="list"
-      aria-label="Resultados de servicios"
-    >
-      {servicios.map((servicio) => {
-        const Icon = ICON_MAP[servicio.icono ?? ""] ?? Stethoscope;
-        return (
-          <div
-            key={servicio.id}
-            role="listitem"
-            className="participa-glass participa-glass--grid participa-glass--interactive rounded-2xl p-5 flex flex-col"
-          >
-            <div
-              className="w-10 h-10 flex items-center justify-center mb-3"
-              style={{ backgroundColor: "var(--color-azul-50)", borderRadius: "10px" }}
-              aria-hidden="true"
-            >
-              <Icon size={20} weight="duotone" style={{ color: "var(--color-azul-700)" }} />
+    <div className="max-h-[640px] overflow-y-auto pr-1">
+      <div
+        className="servicios-alfabetico-grid grid sm:grid-cols-2 gap-4"
+        role="list"
+        aria-label="Resultados de servicios"
+      >
+        {servicios.map((servicio) => {
+          const Icon = ICON_MAP[servicio.icono] ?? Stethoscope;
+          return (
+            <div key={servicio.id} role="listitem" className="servicios-alfabetico-card">
+              <Link
+                href={servicio.url ?? "/servicios"}
+                className="group participa-glass participa-glass--grid participa-glass--interactive rounded-2xl p-5 flex flex-col h-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+              >
+              <div className="flex items-start justify-between mb-3">
+                <div
+                  className="w-10 h-10 flex items-center justify-center"
+                  style={{ backgroundColor: "var(--color-azul-50)", borderRadius: "10px" }}
+                  aria-hidden="true"
+                >
+                  <Icon size={20} weight="duotone" style={{ color: "var(--color-azul-700)" }} />
+                </div>
+                <div
+                  className="w-7 h-7 flex items-center justify-center transition-colors duration-200 group-hover:bg-black"
+                  style={{ borderRadius: "50%", backgroundColor: "var(--color-gris-100)" }}
+                  aria-hidden="true"
+                >
+                  <ArrowUpRight
+                    size={14}
+                    className="transition-colors duration-200 group-hover:text-white"
+                    style={{ color: "var(--color-gris-500)" }}
+                  />
+                </div>
+              </div>
+
+              <p className="font-heading font-semibold text-sm leading-snug mb-1" style={{ color: "var(--color-azul-900)" }}>
+                {servicio.nombre}
+              </p>
+              <p className="font-body text-xs mb-3" style={{ color: "var(--color-gris-500)" }}>
+                {servicio.categoria}
+              </p>
+
+              <span
+                className="mt-auto self-start font-mono text-[11px] px-2 py-0.5"
+                style={{
+                  backgroundColor: "var(--color-gris-100)",
+                  color: "var(--color-gris-500)",
+                  borderRadius: "999px",
+                }}
+              >
+                CUPS {servicio.codigoCups}
+              </span>
+              </Link>
             </div>
-
-            <p className="font-heading font-semibold text-sm leading-snug mb-1" style={{ color: "var(--color-azul-900)" }}>
-              {servicio.nombre}
-            </p>
-            <p className="font-body text-xs leading-relaxed mb-4 flex-1" style={{ color: "var(--color-gris-600)" }}>
-              {servicio.descripcion}
-            </p>
-
-            <Link
-              href={servicio.url ?? "/servicios"}
-              className="inline-flex items-center gap-1.5 font-heading font-semibold text-xs transition-all duration-150 hover:gap-2.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 rounded"
-              style={{ color: "#E63B2E" }}
-            >
-              Explorar
-              <ArrowUpRight size={14} aria-hidden="true" />
-            </Link>
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
     </div>
   );
 }
