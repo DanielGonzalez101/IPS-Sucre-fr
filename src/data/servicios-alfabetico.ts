@@ -3,6 +3,10 @@
 // Cuando el backend agregue la columna generada `letra` a la tabla `servicios`
 // (ver .claude/Cam.Claude/backend/backend-2026-07-23-servicios-alfabetico.md),
 // este array se reemplaza por la consulta a Supabase — la forma no cambia.
+// `FILAS` también se reutiliza en src/data/servicios-detalle.ts para no
+// duplicar numero/codigoCups/nombre/categoria en la ficha de detalle.
+
+import { slugServicio } from "@/lib/slugify";
 
 export interface ServicioAlfabetico {
   id: string;
@@ -35,14 +39,14 @@ function iconoPorCategoria(categoria: string): string {
   return "Bone";
 }
 
-interface FilaServicio {
+export interface FilaServicio {
   numero: number;
   codigoCups: string;
   nombre: string;
   categoria: string;
 }
 
-const FILAS: FilaServicio[] = [
+export const FILAS: FilaServicio[] = [
   { numero: 1, codigoCups: "890229", nombre: "Consulta de primera vez por especialista en Cardiología Pediátrica", categoria: "Cardiología Pediátrica" },
   { numero: 2, codigoCups: "890329", nombre: "Consulta de control o seguimiento por especialista en Cardiología Pediátrica", categoria: "Cardiología Pediátrica" },
   { numero: 3, codigoCups: "890402", nombre: "Interconsulta por medicina especializada en Cardiología Pediátrica", categoria: "Cardiología Pediátrica" },
@@ -157,7 +161,7 @@ export const SERVICIOS_ALFABETICO: ServicioAlfabetico[] = FILAS.map((fila) => ({
   letra: derivarLetra(fila.nombre),
   categoria: fila.categoria,
   icono: iconoPorCategoria(fila.categoria),
-  url: "/servicios",
+  url: `/servicios/catalogo/${slugServicio(fila.numero, fila.nombre)}`,
   visible: true,
   sort_order: fila.numero,
 }));
