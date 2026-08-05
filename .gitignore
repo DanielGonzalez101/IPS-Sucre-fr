@@ -47,6 +47,9 @@ tsconfig.tsbuildinfo
 # Matriz de cumplimiento — archivo interno, no debe subirse
 .claude/formatoMatrizCumplimiento*.xlsx
 
+# Portafolio de servicios — archivo interno, no debe subirse
+.claude/PORTAFOLIO DE SERVICIOS_CARDIOCENTRO.pdf
+
 .claude
 .claude/
 sql/
