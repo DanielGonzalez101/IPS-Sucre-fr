@@ -4,6 +4,7 @@ import type { HeroSlide }  from "@/types";
 import { HeroSection }     from "@/components/home/HeroSection";
 import { StatsSection }    from "@/components/home/StatsSection";
 import { ServicesSection } from "@/components/home/ServicesSection";
+import { ServiciosAlfabeticoSection } from "@/components/home/ServiciosAlfabeticoSection";
 import { BentoCtaRow }    from "@/components/home/BentoCtaRow";
 import { TeamSection }    from "@/components/home/TeamSection";
 import { NewsSection }     from "@/components/home/NewsSection";
@@ -11,6 +12,7 @@ import { SedesSection }    from "@/components/home/SedesSection";
 import { CoberturaRegional } from "@/components/home/CoberturaRegional";
 import { getServiciosPublicos } from "@/actions/servicios";
 import { getSedes } from "@/actions/sitio";
+import { SERVICIOS_ALFABETICO } from "@/data/servicios-alfabetico";
 
 export const dynamic = "force-dynamic";
 
@@ -86,6 +88,7 @@ export default async function HomePage() {
       <HeroSection slides={slides} />
       <StatsSection />
       <ServicesSection servicios={serviciosHome} />
+      <ServiciosAlfabeticoSection servicios={SERVICIOS_ALFABETICO} />
       <BentoCtaRow />
       <TeamSection />
       <NewsSection />
