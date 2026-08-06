@@ -1,3 +1,5 @@
+import { slugServicio } from "@/lib/slugify";
+
 // Fuente: docs/servicios-cardiocentro-numerados.md
 // Portafolio completo — 208 servicios. Mapeo 1:1 por número de fila.
 // Cuando el backend agregue la columna generada `letra` a la tabla `servicios`
@@ -45,7 +47,7 @@ interface FilaServicio {
   categoria: string;
 }
 
-const FILAS: FilaServicio[] = [
+export const FILAS: FilaServicio[] = [
   // ── 2.1 Cardiología Pediátrica ──────────────────────────────
   { numero: 1,   codigoCups: "890229",   nombre: "Consulta de primera vez por especialista en Cardiología Pediátrica",              categoria: "Cardiología Pediátrica" },
   { numero: 2,   codigoCups: "890329",   nombre: "Consulta de control o seguimiento por especialista en Cardiología Pediátrica",    categoria: "Cardiología Pediátrica" },
@@ -281,7 +283,7 @@ export const SERVICIOS_ALFABETICO: ServicioAlfabetico[] = FILAS.map((fila) => ({
   letra: derivarLetra(fila.nombre),
   categoria: fila.categoria,
   icono: iconoPorCategoria(fila.categoria),
-  url: "/servicios",
+  url: `/servicios/catalogo/${slugServicio(fila.numero, fila.nombre)}`,
   visible: true,
   sort_order: fila.numero,
 }));
