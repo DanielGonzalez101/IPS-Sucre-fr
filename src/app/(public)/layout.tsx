@@ -4,6 +4,7 @@ import Footer from "@/components/public/Footer";
 import FloatingWhatsApp from "@/components/public/FloatingWhatsApp";
 import { A11yProvider } from "@/components/public/accesibilidad/A11yContext";
 import { AccessibilityWidget } from "@/components/public/accesibilidad/AccessibilityWidget";
+import ChatWidget from "@/components/ChatWidget";
 import { getSedes, getEmailContacto, getRedesSociales } from "@/actions/sitio";
 
 export default async function PublicLayout({ children }: { children: React.ReactNode }) {
@@ -32,6 +33,7 @@ export default async function PublicLayout({ children }: { children: React.React
       <Footer emailContacto={emailContacto} sedePrincipal={sedePrincipal} redes={redes} />
       <FloatingWhatsApp />
       <AccessibilityWidget />
+      <ChatWidget />
     </A11yProvider>
   );
 }

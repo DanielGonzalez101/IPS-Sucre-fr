@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import Script from "next/script";
 import "./globals.css";
 
 const inter = Inter({
@@ -33,10 +32,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           Saltar al contenido principal
         </a>
         {children}
-        <Script
-          src="https://api.wcx.cloud/widget/?id=9940af917b864606bbe22a837fc08179"
-          strategy="afterInteractive"
-        />
       </body>
     </html>
   );

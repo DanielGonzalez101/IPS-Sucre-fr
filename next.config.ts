@@ -30,14 +30,14 @@ const securityHeaders = [
     value: [
       "default-src 'self'",
       // Next.js necesita inline scripts para hydration
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://api.wcx.cloud https://f.wcentrix.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/",
       // Supabase storage para imágenes/archivos
-      `style-src 'self' 'unsafe-inline'`,
-      `img-src 'self' blob: data: ${process.env.NEXT_PUBLIC_SUPABASE_URL ?? ""}`,
-      `font-src 'self'`,
-      // Supabase API calls
-      `connect-src 'self' ${process.env.NEXT_PUBLIC_SUPABASE_URL ?? ""} wss://*.supabase.co`,
-      "frame-src 'self' https://www.google.com/maps/",
+      `style-src 'self' 'unsafe-inline' https://f.wcentrix.com`,
+      `img-src 'self' blob: data: ${process.env.NEXT_PUBLIC_SUPABASE_URL ?? ""} https://wcentrix.net https://f.wcentrix.com`,
+      `font-src 'self' https://f.wcentrix.com`,
+      // Supabase API calls + WCentrix
+      `connect-src 'self' ${process.env.NEXT_PUBLIC_SUPABASE_URL ?? ""} wss://*.supabase.co https://api.wcx.cloud https://wcentrix.net https://f.wcentrix.com`,
+      "frame-src 'self' https://www.google.com/maps/ https://f.wcentrix.com https://wcentrix.net",
       "frame-ancestors 'self'",
       "base-uri 'self'",
       "form-action 'self'",
