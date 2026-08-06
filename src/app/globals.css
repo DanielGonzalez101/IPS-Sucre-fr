@@ -2971,3 +2971,138 @@ html.a11y-leer-enfoque .a11y-focus-target {
 }
 html.a11y-descripcion-imagenes img { outline: 2px dashed #08338f; outline-offset: -2px; }
 html.a11y-descripcion-imagenes .a11y-img-wrap { position: relative; display: inline-block; }
+
+/* ═══════════════════════════════════════════════════════════
+   FICHA DE DETALLE DE SERVICIO — 5 variantes de layout (A–E)
+   Un solo orden de DOM (header → intro → imagen → proceso →
+   datos → cta); la disposición visual la resuelve grid-template-areas
+   por variante y breakpoint. En móvil/tablet todas colapsan a una
+   sola columna en ese mismo orden.
+   ═══════════════════════════════════════════════════════════ */
+
+.servicio-detalle-grid {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: 1fr;
+  grid-template-areas:
+    "header"
+    "intro"
+    "imagen"
+    "proceso"
+    "datos"
+    "cta";
+}
+
+.sd-slot--header { grid-area: header; }
+.sd-slot--intro { grid-area: intro; }
+.sd-slot--imagen { grid-area: imagen; }
+.sd-slot--proceso { grid-area: proceso; min-width: 0; }
+.sd-slot--datos { grid-area: datos; min-width: 0; }
+.sd-slot--cta { grid-area: cta; }
+
+@media (min-width: 1024px) {
+  .servicio-detalle-grid {
+    gap: 2.5rem;
+    position: relative;
+  }
+
+  .servicio-detalle-grid[data-variant="A"] {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "header proceso"
+      "intro proceso"
+      "imagen proceso"
+      "datos cta";
+  }
+
+  .servicio-detalle-grid[data-variant="B"] {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "header imagen"
+      "intro datos"
+      "proceso datos"
+      "proceso cta";
+  }
+
+  .servicio-detalle-grid[data-variant="C"] {
+    grid-template-columns: 3fr 2fr;
+    grid-template-areas:
+      "imagen imagen"
+      "header header"
+      "intro intro"
+      "proceso datos"
+      "proceso cta";
+  }
+
+  .servicio-detalle-grid[data-variant="D"] {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "header header"
+      "intro intro"
+      "proceso proceso"
+      "imagen datos"
+      "imagen cta";
+  }
+
+  .servicio-detalle-grid[data-variant="E"] {
+    grid-template-columns: 320px 1fr;
+    grid-template-areas:
+      "imagen header"
+      "imagen intro"
+      "datos proceso"
+      "datos cta";
+  }
+
+  /* Divisor vertical sutil, solo en A/B (dos columnas simétricas). */
+  .servicio-detalle-grid[data-variant="A"]::before,
+  .servicio-detalle-grid[data-variant="B"]::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 1px;
+    background: var(--color-gris-200);
+    pointer-events: none;
+  }
+}
+
+/* Glass oscuro sobre navy, más opaco que .participa-glass-dark (pensado
+   para overlays de hero a 0.1) — aquí se necesita 60-80% para paneles de
+   contenido con jerarquía tipográfica por opacidad de blanco. */
+.servicio-detalle-glass-navy {
+  background-color: rgba(27, 43, 94, 0.72);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 8px 30px -10px rgba(6, 36, 77, 0.35),
+    0 1px 3px 0 rgba(6, 36, 77, 0.15);
+}
+
+.servicio-detalle-timeline-linea {
+  background: linear-gradient(
+    to bottom,
+    rgba(230, 59, 46, 0.5),
+    rgba(27, 43, 94, 0.15)
+  );
+}
+
+.servicio-detalle-timeline-linea--navy {
+  background: linear-gradient(
+    to bottom,
+    rgba(230, 59, 46, 0.6),
+    rgba(255, 255, 255, 0.15)
+  );
+}
+
+.servicio-detalle-paso-horizontal::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--color-rojo-500);
+}

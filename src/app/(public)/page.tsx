@@ -82,13 +82,16 @@ export default async function HomePage() {
   ]);
 
   const serviciosHome = seleccionParaHome(servicios ?? []);
+  const serviciosAlfabetico = SERVICIOS_ALFABETICO.filter((s) => s.visible).sort(
+    (a, b) => a.sort_order - b.sort_order
+  );
 
   return (
     <div id="main-content">
       <HeroSection slides={slides} />
       <StatsSection />
       <ServicesSection servicios={serviciosHome} />
-      <ServiciosAlfabeticoSection servicios={SERVICIOS_ALFABETICO} />
+      <ServiciosAlfabeticoSection servicios={serviciosAlfabetico} />
       <BentoCtaRow />
       <TeamSection />
       <NewsSection />
