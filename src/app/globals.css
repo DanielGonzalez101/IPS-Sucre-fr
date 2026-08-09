@@ -2377,9 +2377,9 @@ html.a11y-font-2 { --a11y-font-scale: 1.2; }
 html.a11y-font-3 { --a11y-font-scale: 1.35; }
 html.a11y-font-4 { --a11y-font-scale: 1.5; }
 
-html[class*="a11y-font-"] body,
-html[class*="a11y-font-"] body * {
-  font-size: calc(1em * var(--a11y-font-scale)) !important;
+/* Escala el font-size raíz para que rem se propague proporcionalmente */
+html[class*="a11y-font-"] {
+  font-size: calc(16px * var(--a11y-font-scale)) !important;
 }
 
 /* Espacio entre líneas */
@@ -2481,11 +2481,12 @@ html.a11y-letra-legible body * {
 
 /* ── Resaltar enlaces ── */
 html.a11y-resaltar-enlaces a {
-  background-color: #ffff00 !important;
-  color: #000 !important;
   text-decoration: underline !important;
-  outline: 2px solid #000 !important;
+  text-underline-offset: 3px !important;
+  text-decoration-thickness: 2px !important;
+  outline: 2px solid #ffcc00 !important;
   outline-offset: 2px !important;
+  border-radius: 2px !important;
 }
 
 /* ── Resaltar títulos ── */
@@ -2495,10 +2496,8 @@ html.a11y-resaltar-titulos h3,
 html.a11y-resaltar-titulos h4,
 html.a11y-resaltar-titulos h5,
 html.a11y-resaltar-titulos h6 {
-  background-color: #002855 !important;
-  color: #fff !important;
-  padding: 4px 8px !important;
   border-left: 4px solid #ee3538 !important;
+  padding-left: 10px !important;
 }
 
 /* ── Modo legible (limpia estilos de fondo, tipografía serif clara) ── */
@@ -2577,10 +2576,18 @@ html.a11y-leer-enfoque .a11y-focus-target {
   height: 220px;
   border: 4px solid #08338f;
   border-radius: 50%;
+  overflow: hidden;
   pointer-events: none;
   z-index: 999999;
-  background-repeat: no-repeat;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), 0 0 0 2px #fff;
+}
+
+.a11y-magnifier-frame {
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+  border: none;
+  pointer-events: none;
 }
 
 /* ── Panel principal del widget ── */

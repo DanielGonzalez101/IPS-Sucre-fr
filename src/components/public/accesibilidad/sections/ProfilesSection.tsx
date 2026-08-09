@@ -9,11 +9,8 @@ const PROFILES: { key: ProfileKey; label: string }[] = [
   { key: "daltonismo", label: "Daltonismo" },
   { key: "visual", label: "Discapacidad visual" },
   { key: "epilepsia", label: "Epilepsia" },
-  { key: "tdah", label: "TDAH" },
-  { key: "aprendizaje", label: "Aprendizaje" },
   { key: "mayor", label: "Mayor" },
   { key: "dislexia", label: "Dislexia" },
-  { key: "wcag", label: "Hacer que el sitio web cumpla con WCAG" },
 ];
 
 export function ProfilesSection() {

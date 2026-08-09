@@ -8,7 +8,6 @@ const ITEMS: { key: keyof A11yState; label: string; icon: string }[] = [
   { key: "navTeclado", label: "Navegación con el teclado (Motorizada)", icon: "⌨️" },
   { key: "navInteligente", label: "Navegación inteligente", icon: "🎯" },
   { key: "lectorTexto", label: "Lector de texto", icon: "🔊" },
-  { key: "comandosVoz", label: "Comandos de voz", icon: "🎙️" },
 ];
 
 export function VoiceNavSection() {
