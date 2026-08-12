@@ -9,6 +9,8 @@ import {
   Bone,
   Waves,
   Microscope,
+  Scan,
+  DropHalf,
   MagnifyingGlass,
   type Icon,
 } from "@phosphor-icons/react";
@@ -21,6 +23,8 @@ const ICON_MAP: Record<string, Icon> = {
   Bone,
   Waves,
   Microscope,
+  Scan,
+  DropHalf,
 };
 
 interface Props {
@@ -60,44 +64,44 @@ export function ServiciosAlfabeticoResultados({ servicios }: Props) {
                 href={servicio.url ?? "/servicios"}
                 className="group participa-glass participa-glass--grid participa-glass--interactive rounded-2xl p-5 flex flex-col h-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
               >
-              <div className="flex items-start justify-between mb-3">
-                <div
-                  className="w-10 h-10 flex items-center justify-center"
-                  style={{ backgroundColor: "var(--color-azul-50)", borderRadius: "10px" }}
-                  aria-hidden="true"
-                >
-                  <Icon size={20} weight="duotone" style={{ color: "var(--color-azul-700)" }} />
+                <div className="flex items-start justify-between mb-3">
+                  <div
+                    className="w-10 h-10 flex items-center justify-center"
+                    style={{ backgroundColor: "var(--color-azul-50)", borderRadius: "10px" }}
+                    aria-hidden="true"
+                  >
+                    <Icon size={20} weight="duotone" style={{ color: "var(--color-azul-700)" }} />
+                  </div>
+                  <div
+                    className="w-7 h-7 flex items-center justify-center transition-colors duration-200 group-hover:bg-black"
+                    style={{ borderRadius: "50%", backgroundColor: "var(--color-gris-100)" }}
+                    aria-hidden="true"
+                  >
+                    <ArrowUpRight
+                      size={14}
+                      className="transition-colors duration-200 group-hover:text-white"
+                      style={{ color: "var(--color-gris-500)" }}
+                    />
+                  </div>
                 </div>
-                <div
-                  className="w-7 h-7 flex items-center justify-center transition-colors duration-200 group-hover:bg-black"
-                  style={{ borderRadius: "50%", backgroundColor: "var(--color-gris-100)" }}
-                  aria-hidden="true"
+
+                <p className="font-heading font-semibold text-sm leading-snug mb-1" style={{ color: "var(--color-azul-900)" }}>
+                  {servicio.nombre}
+                </p>
+                <p className="font-body text-xs mb-3" style={{ color: "var(--color-gris-500)" }}>
+                  {servicio.categoria}
+                </p>
+
+                <span
+                  className="mt-auto self-start font-mono text-[11px] px-2 py-0.5"
+                  style={{
+                    backgroundColor: "var(--color-gris-100)",
+                    color: "var(--color-gris-500)",
+                    borderRadius: "999px",
+                  }}
                 >
-                  <ArrowUpRight
-                    size={14}
-                    className="transition-colors duration-200 group-hover:text-white"
-                    style={{ color: "var(--color-gris-500)" }}
-                  />
-                </div>
-              </div>
-
-              <p className="font-heading font-semibold text-sm leading-snug mb-1" style={{ color: "var(--color-azul-900)" }}>
-                {servicio.nombre}
-              </p>
-              <p className="font-body text-xs mb-3" style={{ color: "var(--color-gris-500)" }}>
-                {servicio.categoria}
-              </p>
-
-              <span
-                className="mt-auto self-start font-mono text-[11px] px-2 py-0.5"
-                style={{
-                  backgroundColor: "var(--color-gris-100)",
-                  color: "var(--color-gris-500)",
-                  borderRadius: "999px",
-                }}
-              >
-                CUPS {servicio.codigoCups}
-              </span>
+                  CUPS {servicio.codigoCups}
+                </span>
               </Link>
             </div>
           );
