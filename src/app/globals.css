@@ -2274,6 +2274,17 @@ h6 {
   background: radial-gradient(circle, rgba(230, 59, 46, 0.12) 0%, transparent 70%);
 }
 
+/* Variante para secciones sobre fondo blanco puro (#fff): los blobs a
+   opacidad ≤15% quedan invisibles ahí, así que se refuerza el contraste
+   solo donde se usa esta clase modificadora. */
+.participa-section-blobs--contraste::before {
+  background: radial-gradient(circle, rgba(27, 43, 94, 0.22) 0%, transparent 70%);
+}
+
+.participa-section-blobs--contraste::after {
+  background: radial-gradient(circle, rgba(230, 59, 46, 0.2) 0%, transparent 70%);
+}
+
 /* ── Participa: campos del formulario dark glass ────── */
 .participa-dark-input {
   background-color: rgba(255, 255, 255, 0.1);

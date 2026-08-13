@@ -137,11 +137,12 @@ export function ServiciosAlfabeticoSection({ servicios }: Props) {
   return (
     <section
       ref={sectionRef}
+      id="encuentra-tu-servicio"
       className="relative py-16 md:py-24 overflow-hidden"
       style={{ backgroundColor: "#fff" }}
       aria-labelledby="servicios-alfabetico-title"
     >
-      <div className="participa-section-blobs" aria-hidden="true" />
+      <div className="participa-section-blobs participa-section-blobs--contraste" aria-hidden="true" />
 
       <div className="container-main relative z-10">
         <div className="servicios-alfabetico-heading mb-10">

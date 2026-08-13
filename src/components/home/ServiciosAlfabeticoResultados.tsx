@@ -50,7 +50,7 @@ export function ServiciosAlfabeticoResultados({ servicios }: Props) {
   }
 
   return (
-    <div className="max-h-[640px] overflow-y-auto pr-1">
+    <div className="max-h-[640px] overflow-y-auto px-1 pt-1 pb-4">
       <div
         className="servicios-alfabetico-grid grid sm:grid-cols-2 gap-4"
         role="list"
