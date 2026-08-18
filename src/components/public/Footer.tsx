@@ -154,6 +154,14 @@ export default function Footer({
                 </Link>
               </li>
             </ul>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/supersalud.png"
+              alt="Vigilado Supersalud"
+              width={180}
+              height={60}
+              className="object-contain mt-5"
+            />
           </div>
         </div>
 
