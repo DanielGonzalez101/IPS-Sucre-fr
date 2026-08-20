@@ -46,6 +46,7 @@ tsconfig.tsbuildinfo
 
 # Matriz de cumplimiento — archivo interno, no debe subirse
 .claude/formatoMatrizCumplimiento*.xlsx
+.claude/Matriz_Pendientes_by_ IPS-Bindeg.xlsx
 
 .claude
 .claude/
