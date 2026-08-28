@@ -154,14 +154,22 @@ export default function Footer({
                 </Link>
               </li>
             </ul>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/images/supersalud.png"
-              alt="Vigilado Supersalud"
-              width={180}
-              height={60}
-              className="object-contain mt-5"
-            />
+            <a
+              href="https://www.supersalud.gov.co"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Vigilado por la Superintendencia Nacional de Salud - Supersalud (abre en nueva pestaña)"
+              className="inline-block mt-5"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/supersalud.png"
+                alt="Vigilado Supersalud"
+                width={180}
+                height={60}
+                className="object-contain"
+              />
+            </a>
           </div>
         </div>
 

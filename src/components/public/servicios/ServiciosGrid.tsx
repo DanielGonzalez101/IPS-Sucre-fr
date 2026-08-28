@@ -1,24 +1,29 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "@/lib/gsap";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import ServicioCard, { type ServicioCardData } from "./ServicioCard";
+
+const PAGE_SIZE = 9;
 
 type Filtro =
   | "todos"
   | "Cardiología Pediátrica"
   | "Cardiología Adultos"
-  | "Gastroenterología Pediátrica"
+  | "Gastroenterología"
   | "Diagnóstico por Imágenes";
 
 const FILTROS: { value: Filtro; label: string }[] = [
-  { value: "todos", label: "Todos" },
-  { value: "Cardiología Pediátrica", label: "Cardiología Pediátrica" },
-  { value: "Cardiología Adultos", label: "Cardiología Adultos" },
-  { value: "Gastroenterología Pediátrica", label: "Gastroenterología Pediátrica" },
+  { value: "todos",                    label: "Todos" },
+  { value: "Cardiología Pediátrica",   label: "Cardiología Pediátrica" },
+  { value: "Cardiología Adultos",      label: "Cardiología Adultos" },
+  { value: "Gastroenterología",        label: "Gastroenterología" },
   { value: "Diagnóstico por Imágenes", label: "Diagnóstico por Imágenes" },
 ];
+
+const PREFIJOS_DIAGNOSTICO = ["Radiología", "Mamografía", "Tomografía", "Ecografías", "Estudios"];
 
 interface ServicioConCategoria extends ServicioCardData {
   categoria: string;
@@ -31,15 +36,32 @@ interface ServiciosGridProps {
 
 export default function ServiciosGrid({ servicios }: ServiciosGridProps) {
   const [filtro, setFiltro] = useState<Filtro>("todos");
+  const [pagina, setPagina] = useState(1);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const serviciosFiltrados = useMemo(() => {
-    const lista =
-      filtro === "todos"
-        ? servicios
-        : servicios.filter((s) => s.categoria.startsWith(filtro));
+    let lista: ServicioConCategoria[];
+    if (filtro === "todos") {
+      lista = servicios;
+    } else if (filtro === "Diagnóstico por Imágenes") {
+      lista = servicios.filter((s) =>
+        PREFIJOS_DIAGNOSTICO.some((p) => s.categoria.startsWith(p))
+      );
+    } else {
+      lista = servicios.filter((s) => s.categoria.startsWith(filtro));
+    }
     return [...lista].sort((a, b) => a.orden - b.orden);
   }, [servicios, filtro]);
+
+  const totalPaginas = Math.max(1, Math.ceil(serviciosFiltrados.length / PAGE_SIZE));
+
+  const serviciosPagina = useMemo(
+    () => serviciosFiltrados.slice((pagina - 1) * PAGE_SIZE, pagina * PAGE_SIZE),
+    [serviciosFiltrados, pagina]
+  );
+
+  // Resetea a página 1 cuando cambia el filtro de categoría
+  useEffect(() => { setPagina(1); }, [filtro]);
 
   useGSAP(
     () => {
@@ -58,7 +80,7 @@ export default function ServiciosGrid({ servicios }: ServiciosGridProps) {
         },
       });
     },
-    { scope: containerRef, dependencies: [filtro] }
+    { scope: containerRef, dependencies: [filtro, pagina] }
   );
 
   return (
@@ -117,18 +139,64 @@ export default function ServiciosGrid({ servicios }: ServiciosGridProps) {
 
         <div
           ref={containerRef}
-          key={filtro}
+          key={`${filtro}-${pagina}`}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
         >
-          {serviciosFiltrados.map((servicio, index) => (
+          {serviciosPagina.map((servicio, index) => (
             <ServicioCard
               key={servicio.id}
               servicio={servicio}
-              index={index}
-              featured={index === 0}
+              index={(pagina - 1) * PAGE_SIZE + index}
+              featured={pagina === 1 && index === 0}
             />
           ))}
         </div>
+
+        {totalPaginas > 1 && (
+          <div className="flex items-center justify-center gap-3 mt-12">
+            <button
+              type="button"
+              onClick={() => setPagina((p) => Math.max(1, p - 1))}
+              disabled={pagina === 1}
+              aria-label="Página anterior"
+              className="w-10 h-10 flex items-center justify-center rounded-full border-2 transition-all duration-150 disabled:opacity-40 disabled:pointer-events-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+              style={{ borderColor: "var(--color-azul-200)", color: "var(--color-azul-800)" }}
+            >
+              <ChevronLeft size={16} />
+            </button>
+
+            <div className="flex items-center gap-1.5">
+              {Array.from({ length: totalPaginas }, (_, i) => i + 1).map((n) => (
+                <button
+                  key={n}
+                  type="button"
+                  onClick={() => setPagina(n)}
+                  aria-label={`Página ${n}`}
+                  aria-current={pagina === n ? "page" : undefined}
+                  className="w-9 h-9 flex items-center justify-center rounded-full font-heading font-semibold text-sm transition-all duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+                  style={
+                    pagina === n
+                      ? { backgroundColor: "var(--color-azul-900)", color: "#fff" }
+                      : { backgroundColor: "transparent", color: "var(--color-azul-700)" }
+                  }
+                >
+                  {n}
+                </button>
+              ))}
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setPagina((p) => Math.min(totalPaginas, p + 1))}
+              disabled={pagina === totalPaginas}
+              aria-label="Página siguiente"
+              className="w-10 h-10 flex items-center justify-center rounded-full border-2 transition-all duration-150 disabled:opacity-40 disabled:pointer-events-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+              style={{ borderColor: "var(--color-azul-200)", color: "var(--color-azul-800)" }}
+            >
+              <ChevronRight size={16} />
+            </button>
+          </div>
+        )}
       </div>
     </section>
   );
