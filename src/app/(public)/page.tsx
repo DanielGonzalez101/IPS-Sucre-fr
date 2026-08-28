@@ -10,9 +10,8 @@ import { TeamSection }    from "@/components/home/TeamSection";
 import { NewsSection }     from "@/components/home/NewsSection";
 import { SedesSection }    from "@/components/home/SedesSection";
 import { CoberturaRegional } from "@/components/home/CoberturaRegional";
-import { getServiciosPublicos } from "@/actions/servicios";
+import { getServiciosPublicos, getServiciosCatalogo } from "@/actions/servicios";
 import { getSedes } from "@/actions/sitio";
-import { SERVICIOS_ALFABETICO } from "@/data/servicios-alfabetico";
 
 export const dynamic = "force-dynamic";
 
@@ -61,11 +60,11 @@ async function getHeroSlides(): Promise<HeroSlide[]> {
 }
 
 // Selección acotada para el Home — la grilla completa vive en /servicios.
-// Mantiene el orden dentro de cada categoría (campo `orden`, ya viene
-// ordenado por getServiciosPublicos()).
-function seleccionParaHome<T extends { categoria: string }>(servicios: T[]): T[] {
+// Filtra solo servicios destacados (descripcion no vacía) para no mezclar con el catálogo CUPS.
+function seleccionParaHome<T extends { categoria: string; descripcion: string }>(servicios: T[]): T[] {
+  const destacados = servicios.filter((s) => s.descripcion !== "");
   const tomar = (categoria: string, cantidad: number) =>
-    servicios.filter((s) => s.categoria === categoria).slice(0, cantidad);
+    destacados.filter((s) => s.categoria === categoria).slice(0, cantidad);
 
   return [
     ...tomar("Cardiología Pediátrica", 3),
@@ -75,16 +74,15 @@ function seleccionParaHome<T extends { categoria: string }>(servicios: T[]): T[]
 }
 
 export default async function HomePage() {
-  const [slides, { data: servicios }, { data: sedes }] = await Promise.all([
+  const [slides, { data: servicios }, { data: sedes }, { data: catalogo }] = await Promise.all([
     getHeroSlides(),
     getServiciosPublicos(),
     getSedes(),
+    getServiciosCatalogo(),
   ]);
 
   const serviciosHome = seleccionParaHome(servicios ?? []);
-  const serviciosAlfabetico = SERVICIOS_ALFABETICO.filter((s) => s.visible).sort(
-    (a, b) => a.sort_order - b.sort_order
-  );
+  const serviciosAlfabetico = catalogo;
 
   return (
     <div id="main-content">

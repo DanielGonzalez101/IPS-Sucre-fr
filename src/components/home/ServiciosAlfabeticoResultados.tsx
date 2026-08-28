@@ -14,7 +14,7 @@ import {
   MagnifyingGlass,
   type Icon,
 } from "@phosphor-icons/react";
-import type { ServicioAlfabetico } from "@/data/servicios-alfabetico";
+import type { ServicioCatalogo } from "@/actions/servicios";
 
 const ICON_MAP: Record<string, Icon> = {
   Stethoscope,
@@ -28,10 +28,13 @@ const ICON_MAP: Record<string, Icon> = {
 };
 
 interface Props {
-  servicios: ServicioAlfabetico[];
+  servicios: ServicioCatalogo[];
+  total: number;
+  mostrados: number;
+  onVerMas?: () => void;
 }
 
-export function ServiciosAlfabeticoResultados({ servicios }: Props) {
+export function ServiciosAlfabeticoResultados({ servicios, total, mostrados, onVerMas }: Props) {
   if (servicios.length === 0) {
     return (
       <div
@@ -49,8 +52,10 @@ export function ServiciosAlfabeticoResultados({ servicios }: Props) {
     );
   }
 
+  const restantes = total - mostrados;
+
   return (
-    <div className="max-h-[640px] overflow-y-auto pr-1">
+    <div className="flex flex-col gap-4">
       <div
         className="servicios-alfabetico-grid grid sm:grid-cols-2 gap-4"
         role="list"
@@ -61,7 +66,7 @@ export function ServiciosAlfabeticoResultados({ servicios }: Props) {
           return (
             <div key={servicio.id} role="listitem" className="servicios-alfabetico-card">
               <Link
-                href={servicio.url ?? "/servicios"}
+                href={`/servicios/catalogo/${servicio.slug}`}
                 className="group participa-glass participa-glass--grid participa-glass--interactive rounded-2xl p-5 flex flex-col h-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
               >
                 <div className="flex items-start justify-between mb-3">
@@ -86,27 +91,39 @@ export function ServiciosAlfabeticoResultados({ servicios }: Props) {
                 </div>
 
                 <p className="font-heading font-semibold text-sm leading-snug mb-1" style={{ color: "var(--color-azul-900)" }}>
-                  {servicio.nombre}
+                  {servicio.titulo}
                 </p>
-                <p className="font-body text-xs mb-3" style={{ color: "var(--color-gris-500)" }}>
+                <p className="font-body text-xs" style={{ color: "var(--color-gris-500)" }}>
                   {servicio.categoria}
                 </p>
-
-                <span
-                  className="mt-auto self-start font-mono text-[11px] px-2 py-0.5"
-                  style={{
-                    backgroundColor: "var(--color-gris-100)",
-                    color: "var(--color-gris-500)",
-                    borderRadius: "999px",
-                  }}
-                >
-                  CUPS {servicio.codigoCups}
-                </span>
               </Link>
             </div>
           );
         })}
       </div>
+
+      {onVerMas && (
+        <div className="flex items-center justify-center pt-2">
+          <button
+            type="button"
+            onClick={onVerMas}
+            className="font-heading font-semibold text-sm px-6 py-2.5 rounded-full border-2 transition-all duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+            style={{
+              borderColor: "var(--color-azul-200)",
+              color: "var(--color-azul-800)",
+              backgroundColor: "transparent",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = "var(--color-azul-50)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = "transparent";
+            }}
+          >
+            Ver {restantes > 12 ? 12 : restantes} más de {total}
+          </button>
+        </div>
+      )}
     </div>
   );
 }

@@ -32,6 +32,30 @@ export async function getServiciosPublicos() {
   return { data: data ?? [], error: null };
 }
 
+export interface ServicioCatalogo {
+  id: string;
+  titulo: string;
+  categoria: string;
+  icono: string;
+  slug: string;
+  orden: number;
+}
+
+// Catálogo completo de servicios (208 registros CUPS).
+// Se distingue de los servicios destacados por descripcion = ''.
+export async function getServiciosCatalogo(): Promise<{ data: ServicioCatalogo[]; error: string | null }> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("servicios")
+    .select("id, titulo, categoria, icono, slug, orden")
+    .eq("activo", true)
+    .eq("descripcion", "")
+    .order("orden");
+
+  if (error) return { data: [], error: error.message };
+  return { data: (data ?? []) as ServicioCatalogo[], error: null };
+}
+
 export async function createServicio(fields: {
   titulo: string;
   categoria: string;

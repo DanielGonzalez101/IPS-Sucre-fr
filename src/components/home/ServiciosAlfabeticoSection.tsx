@@ -6,58 +6,85 @@ import { gsap } from "@/lib/gsap";
 import { CursorClick } from "@phosphor-icons/react";
 import { ServiciosAlfabeticoFiltro } from "./ServiciosAlfabeticoFiltro";
 import { ServiciosAlfabeticoResultados } from "./ServiciosAlfabeticoResultados";
-import type { ServicioAlfabetico } from "@/data/servicios-alfabetico";
+import type { ServicioCatalogo } from "@/actions/servicios";
+
+const PAGE_SIZE = 12;
+
+function normalizarTexto(s: string): string {
+  return s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
+}
+
+function derivarLetra(titulo: string): string {
+  return normalizarTexto(titulo).charAt(0).toUpperCase();
+}
 
 interface Props {
-  servicios: ServicioAlfabetico[];
+  servicios: ServicioCatalogo[] | null;
 }
 
 export function ServiciosAlfabeticoSection({ servicios }: Props) {
+  const lista = servicios ?? [];
   const sectionRef = useRef<HTMLDivElement>(null);
   const resultadosRef = useRef<HTMLDivElement>(null);
 
   const [letraActiva, setLetraActiva] = useState<string | null>(null);
   const [busquedaInput, setBusquedaInput] = useState("");
   const [busqueda, setBusqueda] = useState("");
+  const [pagina, setPagina] = useState(1);
 
   useEffect(() => {
-    const timeout = setTimeout(() => setBusqueda(busquedaInput.trim().toLowerCase()), 200);
+    const timeout = setTimeout(() => setBusqueda(normalizarTexto(busquedaInput)), 200);
     return () => clearTimeout(timeout);
   }, [busquedaInput]);
 
   const handleLetraChange = (letra: string | null) => {
     setLetraActiva(letra);
+    setPagina(1);
     if (letra) setBusquedaInput("");
   };
 
   const handleBusquedaChange = (valor: string) => {
     setBusquedaInput(valor);
+    setPagina(1);
     if (valor) setLetraActiva(null);
   };
 
   const letras = useMemo(
-    () => Array.from(new Set(servicios.map((s) => s.letra))).sort(),
-    [servicios]
+    () => Array.from(new Set(lista.map((s) => derivarLetra(s.titulo)))).sort(),
+    [lista]
   );
 
   const interactuando = letraActiva !== null || busqueda.length > 0;
 
   const resultados = useMemo(() => {
     const filtrados = letraActiva
-      ? servicios.filter((s) => s.letra === letraActiva)
+      ? lista.filter((s) => derivarLetra(s.titulo) === letraActiva)
       : busqueda
-        ? servicios.filter((s) => s.nombre.toLowerCase().includes(busqueda))
+        ? lista.filter((s) => normalizarTexto(s.titulo).includes(busqueda))
         : [];
-    return [...filtrados].sort((a, b) => a.nombre.localeCompare(b.nombre, "es"));
-  }, [servicios, letraActiva, busqueda]);
+    return [...filtrados].sort((a, b) => a.titulo.localeCompare(b.titulo, "es"));
+  }, [lista, letraActiva, busqueda]);
 
-  const [resultadosCongelados, setResultadosCongelados] = useState<ServicioAlfabetico[]>([]);
+  // Reset page when results change (nueva letra o búsqueda)
+  useEffect(() => { setPagina(1); }, [resultados]);
+
+  const resultadosVisibles = useMemo(
+    () => resultados.slice(0, pagina * PAGE_SIZE),
+    [resultados, pagina]
+  );
+  const hayMas = resultados.length > pagina * PAGE_SIZE;
+
+  const [resultadosCongelados, setResultadosCongelados] = useState<ServicioCatalogo[]>([]);
+  const [paginaCongelada, setPaginaCongelada] = useState(1);
   const [panelVisible, setPanelVisible] = useState(interactuando);
   const estabaInteractuandoRef = useRef(interactuando);
 
   useEffect(() => {
-    if (interactuando) setResultadosCongelados(resultados);
-  }, [resultados, interactuando]);
+    if (interactuando) {
+      setResultadosCongelados(resultadosVisibles);
+      setPaginaCongelada(pagina);
+    }
+  }, [resultadosVisibles, interactuando, pagina]);
 
   useEffect(() => {
     if (interactuando) {
@@ -129,10 +156,14 @@ export function ServiciosAlfabeticoSection({ servicios }: Props) {
         { opacity: 1, y: 0, duration: 0.35, stagger: 0.04, ease: "power2.out" }
       );
     },
-    { dependencies: [resultados, interactuando], scope: resultadosRef }
+    { dependencies: [resultadosVisibles, interactuando], scope: resultadosRef }
   );
 
-  if (servicios.length === 0) return null;
+  if (lista.length === 0) return null;
+
+  const visibles = interactuando ? resultadosVisibles : resultadosCongelados;
+  const totalResultados = resultados.length;
+  const mostradosHasta = interactuando ? pagina * PAGE_SIZE : paginaCongelada * PAGE_SIZE;
 
   return (
     <section
@@ -178,7 +209,10 @@ export function ServiciosAlfabeticoSection({ servicios }: Props) {
           <div ref={resultadosRef} className="servicios-alfabetico-panel">
             {panelVisible ? (
               <ServiciosAlfabeticoResultados
-                servicios={interactuando ? resultados : resultadosCongelados}
+                servicios={visibles}
+                total={totalResultados}
+                mostrados={Math.min(mostradosHasta, totalResultados)}
+                onVerMas={hayMas && interactuando ? () => setPagina((p) => p + 1) : undefined}
               />
             ) : (
               <div
