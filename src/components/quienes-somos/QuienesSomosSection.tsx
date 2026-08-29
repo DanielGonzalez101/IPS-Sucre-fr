@@ -4,15 +4,13 @@ import { useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
-  Eye,
   Building2,
   Users,
   Award,
   Handshake,
 } from "lucide-react";
-import { Compass } from "@phosphor-icons/react";
 import { useGSAP } from "@gsap/react";
-import { gsap } from "@/lib/gsap";
+import { gsap, ScrollTrigger, SplitText } from "@/lib/gsap";
 
 const stats = [
   { value: 15,    suffix: "+", label: "Años de experiencia", icon: Award },
@@ -21,7 +19,8 @@ const stats = [
   { value: 19,    suffix: "",  label: "Entidades en convenio", icon: Handshake },
 ];
 
-const timeline = [
+// 2010–2017: hitos fundacionales — efecto llamativo (sticky stack pineado).
+const timelineStack = [
   {
     year: "2010",
     text: "Inicia como consultorio en Sincelejo con el Dr. Leandro Ruiz Moreno en cardiología pediátrica.",
@@ -40,6 +39,20 @@ const timeline = [
   },
 ];
 
+// 2018–2026: grilla compacta, sin pin — placeholders de ejemplo a
+// reemplazar con el texto real de cada año.
+const timelineRecent = [
+  { year: "2018", text: "Se incorpora un nuevo equipo de ecocardiografía Doppler color, ampliando la capacidad diagnóstica para cardiopatías congénitas." },
+  { year: "2019", text: "Inicia el convenio con nuevas EPS de la región, ampliando la cobertura de atención para familias de Sucre y Bolívar." },
+  { year: "2020", text: "Se adaptan los protocolos de atención con medidas de bioseguridad reforzadas para garantizar la continuidad del servicio." },
+  { year: "2021", text: "Se abre la segunda sede en El Carmen de Bolívar, acercando la atención especializada a más municipios de la región." },
+  { year: "2022", text: "Se implementa el sistema de agendamiento de citas en línea, facilitando el acceso de los pacientes al servicio." },
+  { year: "2023", text: "Se incorpora un nuevo especialista en radiología pediátrica, fortaleciendo el equipo de diagnóstico por imágenes." },
+  { year: "2024", text: "Se abre la tercera sede en Magangué, consolidando la presencia del Cardiocentro en tres municipios de la región." },
+  { year: "2025", text: "Se renueva el equipo de rayos X digital, mejorando la calidad y el tiempo de entrega de los estudios." },
+  { year: "2026", text: "Se lanza el nuevo portal web institucional, con módulo de PQRSD y consulta de citas en línea para los usuarios." },
+];
+
 export default function QuienesSomosSection() {
   const containerRef = useRef<HTMLElement>(null);
 
@@ -54,18 +67,46 @@ export default function QuienesSomosSection() {
         return;
       }
 
-      gsap.set(".mision-icon-wrap", { opacity: 0, scale: 0.6, rotate: -35 });
-      gsap.to(".mision-icon-wrap", {
-        opacity: 1,
-        scale: 1,
-        rotate: 0,
-        duration: 0.7,
-        ease: "back.out(1.7)",
-        scrollTrigger: {
-          trigger: ".mision-card",
-          start: "top 85%",
-        },
-      });
+      // Misión — reveal palabra por palabra: cada palabra pasa de opacidad
+      // tenue a opacidad plena en scrub, como si el texto "se encendiera"
+      // a medida que se hace scroll. Distinto del split-por-líneas de Visión.
+      const misionStatement = document.querySelector<HTMLElement>(".mision-statement");
+      if (misionStatement) {
+        gsap.set(".mision-word", { opacity: 0.15 });
+        gsap.to(".mision-word", {
+          opacity: 1,
+          stagger: 0.04,
+          ease: "none",
+          scrollTrigger: {
+            trigger: misionStatement,
+            start: "top 75%",
+            end: "top 20%",
+            scrub: true,
+          },
+        });
+
+        gsap.set([".mision-eyebrow", ".mision-detail"], { opacity: 0, y: 16 });
+        gsap.to(".mision-eyebrow", {
+          opacity: 1,
+          y: 0,
+          duration: 0.5,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: misionStatement,
+            start: "top 80%",
+          },
+        });
+        gsap.to(".mision-detail", {
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: ".mision-detail",
+            start: "top 88%",
+          },
+        });
+      }
 
       gsap.set(".stat-fade", { opacity: 0, y: 24 });
       gsap.to(".stat-fade", {
@@ -112,6 +153,93 @@ export default function QuienesSomosSection() {
           start: "top 90%",
         },
       });
+
+      // Line split on scroll — responsive: SplitText recalcula las líneas
+      // automáticamente si cambia el ancho del contenedor (autoSplit).
+      const visionParagraph = document.querySelector<HTMLElement>(".vision-paragraph");
+      if (visionParagraph) {
+        SplitText.create(visionParagraph, {
+          type: "lines",
+          linesClass: "vision-line",
+          autoSplit: true,
+          mask: "lines",
+          onSplit(self) {
+            gsap.set(self.lines, { yPercent: 110, opacity: 0 });
+            return gsap.to(self.lines, {
+              yPercent: 0,
+              opacity: 1,
+              duration: 0.7,
+              stagger: 0.12,
+              ease: "power3.out",
+              scrollTrigger: {
+                trigger: visionParagraph,
+                start: "top 88%",
+              },
+            });
+          },
+        });
+      }
+
+      // Paneles apilados (sticky stack): cada card se pinea al tope del
+      // viewport y se queda fija mientras la siguiente sube por encima y
+      // la cubre. z-index creciente + leve scale/oscurecido dan la
+      // sensación de profundidad del apilado.
+      //
+      // El scroll POR CARD se calcula a partir de un total fijo para toda
+      // la sección (no un % fijo por card) — así, si se agregan o quitan
+      // hitos con el tiempo, el recorrido total de la sección no crece:
+      // solo se reparte entre más o menos paneles.
+      const historiaCards = gsap.utils.toArray<HTMLElement>(".historia-card");
+      if (historiaCards.length > 0) {
+        const HISTORIA_TOTAL_VH = 180; // % de alto de viewport para TODA la sección
+        const perCard = HISTORIA_TOTAL_VH / historiaCards.length;
+
+        historiaCards.forEach((card, i) => {
+          const isLast = i === historiaCards.length - 1;
+
+          // Cada card pinea por su porción de la distancia total y SIEMPRE
+          // reserva su propio spacer (pinSpacing) — así el layout de las
+          // secciones siguientes (Trayectoria, Visión) nunca colapsa ni
+          // se recalcula mal.
+          ScrollTrigger.create({
+            trigger: card,
+            start: "top top",
+            end: isLast ? "+=10%" : `+=${perCard}%`,
+            pin: true,
+            pinSpacing: true,
+          });
+
+          if (!isLast) {
+            gsap.to(card, {
+              scale: 0.94,
+              opacity: 0.5,
+              ease: "none",
+              scrollTrigger: {
+                trigger: historiaCards[i + 1],
+                start: "top bottom",
+                end: "top top",
+                scrub: true,
+              },
+            });
+          }
+        });
+      }
+
+      // Historia reciente — reveal ligero por scroll normal (sin pin, sin
+      // scrub): no consume distancia de scroll extra, cada item aparece al
+      // entrar en viewport.
+      gsap.set(".historia-recent-item", { opacity: 0, y: 20 });
+      gsap.to(".historia-recent-item", {
+        opacity: 1,
+        y: 0,
+        duration: 0.5,
+        stagger: 0.08,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: ".historia-recent",
+          start: "top 85%",
+        },
+      });
     },
     { scope: containerRef }
   );
@@ -127,17 +255,6 @@ export default function QuienesSomosSection() {
 
         {/* ── Bloque 1: Encabezado ── */}
         <div className="mb-10 md:mb-14">
-          <span
-            className="inline-flex items-center gap-1.5 font-heading font-semibold text-sm px-4 py-1.5 mb-4"
-            style={{
-              backgroundColor: "var(--color-azul-100)",
-              color: "var(--color-azul-800)",
-              borderRadius: "999px",
-            }}
-          >
-            + Quiénes Somos
-          </span>
-
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
             <h1
               id="quienes-somos-title"
@@ -210,133 +327,122 @@ export default function QuienesSomosSection() {
             </div>
           </div>
 
-          {/* Card C — Misión (col-span-5) */}
-          <div
-            className="mision-card col-span-12 md:col-span-5 flex flex-col p-7 md:p-8 relative overflow-hidden transition-all duration-300 hover:-translate-y-1"
-            style={{
-              borderRadius: "1.5rem",
-              backgroundColor: "#fff",
-              border: "1px solid var(--color-gris-200)",
-              boxShadow: "var(--shadow-card)",
-            }}
-          >
-            <div
-              className="mision-icon-wrap w-14 h-14 flex items-center justify-center mb-5 relative transition-transform duration-500"
-              style={{
-                backgroundColor: "var(--color-azul-50)",
-                borderRadius: "16px",
-              }}
-              aria-hidden="true"
-            >
-              <Compass size={28} weight="duotone" style={{ color: "var(--color-azul-700)" }} />
-            </div>
-
-            <span
-              className="inline-flex items-center gap-1.5 font-heading font-semibold text-xs px-3 py-1.5 mb-3 self-start"
-              style={{
-                backgroundColor: "var(--color-azul-100)",
-                color: "var(--color-azul-800)",
-                borderRadius: "999px",
-              }}
-            >
-              + Misión
-            </span>
-
-            <h2
-              className="font-heading font-bold text-xl mb-3"
-              style={{ color: "var(--color-azul-900)" }}
-            >
-              Misión
-            </h2>
-
-            <p
-              className="font-body text-sm leading-relaxed"
-              style={{ color: "var(--color-gris-700)" }}
-            >
-              Somos una organización que nos apasiona ofrecer un excelente servicio en la atención especializada en
-              Cardiología Pediátrica, Radiología, y Diagnóstico por imágenes; que cuenta con un talento humano capacitado,
-              íntegro y comprometido con las actividades que se realizan, ofreciendo servicios de calidad y logrando
-              diagnósticos confiables y oportunos, caracterizada por el más alto desarrollo profesional y tecnológico.
-            </p>
-          </div>
-
-          {/* Card D — Reseña Histórica / Timeline (col-span-7) */}
-          <div
-            className="col-span-12 md:col-span-7 p-7 md:p-8 transition-transform duration-200 hover:scale-[1.01]"
-            style={{
-              borderRadius: "1.5rem",
-              backgroundColor: "var(--color-gris-50)",
-              border: "1px solid var(--color-gris-200)",
-            }}
-          >
-            <span
-              className="inline-flex items-center gap-1.5 font-heading font-semibold text-xs px-3 py-1.5 mb-4 self-start"
-              style={{
-                backgroundColor: "var(--color-azul-100)",
-                color: "var(--color-azul-800)",
-                borderRadius: "999px",
-              }}
-            >
-              + Reseña histórica
-            </span>
-
-            <h2
-              className="font-heading font-bold text-xl mb-6"
-              style={{ color: "var(--color-azul-900)" }}
-            >
-              Nuestra historia
-            </h2>
-
-            {/* Timeline vertical en mobile, grid simétrico horizontal en desktop */}
-            <div className="flex flex-col md:grid md:grid-cols-4 md:gap-4 relative">
-              {/* Línea conectora continua — solo desktop, detrás de los puntos */}
-              <div
-                className="hidden md:block absolute top-1.5 left-0 right-0 h-px"
-                style={{ backgroundColor: "var(--color-gris-300)" }}
-                aria-hidden="true"
-              />
-
-              {timeline.map((hito, i) => (
-                <div key={hito.year} className="flex flex-row md:flex-col relative">
-
-                  {/* Punto + línea vertical (mobile) */}
-                  <div className="flex flex-col md:block items-center mr-4 md:mr-0 md:mb-4">
-                    <div
-                      className="w-3 h-3 rounded-full shrink-0 z-10 relative"
-                      style={{ backgroundColor: "var(--color-rojo-500)" }}
-                      aria-hidden="true"
-                    />
-                    {i < timeline.length - 1 && (
-                      <div
-                        className="md:hidden flex-1 w-px"
-                        style={{ backgroundColor: "var(--color-gris-300)" }}
-                        aria-hidden="true"
-                      />
-                    )}
-                  </div>
-
-                  {/* Contenido del hito */}
-                  <div className="pb-6 md:pb-0">
-                    <p
-                      className="font-heading font-black text-xl md:text-2xl leading-none mb-1.5"
-                      style={{ color: "var(--color-rojo-500)" }}
-                    >
-                      {hito.year}
-                    </p>
-                    <p
-                      className="font-body text-sm leading-relaxed"
-                      style={{ color: "var(--color-gris-700)" }}
-                    >
-                      {hito.text}
-                    </p>
-                  </div>
-
-                </div>
-              ))}
-            </div>
-          </div>
-
         </div>{/* fin bento grid */}
+      </div>
+
+      {/* ── Bloque 2.3: Misión — statement editorial centrado, fondo blanco ── */}
+      <div className="mision-statement">
+        <div className="container-main">
+          <p className="mision-eyebrow">— Misión</p>
+          <p className="mision-quote">
+            <span className="mision-word">Somos</span>{" "}
+            <span className="mision-word">una</span>{" "}
+            <span className="mision-word">organización</span>{" "}
+            <span className="mision-word">que</span>{" "}
+            <span className="mision-word">nos</span>{" "}
+            <span className="mision-word mision-word--accent">apasiona</span>{" "}
+            <span className="mision-word">ofrecer</span>{" "}
+            <span className="mision-word">un</span>{" "}
+            <span className="mision-word">excelente</span>{" "}
+            <span className="mision-word">servicio</span>{" "}
+            <span className="mision-word">en</span>{" "}
+            <span className="mision-word">la</span>{" "}
+            <span className="mision-word">atención</span>{" "}
+            <span className="mision-word">especializada</span>{" "}
+            <span className="mision-word">en</span>{" "}
+            <span className="mision-word">Cardiología</span>{" "}
+            <span className="mision-word">Pediátrica,</span>{" "}
+            <span className="mision-word">Radiología</span>{" "}
+            <span className="mision-word">y</span>{" "}
+            <span className="mision-word">Diagnóstico</span>{" "}
+            <span className="mision-word">por</span>{" "}
+            <span className="mision-word">imágenes.</span>
+          </p>
+          <p className="mision-detail">
+            Contamos con un talento humano capacitado, íntegro y comprometido con las actividades que se
+            realizan, ofreciendo servicios de calidad y logrando diagnósticos confiables y oportunos,
+            caracterizada por el más alto desarrollo profesional y tecnológico.
+          </p>
+        </div>
+      </div>
+
+      {/* ── Bloque 2.4: Reseña histórica — paneles apilados (sticky stack) en scroll vertical ── */}
+      <div className="historia-section">
+        <div className="container-main historia-header">
+          {/* <span
+            className="inline-flex items-center gap-1.5 font-heading font-semibold text-xs px-3 py-1.5 mb-4"
+            style={{
+              backgroundColor: "var(--color-azul-100)",
+              color: "var(--color-azul-800)",
+              borderRadius: "999px",
+            }}
+          >
+            + Reseña histórica
+          </span> */}
+
+          <h2
+            className="font-heading font-bold text-2xl mb-3"
+            style={{ color: "var(--color-azul-900)" }}
+          >
+            Nuestra historia
+          </h2>
+          <p className="font-body text-sm mb-4 text-center" style={{ color: "var(--color-gris-500)" }}>
+            Desplázate para recorrer la línea de tiempo ↓
+          </p>
+        </div>
+
+        <div role="list" aria-label="Línea de tiempo de hitos fundacionales de la institución">
+          {timelineStack.map((hito, i) => (
+            <div
+              key={hito.year}
+              className="historia-card"
+              role="listitem"
+              style={{ zIndex: i + 1 }}
+            >
+              <div className="container-main historia-card-inner">
+                <span className="historia-card-index">
+                  {String(i + 1).padStart(2, "0")}/{String(timelineStack.length).padStart(2, "0")}
+                </span>
+                <p className="historia-card-year" aria-hidden="true">{hito.year}</p>
+                <div className="historia-card-body">
+                  <p className="historia-card-year-small">{hito.year}</p>
+                  <p className="historia-card-text">{hito.text}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Bloque 2.45: Historia reciente — grilla compacta, sin pin, sección propia ── */}
+      <div className="historia-recent">
+        <div className="container-main">
+          {/* <span
+            className="inline-flex items-center gap-1.5 font-heading font-semibold text-xs px-3 py-1.5 mb-4"
+            style={{
+              backgroundColor: "var(--color-azul-100)",
+              color: "var(--color-azul-800)",
+              borderRadius: "999px",
+            }}
+          >
+            Últimos años
+          </span> */}
+          <h2
+            className="font-heading font-bold text-2xl mb-8"
+            style={{ color: "var(--color-azul-900)" }}
+          >
+            Seguimos creciendo
+          </h2>
+
+          <div className="historia-recent-grid" role="list" aria-label="Línea de tiempo reciente de la institución">
+            {timelineRecent.map((hito) => (
+              <div key={hito.year} className="historia-recent-item" role="listitem">
+                <p className="historia-recent-year">{hito.year}</p>
+                <p className="historia-recent-text">{hito.text}</p>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* ── Bloque 2.5: Nuestra trayectoria en números ── */}
@@ -398,13 +504,6 @@ export default function QuienesSomosSection() {
             className="flex-1 md:pr-8 md:border-r"
             style={{ borderColor: "var(--color-gris-200)" }}
           >
-            <div className="vision-fade flex items-center gap-2 mb-4">
-              <Eye className="w-6 h-6" aria-hidden="true" style={{ color: "var(--color-azul-900)" }} />
-              <span className="font-heading font-medium text-sm" style={{ color: "var(--color-rojo-500)" }}>
-                + Visión
-              </span>
-            </div>
-
             <h2
               className="vision-fade font-heading font-bold text-2xl mb-4"
               style={{ color: "var(--color-azul-900)" }}
@@ -413,7 +512,7 @@ export default function QuienesSomosSection() {
             </h2>
 
             <p
-              className="vision-fade font-body text-base leading-relaxed"
+              className="vision-paragraph font-body text-base leading-relaxed"
               style={{ color: "var(--color-gris-600)" }}
             >
               En el año {new Date().getFullYear()} seremos una empresa sólida y reconocida por la excelente prestación de servicio en la

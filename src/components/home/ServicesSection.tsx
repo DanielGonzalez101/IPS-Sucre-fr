@@ -149,7 +149,7 @@ export function ServicesSection({ servicios }: Props) {
                 borderRadius: "999px",
               }}
             >
-              + Servicios
+              Servicios
             </span>
             <h2
               id="services-title"

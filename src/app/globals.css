@@ -901,6 +901,195 @@ h6 {
   background-color: var(--color-rojo-600);
 }
 
+/* ── Misión (Quiénes Somos) — statement editorial centrado, fondo blanco ──
+   Texto grande tipo "quote" en vez de card; cada palabra se enciende
+   (opacity 0.15 → 1) en scrub mientras se hace scroll. */
+.mision-statement {
+  padding-block: 5rem;
+  background-color: #fff;
+  text-align: center;
+}
+
+.mision-eyebrow {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+  color: var(--color-rojo-500);
+  margin-bottom: 1.5rem;
+}
+
+.mision-quote {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: clamp(1.5rem, 4.2vw, 3.25rem);
+  line-height: 1.35;
+  color: var(--color-azul-900);
+  max-width: 74rem;
+  margin-inline: auto;
+}
+
+.mision-word--accent {
+  color: var(--color-rojo-500);
+}
+
+.mision-detail {
+  font-family: var(--font-body);
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  color: var(--color-gris-600);
+  max-width: 52rem;
+  margin: 2rem auto 0;
+}
+
+/* ── Reseña histórica — paneles apilados en scroll vertical (Quiénes Somos) ──
+   Patrón "sticky stack": cada .historia-card se pinea (GSAP ScrollTrigger,
+   pin: true) al llegar arriba del viewport y se queda fija mientras la
+   siguiente card sube por encima y la cubre por completo (fondo sólido +
+   z-index creciente). El movimiento lo controla JS — acá solo va la
+   apariencia estática de cada panel. */
+.historia-section {
+  position: relative;
+  background-color: var(--color-azul-900);
+  padding-block: 4rem;
+}
+
+.historia-header {
+  position: relative;
+  z-index: 1;
+}
+
+.historia-card {
+  position: relative;
+  min-height: 70vh;
+  display: flex;
+  align-items: center;
+  background-color: var(--color-azul-900);
+  border-top-left-radius: 2rem;
+  border-top-right-radius: 2rem;
+  box-shadow: 0 -12px 32px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+}
+
+.historia-card-inner {
+  position: relative;
+  width: 100%;
+  padding-block: 3rem;
+}
+
+.historia-card-index {
+  display: block;
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 0.875rem;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.50);
+  margin-bottom: 1.5rem;
+}
+
+/* Año como marca de agua gigante — elemento gráfico dominante del panel */
+.historia-card-year {
+  position: absolute;
+  right: max(0px, calc((100vw - var(--container-main-width, 1440px)) / 2 - 1rem));
+  bottom: -1.5rem;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: clamp(6rem, 18vw, 13rem);
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.05);
+  pointer-events: none;
+}
+
+.historia-card-body {
+  position: relative;
+  max-width: 32rem;
+}
+
+.historia-card-year-small {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: clamp(2rem, 4vw, 2.75rem);
+  line-height: 1;
+  color: var(--color-rojo-500);
+  margin-bottom: 1rem;
+}
+
+.historia-card-text {
+  font-family: var(--font-body);
+  font-size: 1.125rem;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+/* Sin pin propio: con reduced-motion el stack se muestra como columna
+   estática (cada card ocupa su alto natural, sin sticky ni superposición). */
+@media (prefers-reduced-motion: reduce) {
+  .historia-card {
+    min-height: 0;
+    box-shadow: none;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+  }
+  .historia-card-inner {
+    padding-block: 2rem;
+  }
+}
+
+/* ── Historia reciente — grilla compacta, sin pin (Quiénes Somos) ──
+   Sección propia, separada del sticky stack de arriba: fondo claro (no
+   azul-900, para que se lea como bloque distinto) y grid de tarjetas
+   pequeñas en vez de filas verticales largas — cada tarjeta entra con un
+   fade+slide normal al hacer scroll, sin pin ni scrub. */
+.historia-recent {
+  background-color: var(--color-gris-50);
+  padding-block: 4rem;
+  border-top: 1px solid var(--color-gris-200);
+}
+
+.historia-recent-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+.historia-recent-item {
+  padding: 1.5rem;
+  border-radius: 1rem;
+  background-color: #fff;
+  border: 1px solid var(--color-gris-200);
+}
+
+.historia-recent-year {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 1.05rem;
+  color: var(--color-rojo-500);
+  padding-bottom: 0.6rem;
+  margin-bottom: 0.6rem;
+  border-bottom: 2px solid var(--color-rojo-500);
+  display: inline-block;
+}
+
+.historia-recent-text {
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: var(--color-gris-700);
+}
+
+@media (min-width: 640px) {
+  .historia-recent-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .historia-recent-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
 /* ── CTASection PQRSD ───────────────────────────── */
 .cta-pqrs-section {
   position: relative;
@@ -1603,12 +1792,6 @@ h6 {
   height: 5px;
   background-color: var(--color-rojo-500);
   z-index: 3;
-}
-
-/* Card Misión — ícono brújula gira suave en hover */
-.mision-card:hover .mision-icon-wrap {
-  transform: rotate(20deg);
-  background-color: var(--color-azul-100);
 }
 
 /* ── Bento grid (layout Image 10) ── */

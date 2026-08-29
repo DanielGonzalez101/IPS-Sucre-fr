@@ -54,3 +54,6 @@ tareas/
 .claude
 context_global/
 informacion/
+
+.CLAUDE.md
+.AGENTS.md
